@@ -1,0 +1,22 @@
+#sc-admin-link {
+    cursor: pointer;
+}
+
+.bs .sc-admin-menu.dropdown-menu {
+    border: none;
+    display: block;
+    position: relative;
+}
+
+.bs.sc-admin-dlg-results .modal-dialog {
+    max-width: 95vw;
+}
+
+.bs.sc-admin-dlg-results .modal-title {
+    margin-left: 0;
+}
+
+.bs.sc-admin-dlg-results .modal-body {
+    max-height: 75vh;
+    overflow: auto;
+}
