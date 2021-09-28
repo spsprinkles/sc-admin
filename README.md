@@ -1,5 +1,4 @@
-# sc-admin
-Site Collection Administration Tool
+# Site Collection Administration Tool
 
 ## Building the Solution
 
@@ -41,6 +40,7 @@ var el = document.createElement("script");
 el.src = "/sites/dev/siteassets/sc-admin.min.js";
 document.head.appendChild(el);
 ```
+_Update the src url w/ your target web._
 
 #### Install the Solution
 
