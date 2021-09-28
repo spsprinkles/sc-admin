@@ -62,6 +62,7 @@ export class Menu {
     private render(el: Element) {
         // Create the menu
         let menu = Components.Dropdown({
+            autoSelect: false,
             className: "sc-admin-menu",
             menuOnly: true,
             items: [

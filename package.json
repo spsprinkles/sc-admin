@@ -23,7 +23,7 @@
     "datatables.net": "^1.11.3",
     "datatables.net-bs5": "^1.11.3",
     "dattatable": "^0.9.5",
-    "gd-sprest-bs": "^8.5.3",
+    "gd-sprest-bs": "^8.5.4",
     "jquery": "^3.6.0",
     "moment": "^2.29.1",
     "text-encoding": "^0.7.0"
