@@ -95,6 +95,9 @@ export class Lists {
 
         // Set the type
         switch (template) {
+            case SPTypes.ListTemplateType.AccessApp:
+                listType = "Access App";
+                break;
             case SPTypes.ListTemplateType.AccessRequest:
                 listType = "Access Request";
                 break;
@@ -104,11 +107,23 @@ export class Lists {
             case SPTypes.ListTemplateType.Agenda:
                 listType = "Agenda";
                 break;
+            case SPTypes.ListTemplateType.AlchemyApprovalWorkflow:
+                listType = "Alchemy Approval Workflow";
+                break;
+            case SPTypes.ListTemplateType.AlchemyMobileForm:
+                listType = "Alchemy Mobile Form";
+                break;
             case SPTypes.ListTemplateType.Announcements:
                 listType = "Announcements";
                 break;
+            case SPTypes.ListTemplateType.AppCatalog:
+                listType = "App Catalog";
+                break;
             case SPTypes.ListTemplateType.AppDataCatalog:
                 listType = "App Data Catalog";
+                break;
+            case SPTypes.ListTemplateType.AssetLibrary:
+                listType = "Asset Library";
                 break;
             case SPTypes.ListTemplateType.CallTrack:
                 listType = "Call Track";
@@ -118,6 +133,12 @@ export class Lists {
                 break;
             case SPTypes.ListTemplateType.Circulation:
                 listType = "Circulation";
+                break;
+            case SPTypes.ListTemplateType.ClientSideAssets:
+                listType = "Client Side Assets";
+                break;
+            case SPTypes.ListTemplateType.ClientSideComponentManifests:
+                listType = "Client Side Component Manifests";
                 break;
             case SPTypes.ListTemplateType.Comments:
                 listType = "Comments";
@@ -185,6 +206,12 @@ export class Lists {
             case SPTypes.ListTemplateType.IssueTracking:
                 listType = "Issue Tracking";
                 break;
+            case SPTypes.ListTemplateType.KPIStatusList:
+                listType = "KPI Status List";
+                break;
+            case SPTypes.ListTemplateType.LanguagesAndTranslatorsList:
+                listType = "Languages And Translators List";
+                break;
             case SPTypes.ListTemplateType.Links:
                 listType = "Links";
                 break;
@@ -200,11 +227,14 @@ export class Lists {
             case SPTypes.ListTemplateType.MeetingObjective:
                 listType = "Meeting Objective";
                 break;
+            case SPTypes.ListTemplateType.Meetings:
+                listType = "Meetings";
+                break;
             case SPTypes.ListTemplateType.MeetingUser:
                 listType = "Meeting User";
                 break;
-            case SPTypes.ListTemplateType.Meetings:
-                listType = "Meetings";
+            case SPTypes.ListTemplateType.MicroFeed:
+                listType = "Micro Feed";
                 break;
             case SPTypes.ListTemplateType.MySiteDocumentLibrary:
                 listType = "My Site Document Library";
@@ -215,11 +245,41 @@ export class Lists {
             case SPTypes.ListTemplateType.NoCodeWorkflows:
                 listType = "No Code Workflows";
                 break;
+            case SPTypes.ListTemplateType.PageLibrary:
+                listType = "Page Library";
+                break;
+            case SPTypes.ListTemplateType.PerformancePointContentList:
+                listType = "Performance Point Content List";
+                break;
+            case SPTypes.ListTemplateType.PerformancePointDashboardsLibrary:
+                listType = "Performance Point Dashboards Library";
+                break;
+            case SPTypes.ListTemplateType.PerformancePointDataConnectionsLibrary:
+                listType = "Performance Point Data Connections Library";
+                break;
+            case SPTypes.ListTemplateType.PerformancePointDataSourceLibrary:
+                listType = "Performance Point Data Source Library";
+                break;
+            case SPTypes.ListTemplateType.PersonalDocumentLibrary:
+                listType = "Personal Document Library";
+                break;
             case SPTypes.ListTemplateType.PictureLibrary:
                 listType = "Picture Library";
                 break;
             case SPTypes.ListTemplateType.Posts:
                 listType = "Posts";
+                break;
+            case SPTypes.ListTemplateType.PrivateDocumentLibrary:
+                listType = "Private Document Library";
+                break;
+            case SPTypes.ListTemplateType.RecordLibrary:
+                listType = "Record Library";
+                break;
+            case SPTypes.ListTemplateType.ReportLibrary:
+                listType = "Report Library";
+                break;
+            case SPTypes.ListTemplateType.SharingLinks:
+                listType = "Sharing Links";
                 break;
             case SPTypes.ListTemplateType.SolutionCatalog:
                 listType = "Solution Catalog";
@@ -233,6 +293,9 @@ export class Lists {
             case SPTypes.ListTemplateType.TasksWithTimelineAndHierarchy:
                 listType = "Tasks With Timeline And Hierarchy";
                 break;
+            case SPTypes.ListTemplateType.TenantWideExtensions:
+                listType = "Tenant Wide Extensions";
+                break;
             case SPTypes.ListTemplateType.TextBox:
                 listType = "Text Box";
                 break;
@@ -245,8 +308,17 @@ export class Lists {
             case SPTypes.ListTemplateType.Timecard:
                 listType = "Timecard";
                 break;
+            case SPTypes.ListTemplateType.TranslationManagementLibrary:
+                listType = "Translation Management Library";
+                break;
             case SPTypes.ListTemplateType.UserInformation:
                 listType = "User Information";
+                break;
+            case SPTypes.ListTemplateType.VisioProcessDiagramMetricLibrary:
+                listType = "Visio Process Diagram Metric Library";
+                break;
+            case SPTypes.ListTemplateType.VisioProcessDiagramUSUnitsLibrary:
+                listType = "Visio Process Diagram US Units Library";
                 break;
             case SPTypes.ListTemplateType.WebPageLibrary:
                 listType = "Web Page Library";
