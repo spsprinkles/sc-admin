@@ -377,7 +377,7 @@ export class DocumentRetention {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", [
+                        new ExportCSV("documet_retention.csv", [
                             "DocumentName", "DocumentUrl", "LastModifiedDate",
                             "ListName", "WebTitle", "WebUrl"
                         ], this._rows);

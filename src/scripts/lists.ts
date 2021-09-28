@@ -1,5 +1,5 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ExportCSV } from "./exportCSV";
 import { Webs } from "./webs";
@@ -46,7 +46,7 @@ export class Lists {
                         ListDescription: list.Description,
                         ListId: list.Id,
                         ListName: list.Title,
-                        ListType: list.BaseType + "",
+                        ListType: this.getListType(list.BaseTemplate),
                         ListUrl: (list.RootFolder as any as Types.SP.Folder).ServerRelativeUrl,
                         WebTitle: web.Title,
                         WebUrl: web.Url
@@ -87,6 +87,191 @@ export class Lists {
                 }
             );
         });
+    }
+
+    // Returns the string value for a list type
+    private getListType(template: number): string {
+        let listType = "Unknown Type (" + template + ")";
+
+        // Set the type
+        switch (template) {
+            case SPTypes.ListTemplateType.AccessRequest:
+                listType = "Access Request";
+                break;
+            case SPTypes.ListTemplateType.AdminTasks:
+                listType = "Admin Tasks";
+                break;
+            case SPTypes.ListTemplateType.Agenda:
+                listType = "Agenda";
+                break;
+            case SPTypes.ListTemplateType.Announcements:
+                listType = "Announcements";
+                break;
+            case SPTypes.ListTemplateType.AppDataCatalog:
+                listType = "App Data Catalog";
+                break;
+            case SPTypes.ListTemplateType.CallTrack:
+                listType = "Call Track";
+                break;
+            case SPTypes.ListTemplateType.Categories:
+                listType = "Categories";
+                break;
+            case SPTypes.ListTemplateType.Circulation:
+                listType = "Circulation";
+                break;
+            case SPTypes.ListTemplateType.Comments:
+                listType = "Comments";
+                break;
+            case SPTypes.ListTemplateType.Contacts:
+                listType = "Contacts";
+                break;
+            case SPTypes.ListTemplateType.CustomGrid:
+                listType = "Custom Grid";
+                break;
+            case SPTypes.ListTemplateType.DataConnectionLibrary:
+                listType = "Data Connection Library";
+                break;
+            case SPTypes.ListTemplateType.DataSources:
+                listType = "Data Sources";
+                break;
+            case SPTypes.ListTemplateType.Decision:
+                listType = "Decision";
+                break;
+            case SPTypes.ListTemplateType.DesignCatalog:
+                listType = "Design Catalog";
+                break;
+            case SPTypes.ListTemplateType.DeveloperSiteDraftApps:
+                listType = "Developer Site Draft Apps";
+                break;
+            case SPTypes.ListTemplateType.DiscussionBoard:
+                listType = "Discussion Board";
+                break;
+            case SPTypes.ListTemplateType.DocumentLibrary:
+                listType = "Document Library";
+                break;
+            case SPTypes.ListTemplateType.Events:
+                listType = "Events";
+                break;
+            case SPTypes.ListTemplateType.ExternalList:
+                listType = "External List";
+                break;
+            case SPTypes.ListTemplateType.Facility:
+                listType = "Facility";
+                break;
+            case SPTypes.ListTemplateType.GanttTasks:
+                listType = "Gantt Tasks";
+                break;
+            case SPTypes.ListTemplateType.GenericList:
+                listType = "Generic List";
+                break;
+            case SPTypes.ListTemplateType.HealthReports:
+                listType = "Health Reports";
+                break;
+            case SPTypes.ListTemplateType.HealthRules:
+                listType = "Health Rules";
+                break;
+            case SPTypes.ListTemplateType.HelpLibrary:
+                listType = "Help Library";
+                break;
+            case SPTypes.ListTemplateType.Holidays:
+                listType = "Holidays";
+                break;
+            case SPTypes.ListTemplateType.HomePageLibrary:
+                listType = "Home Page Library";
+                break;
+            case SPTypes.ListTemplateType.IMEDic:
+                listType = "IMEDic";
+                break;
+            case SPTypes.ListTemplateType.IssueTracking:
+                listType = "Issue Tracking";
+                break;
+            case SPTypes.ListTemplateType.Links:
+                listType = "Links";
+                break;
+            case SPTypes.ListTemplateType.ListTemplateCatalog:
+                listType = "List Template Catalog";
+                break;
+            case SPTypes.ListTemplateType.MaintenanceLogs:
+                listType = "Maintenance Logs";
+                break;
+            case SPTypes.ListTemplateType.MasterPageCatalog:
+                listType = "Master Page Catalog";
+                break;
+            case SPTypes.ListTemplateType.MeetingObjective:
+                listType = "Meeting Objective";
+                break;
+            case SPTypes.ListTemplateType.MeetingUser:
+                listType = "Meeting User";
+                break;
+            case SPTypes.ListTemplateType.Meetings:
+                listType = "Meetings";
+                break;
+            case SPTypes.ListTemplateType.MySiteDocumentLibrary:
+                listType = "My Site Document Library";
+                break;
+            case SPTypes.ListTemplateType.NoCodePublic:
+                listType = "No Code Public";
+                break;
+            case SPTypes.ListTemplateType.NoCodeWorkflows:
+                listType = "No Code Workflows";
+                break;
+            case SPTypes.ListTemplateType.PictureLibrary:
+                listType = "Picture Library";
+                break;
+            case SPTypes.ListTemplateType.Posts:
+                listType = "Posts";
+                break;
+            case SPTypes.ListTemplateType.SolutionCatalog:
+                listType = "Solution Catalog";
+                break;
+            case SPTypes.ListTemplateType.Survey:
+                listType = "Survey";
+                break;
+            case SPTypes.ListTemplateType.Tasks:
+                listType = "Tasks";
+                break;
+            case SPTypes.ListTemplateType.TasksWithTimelineAndHierarchy:
+                listType = "Tasks With Timeline And Hierarchy";
+                break;
+            case SPTypes.ListTemplateType.TextBox:
+                listType = "Text Box";
+                break;
+            case SPTypes.ListTemplateType.ThemeCatalog:
+                listType = "Theme Catalog";
+                break;
+            case SPTypes.ListTemplateType.ThingsToBring:
+                listType = "Things To Bring";
+                break;
+            case SPTypes.ListTemplateType.Timecard:
+                listType = "Timecard";
+                break;
+            case SPTypes.ListTemplateType.UserInformation:
+                listType = "User Information";
+                break;
+            case SPTypes.ListTemplateType.WebPageLibrary:
+                listType = "Web Page Library";
+                break;
+            case SPTypes.ListTemplateType.WebPartCatalog:
+                listType = "Web Part Catalog";
+                break;
+            case SPTypes.ListTemplateType.WebTemplateCatalog:
+                listType = "Web Template Catalog";
+                break;
+            case SPTypes.ListTemplateType.Whereabouts:
+                listType = "Whereabouts";
+                break;
+            case SPTypes.ListTemplateType.WorkflowHistory:
+                listType = "Workflow History";
+                break;
+            case SPTypes.ListTemplateType.WorkflowProcess:
+                listType = "Workflow Process";
+                break;
+            case SPTypes.ListTemplateType.XMLForm:
+                listType = "XML Form";
+                break;
+        }
+
+        return listType;
     }
 
     // Renders the dialog
@@ -141,7 +326,7 @@ export class Lists {
                                         onQueryWeb: (odata) => {
                                             // Include the list information
                                             odata.Expand.push("Lists/RootFolder");
-                                            odata.Select.push("Lists/BaseType");
+                                            odata.Select.push("Lists/BaseTemplate");
                                             odata.Select.push("Lists/Description");
                                             odata.Select.push("Lists/Id");
                                             odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
@@ -293,7 +478,7 @@ export class Lists {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", [
+                        new ExportCSV("list_information.csv", [
                             "ListDescription", "ListId", "ListName",
                             "ListType", "ListUrl", "WebTitle", "WebUrl"
                         ], this._rows);

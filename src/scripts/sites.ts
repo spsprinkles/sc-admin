@@ -265,7 +265,7 @@ export class Sites {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", [
+                        new ExportCSV("site_information.csv", [
                             "WebId", "WebTitle", "WebUrl", "WebDescription"
                         ], this._rows);
                     }
