@@ -256,7 +256,7 @@ export class SecurityGroups {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Document Rentention");
+        Modal.setHeader("Security Groups");
 
         // Render the table
         let elTable = document.createElement("div");

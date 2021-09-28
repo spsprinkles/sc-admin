@@ -275,7 +275,7 @@ export class DocumentRetention {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Security Groups");
+        Modal.setHeader("Document Retention");
 
         // Render the table
         let elTable = document.createElement("div");
