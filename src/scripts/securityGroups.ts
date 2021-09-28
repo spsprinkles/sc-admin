@@ -60,18 +60,6 @@ export class SecurityGroups {
                         for (let i = 0; i < group.Users.results.length; i++) {
                             let user = group.Users.results[i];
 
-                            // See if this is a group
-                            let groupUsers = (user as any as Types.SP.GroupOData).Users;
-                            if (groupUsers && groupUsers.results) {
-                                // Parse the group users
-                                for (let j = 0; j < groupUsers.results.length; j++) {
-                                    let groupUser = groupUsers.results[j];
-
-                                    // Add the user information
-                                    members.push(groupUser.Email || groupUser.UserPrincipalName || groupUser.Title);
-                                }
-                            }
-
                             // Add the user information
                             members.push(user.Email || user.UserPrincipalName || user.Title);
                         }
@@ -226,7 +214,6 @@ export class SecurityGroups {
                                             odata.Expand.push("RoleAssignments");
                                             odata.Expand.push("RoleAssignments/Member");
                                             odata.Expand.push("RoleAssignments/Member/Users");
-                                            odata.Expand.push("RoleAssignments/Member/Users/Users");
                                             odata.Expand.push("RoleAssignments/RoleDefinitionBindings");
                                         },
                                         recursiveFl: formValues["RecurseWebs"],
