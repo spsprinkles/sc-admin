@@ -8,6 +8,7 @@ import { Webs } from "./webs";
 interface IRowInfo {
     ListDescription: string;
     ListId: string;
+    ListItemCount: string;
     ListName: string;
     ListType: string;
     ListUrl: string;
@@ -45,6 +46,7 @@ export class Lists {
                     this._rows.push({
                         ListDescription: list.Description,
                         ListId: list.Id,
+                        ListItemCount: list.ItemCount + "",
                         ListName: list.Title,
                         ListType: this.getListType(list.BaseTemplate),
                         ListUrl: (list.RootFolder as any as Types.SP.Folder).ServerRelativeUrl,
@@ -352,7 +354,7 @@ export class Lists {
         Modal.setType(Components.ModalTypes.Large);
 
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader("List Information");
 
         // Render the form
         let form = Components.Form({
@@ -401,6 +403,7 @@ export class Lists {
                                             odata.Select.push("Lists/BaseTemplate");
                                             odata.Select.push("Lists/Description");
                                             odata.Select.push("Lists/Id");
+                                            odata.Select.push("Lists/ItemCount");
                                             odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
                                             odata.Select.push("Lists/Title");
                                         },
@@ -500,6 +503,10 @@ export class Lists {
                     title: "List Description"
                 },
                 {
+                    name: "ListItemCount",
+                    title: "List Item Count"
+                },
+                {
                     name: "",
                     title: "",
                     onRenderCell: (el, col, row: IRowInfo) => {
@@ -551,7 +558,7 @@ export class Lists {
                     onClick: () => {
                         // Export the CSV
                         new ExportCSV("list_information.csv", [
-                            "ListDescription", "ListId", "ListName",
+                            "ListDescription", "ListId", "ListItemCount", "ListName",
                             "ListType", "ListUrl", "WebTitle", "WebUrl"
                         ], this._rows);
                     }
