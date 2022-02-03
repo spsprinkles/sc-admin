@@ -5,21 +5,21 @@ declare var RenderHeaderTemplate, RenderFooterTemplate;
 
 // Registers a JSLink w/ a list
 export function register() {
+    // See if the TextDecoder global variable exists
+    if (window["TextDecoder"] == null) {
+        // Load the text-encoder
+        var s = document.createElement("script");
+        s.src = "https://unpkg.com/text-encoding@0.6.4/lib/encoding-indexes.js";
+        document.head.appendChild(s);
+        s = document.createElement("script");
+        s.src = "https://unpkg.com/text-encoding@0.6.4/lib/encoding.js";
+        document.head.appendChild(s);
+    }
+
     // Create the JSLink
     Helper.JSLink.register({
         Templates: {
             Header: ctx => {
-                // See if the TextDecoder global variable exists
-                if (window["TextDecoder"] == null) {
-                    // Load the text-encoder
-                    var s = document.createElement("script");
-                    s.src = "https://unpkg.com/text-encoding@0.6.4/lib/encoding-indexes.js";
-                    document.head.appendChild(s);
-                    s = document.createElement("script");
-                    s.src = "https://unpkg.com/text-encoding@0.6.4/lib/encoding.js";
-                    document.head.appendChild(s);
-                }
-
                 // Render the default header
                 return "<div id='sc-admin-header'>" + RenderHeaderTemplate(ctx) + "</div>";
             },
