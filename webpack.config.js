@@ -1,63 +1,80 @@
+var project = require("./package.json");
 var path = require("path");
 
-// Export the configuration
+// Return the configuration
 module.exports = (env, argv) => {
-    var isDev = argv.mode === "development";
-
-    // Return the configuration
+    var isDev = argv.mode !== "production";
     return {
-        // Main project file
+        // Set the main source as the entry point
         entry: [
-            "./node_modules/gd-sprest-bs/dist/gd-sprest-bs.js",
-            "./src/index.ts"
+            path.resolve(__dirname, project.main)
         ],
 
-        // Ignore the gd-sprest libraries from the bundle
-        externals: {
-            "gd-sprest": "$REST",
-            "gd-sprest-bs": "$REST"
-        },
-
-        // Output information
+        // Output location
         output: {
             path: path.resolve(__dirname, "dist"),
-            filename: "sc-admin" + (isDev ? "" : ".min") + ".js"
+            filename: project.name + (isDev ? "" : ".min") + ".js"
         },
 
         // Resolve the file names
         resolve: {
-            extensions: [".js", ".ts"]
+            extensions: [".js", ".css", ".scss", ".ts"]
         },
 
-        // Compiler Information
+        // Dev Server
+        devServer: {
+            inline: true,
+            hot: true,
+            open: true,
+            publicPath: "/dist/"
+        },
+
+        // Loaders
         module: {
             rules: [
-                // Handle SASS Files
+                // SASS to JavaScript
                 {
-                    test: /\.css$/,
+                    // Target the sass and css files
+                    test: /\.s?css$/,
+                    // Define the compiler to use
                     use: [
-                        // Create the style nodes from the CommonJS code
+                        // Create style nodes from the CommonJS code
                         { loader: "style-loader" },
                         // Translate css to CommonJS
-                        { loader: "css-loader" }
+                        { loader: "css-loader" },
+                        // Compile sass to css
+                        { loader: "sass-loader" }
                     ]
                 },
-                // Handle TypeScript Files
+                // Handle Image Files
                 {
-                    test: /\.tsx?$/,
-                    exclude: /node_modules/,
+                    test: /\.(jpe?g|png|gif|svg|eot|woff|ttf)$/,
+                    loader: "url-loader"
+                },
+                // JavaScript
+                {
+                    // Target JavaScript files
+                    test: /\.jsx?$/,
                     use: [
-                        // Step 2 - Compile JavaScript ES6 to JavaScript Current Standards
+                        // JavaScript (ES5) -> JavaScript (Current)
                         {
                             loader: "babel-loader",
-                            options: {
-                                presets: ["@babel/preset-env"]
-                            }
-                        },
-                        // Step 1 - Compile TypeScript to JavaScript ES6
-                        {
-                            loader: "ts-loader"
+                            options: { presets: ["@babel/preset-env"] }
                         }
+                    ]
+                },
+                // TypeScript to JavaScript
+                {
+                    // Target TypeScript files
+                    test: /\.tsx?$/,
+                    use: [
+                        // JavaScript (ES5) -> JavaScript (Current)
+                        {
+                            loader: "babel-loader",
+                            options: { presets: ["@babel/preset-env"] }
+                        },
+                        // TypeScript -> JavaScript (ES5)
+                        { loader: "ts-loader" }
                     ]
                 }
             ]
