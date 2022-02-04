@@ -4,9 +4,11 @@
   "description": "This SharePoint 2013/Online solution utilizes JSLink to add an \"Admin\" button to a list. This list stores the site collections owned by the admin and provides a way to determine if solutions have been applied. This can differ client to client, but this example gives an example of getting permissions and seeing if custom actions have been deployed.",
   "main": "src/index.ts",
   "scripts": {
-    "all": "npm run build && npm run prod",
+    "all": "npm run clean && npm run build && npm run prod && npm run spfx",
     "build": "webpack --mode=development",
-    "prod": "webpack --mode=production"
+    "clean": "node ./clean.js",
+    "prod": "webpack --mode=production",
+    "spfx": "cd spfx && npm run package"
   },
   "repository": {
     "type": "git",

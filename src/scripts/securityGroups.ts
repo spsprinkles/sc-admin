@@ -1,6 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
+import { IScript } from ".";
 import { ExportCSV } from "./exportCSV";
 import { Webs } from "./webs";
 
@@ -17,10 +18,10 @@ interface IRowInfo {
 }
 
 /**
- * Security Groups
+ * Security Group Information
  * Displays a dialog to get the site information.
  */
-export class SecurityGroups {
+class SecurityGroups {
     private _errors: string[] = null;
     private _rows: IRowInfo[] = null;
     private _urls: string[] = null;
@@ -401,3 +402,10 @@ export class SecurityGroups {
         Modal.show();
     }
 }
+
+// Script Information
+export const SecurityGroupsModal: IScript = {
+    init: SecurityGroups,
+    name: "Security Group Information",
+    description: ""
+};

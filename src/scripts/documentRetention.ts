@@ -2,6 +2,7 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
+import { IScript } from ".";
 import { ExportCSV } from "./exportCSV";
 import { Webs } from "./webs";
 
@@ -19,7 +20,7 @@ interface IRowInfo {
  * Document Retention
  * Displays a dialog to get the site information.
  */
-export class DocumentRetention {
+class DocumentRetention {
     private _errors: string[] = null;
     private _rows: IRowInfo[] = null;
     private _urls: string[] = null;
@@ -398,3 +399,10 @@ export class DocumentRetention {
         Modal.show();
     }
 }
+
+// Script Information
+export const DocumentRetentionModal: IScript = {
+    init: DocumentRetention,
+    name: "Document Retention",
+    description: ""
+};

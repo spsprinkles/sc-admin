@@ -1,4 +1,4 @@
-import { Components } from "gd-sprest-bs";
+import { Components, ContextInfo } from "gd-sprest-bs";
 import * as Scripts from "./scripts";
 declare var SP;
 
@@ -13,15 +13,24 @@ export class Menu {
         // Save the context
         this._ctx = ctx;
 
-        // Create the link element
-        let elLink = document.createElement("a");
-        elLink.classList.add("ms-commandLink");
-        elLink.id = "sc-admin-link";
-        elLink.innerHTML = "Admin";
-        elMenu.appendChild(elLink);
+        // See if this is coming from SPFx
+        if (this._ctx.pageContext) {
+            // Set the context
+            ContextInfo.setPageContext(this._ctx.pageContext);
 
-        // Render the menu
-        this.render(elLink);
+            // Render the menu
+            this.render(elMenu);
+        } else {
+            // Create the link element
+            let elLink = document.createElement("a");
+            elLink.classList.add("ms-commandLink");
+            elLink.id = "sc-admin-link";
+            elLink.innerHTML = "Admin";
+            elMenu.appendChild(elLink);
+
+            // Render the menu
+            this.render(elLink);
+        }
     }
 
     // Sees if the admin menu exists
@@ -67,43 +76,43 @@ export class Menu {
             menuOnly: true,
             items: [
                 {
-                    text: "Document Retention",
+                    text: Scripts.DocumentRetentionModal.name,
                     onClick: () => {
                         // Hide the popover
                         popover.hide();
 
                         // Display the dialog
-                        new Scripts.DocumentRetention(this.getSelectedUrls());
+                        new Scripts.DocumentRetentionModal.init(this.getSelectedUrls());
                     }
                 },
                 {
-                    text: "List Information",
+                    text: Scripts.ListInfoModal.name,
                     onClick: () => {
                         // Hide the popover
                         popover.hide();
 
                         // Display the dialog
-                        new Scripts.Lists(this.getSelectedUrls());
+                        new Scripts.ListInfoModal.init(this.getSelectedUrls());
                     }
                 },
                 {
-                    text: "Site Groups",
+                    text: Scripts.SecurityGroupsModal.name,
                     onClick: () => {
                         // Hide the popover
                         popover.hide();
 
                         // Display the dialog
-                        new Scripts.SecurityGroups(this.getSelectedUrls());
+                        new Scripts.SecurityGroupsModal.init(this.getSelectedUrls());
                     }
                 },
                 {
-                    text: "Site Information",
+                    text: Scripts.SiteInfoModal.name,
                     onClick: () => {
                         // Hide the popover
                         popover.hide();
 
                         // Display the dialog
-                        new Scripts.Sites(this.getSelectedUrls());
+                        new Scripts.SiteInfoModal.init(this.getSelectedUrls());
                     }
                 }
             ]

@@ -1,6 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
+import { IScript } from ".";
 import { ExportCSV } from "./exportCSV";
 import { Webs } from "./webs";
 
@@ -15,7 +16,7 @@ interface IRowInfo {
  * Sites
  * Displays a dialog to get the site information.
  */
-export class Sites {
+class SiteInfo {
     private _errors: string[] = null;
     private _rows: IRowInfo[] = null;
     private _urls: string[] = null;
@@ -285,3 +286,10 @@ export class Sites {
         Modal.show();
     }
 }
+
+// Script Information
+export const SiteInfoModal: IScript = {
+    init: SiteInfo,
+    name: "Site Information",
+    description: ""
+};
