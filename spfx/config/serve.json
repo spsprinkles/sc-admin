@@ -2,30 +2,9 @@
   "$schema": "https://developer.microsoft.com/json-schemas/core-build/serve.schema.json",
   "port": 4321,
   "https": true,
-  "serveConfigurations": {
-    "default": {
-      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/SitePages/myPage.aspx",
-      "customActions": {
-        "c17920ab-2e3c-4ee5-9077-8be9b52969c2": {
-          "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
-          "properties": {
-            "sampleTextOne": "One item is selected in the list",
-            "sampleTextTwo": "This command is always visible."
-          }
-        }
-      }
-    },
-    "adminMenu": {
-      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/SitePages/myPage.aspx",
-      "customActions": {
-        "c17920ab-2e3c-4ee5-9077-8be9b52969c2": {
-          "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
-          "properties": {
-            "sampleTextOne": "One item is selected in the list",
-            "sampleTextTwo": "This command is always visible."
-          }
-        }
-      }
-    }
+  "initialPage": "https://localhost:5432/workbench",
+  "api": {
+    "port": 5432,
+    "entryPath": "node_modules/@microsoft/sp-webpart-workbench/lib/api/"
   }
 }

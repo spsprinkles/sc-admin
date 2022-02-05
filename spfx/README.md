@@ -1,4 +1,4 @@
-# admin-menu
+# sc-admin
 
 ## Summary
 

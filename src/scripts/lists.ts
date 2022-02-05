@@ -584,5 +584,5 @@ class ListInfo {
 export const ListInfoModal: IScript = {
     init: ListInfo,
     name: "List Information",
-    description: ""
+    description: "Scan site(s) for list & library information."
 };

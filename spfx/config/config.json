@@ -2,17 +2,17 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "admin-menu-command-set": {
+    "sc-admin-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/extensions/adminMenu/AdminMenuCommandSet.js",
-          "manifest": "./src/extensions/adminMenu/AdminMenuCommandSet.manifest.json"
+          "entrypoint": "./lib/webparts/scAdmin/ScAdminWebPart.js",
+          "manifest": "./src/webparts/scAdmin/ScAdminWebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "AdminMenuCommandSetStrings": "lib/extensions/adminMenu/loc/{locale}.js"
+    "ScAdminWebPartStrings": "lib/webparts/scAdmin/loc/{locale}.js"
   }
 }

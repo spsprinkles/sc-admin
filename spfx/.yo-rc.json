@@ -3,11 +3,10 @@
     "isCreatingSolution": true,
     "environment": "spo",
     "version": "1.12.1",
-    "libraryName": "admin-menu",
-    "libraryId": "b0e6bac1-d17e-446e-b00b-ad452034fab3",
+    "libraryName": "sc-admin",
+    "libraryId": "c23bade1-1067-49a9-a100-d528bbb1b567",
     "packageManager": "npm",
     "isDomainIsolated": false,
-    "componentType": "extension",
-    "extensionType": "ListViewCommandSet"
+    "componentType": "webpart"
   }
 }

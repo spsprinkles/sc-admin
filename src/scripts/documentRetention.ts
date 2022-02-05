@@ -404,5 +404,5 @@ class DocumentRetention {
 export const DocumentRetentionModal: IScript = {
     init: DocumentRetention,
     name: "Document Retention",
-    description: ""
+    description: "Scans for files older than a specified date."
 };

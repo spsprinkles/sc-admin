@@ -1,34 +1,21 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "admin-menu-client-side-solution",
-    "id": "b0e6bac1-d17e-446e-b00b-ad452034fab3",
-    "version": "1.0.0.0",
+    "name": "Site Collection Admin Tool",
+    "id": "c23bade1-1067-49a9-a100-d528bbb1b567",
+    "version": "0.0.0.4",
     "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
-      "websiteUrl": "",
+      "name": "Gunjan Datta",
+      "websiteUrl": "https://spsprinkles.com",
       "privacyUrl": "",
       "termsOfUseUrl": "",
       "mpnId": ""
-    },
-    "features": [
-      {
-        "title": "Application Extension - Deployment of custom action.",
-        "description": "Deploys a custom action with ClientSideComponentId association",
-        "id": "55191bc8-a2cc-4c2b-9d2f-6cf47664d42c",
-        "version": "1.0.0.0",
-        "assets": {
-          "elementManifests": [
-            "elements.xml",
-            "ClientSideInstance.xml"
-          ]
-        }
-      }
-    ]
+    }
   },
   "paths": {
-    "zippedPackage": "solution/admin-menu.sppkg"
+    "zippedPackage": "../../dist/sc-admin.sppkg"
   }
 }

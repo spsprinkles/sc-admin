@@ -407,5 +407,5 @@ class SecurityGroups {
 export const SecurityGroupsModal: IScript = {
     init: SecurityGroups,
     name: "Security Group Information",
-    description: ""
+    description: "Scan site(s) for security group information."
 };

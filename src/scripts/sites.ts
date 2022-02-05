@@ -291,5 +291,5 @@ class SiteInfo {
 export const SiteInfoModal: IScript = {
     init: SiteInfo,
     name: "Site Information",
-    description: ""
+    description: "Scans for site information."
 };
