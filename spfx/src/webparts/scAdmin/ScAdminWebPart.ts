@@ -14,7 +14,7 @@ export interface IScAdminWebPartProps {
 }
 
 // Reference the solution
-import "../../../../dist/sc-admin.js";
+import "../../../../dist/sc-admin.min.js";
 declare var SCAdmin;
 
 export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPartProps> {
