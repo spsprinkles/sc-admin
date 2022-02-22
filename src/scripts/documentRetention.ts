@@ -2,9 +2,7 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
-import { IScript } from ".";
-import { ExportCSV } from "./exportCSV";
-import { Webs } from "./webs";
+import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -15,6 +13,12 @@ interface IRowInfo {
     WebTitle: string;
     WebUrl: string;
 }
+
+// CSV Export Fields
+const CSVExportFields = [
+    "DocumentName", "DocumentUrl", "LastModifiedDate",
+    "ListName", "WebTitle", "WebUrl"
+];
 
 /**
  * Document Retention
@@ -378,10 +382,7 @@ class DocumentRetention {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("documet_retention.csv", [
-                            "DocumentName", "DocumentUrl", "LastModifiedDate",
-                            "ListName", "WebTitle", "WebUrl"
-                        ], this._rows);
+                        new ExportCSV("documet_retention.csv", CSVExportFields, this._rows);
                     }
                 },
                 {

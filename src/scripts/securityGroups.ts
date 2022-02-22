@@ -1,9 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
-import { IScript } from ".";
-import { ExportCSV } from "./exportCSV";
-import { Webs } from "./webs";
+import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -16,6 +14,13 @@ interface IRowInfo {
     WebTitle: string;
     WebUrl: string;
 }
+
+// CSV Export Fields
+const CSVExportFields = [
+    "RoleAssignmentId", "SiteGroupId", "SiteGroupName",
+    "SiteGroupPermission", "SiteGroupUrl", "SiteGroupUsers",
+    "WebTitle", "WebUrl"
+];
 
 /**
  * Security Group Information
@@ -380,11 +385,7 @@ class SecurityGroups {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", [
-                            "RoleAssignmentId", "SiteGroupId", "SiteGroupName",
-                            "SiteGroupPermission", "SiteGroupUrl", "SiteGroupUsers",
-                            "WebTitle", "WebUrl"
-                        ], this._rows);
+                        new ExportCSV("security_groups.csv", CSVExportFields, this._rows);
                     }
                 },
                 {

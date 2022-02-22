@@ -1,9 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
-import { IScript } from ".";
-import { ExportCSV } from "./exportCSV";
-import { Webs } from "./webs";
+import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -11,6 +9,11 @@ interface IRowInfo {
     WebTitle: string;
     WebUrl: string;
 }
+
+// CSV Export Fields
+const CSVExportFields = [
+    "WebId", "WebTitle", "WebUrl", "WebDescription"
+];
 
 /**
  * Sites
@@ -266,9 +269,7 @@ class SiteInfo {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("site_information.csv", [
-                            "WebId", "WebTitle", "WebUrl", "WebDescription"
-                        ], this._rows);
+                        new ExportCSV("site_information.csv", CSVExportFields, this._rows);
                     }
                 },
                 {

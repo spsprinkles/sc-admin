@@ -114,6 +114,16 @@ export class Menu {
                         // Display the dialog
                         new Scripts.SiteInfoModal.init(this.getSelectedUrls());
                     }
+                },
+                {
+                    text: Scripts.SiteUsageModal.name,
+                    onClick: () => {
+                        // Hide the popover
+                        popover.hide();
+
+                        // Display the dialog
+                        new Scripts.SiteUsageModal.init(this.getSelectedUrls());
+                    }
                 }
             ]
         });
