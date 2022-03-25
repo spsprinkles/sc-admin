@@ -4,7 +4,7 @@ specifiers:
   '@babel/core': ^7.17.8
   '@babel/preset-env': ^7.16.11
   babel-loader: ^8.2.4
-  css-loader: ^6.7.1
+  css-loader: ^5.2.7
   datatables.net: ^1.11.5
   datatables.net-bs5: ^1.11.5
   dattatable: ^1.7.3
@@ -36,7 +36,7 @@ devDependencies:
   '@babel/core': 7.17.8
   '@babel/preset-env': 7.16.11_@babel+core@7.17.8
   babel-loader: 8.2.4_fa907c5a4f16ccc493e21649ccc59574
-  css-loader: 6.7.1_webpack@5.70.0
+  css-loader: 5.2.7_webpack@5.70.0
   moment-locales-webpack-plugin: 1.2.0_moment@2.29.1+webpack@5.70.0
   sass: 1.49.9
   sass-loader: 12.6.0_sass@1.49.9+webpack@5.70.0
@@ -1673,19 +1673,21 @@ packages:
       which: 2.0.2
     dev: true
 
-  /css-loader/6.7.1_webpack@5.70.0:
-    resolution: {integrity: sha512-yB5CNFa14MbPJcomwNh3wLThtkZgcNyI2bNMRt8iE5Z8Vwl7f8vQXFAzn2HDOJvtDq2NTZBUGMSUNNyrv3/+cw==}
-    engines: {node: '>= 12.13.0'}
+  /css-loader/5.2.7_webpack@5.70.0:
+    resolution: {integrity: sha512-Q7mOvpBNBG7YrVGMxRxcBJZFL75o+cH2abNASdibkj/fffYD8qWbInZrD0S9ccI6vZclF3DsHE7njGlLtaHbhg==}
+    engines: {node: '>= 10.13.0'}
     peerDependencies:
-      webpack: ^5.0.0
+      webpack: ^4.27.0 || ^5.0.0
     dependencies:
       icss-utils: 5.1.0_postcss@8.4.12
+      loader-utils: 2.0.2
       postcss: 8.4.12
       postcss-modules-extract-imports: 3.0.0_postcss@8.4.12
       postcss-modules-local-by-default: 4.0.0_postcss@8.4.12
       postcss-modules-scope: 3.0.0_postcss@8.4.12
       postcss-modules-values: 4.0.0_postcss@8.4.12
       postcss-value-parser: 4.2.0
+      schema-utils: 3.1.1
       semver: 7.3.5
       webpack: 5.70.0_webpack-cli@4.9.2
     dev: true

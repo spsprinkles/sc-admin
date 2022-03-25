@@ -1,3 +1,5 @@
+[![Build & Package](https://github.com/spsprinkles/sc-admin/actions/workflows/webpack.yml/badge.svg)](https://github.com/spsprinkles/sc-admin/actions/workflows/webpack.yml)
+
 # Site Collection Administration Tool
 
 ## Building the Solution
