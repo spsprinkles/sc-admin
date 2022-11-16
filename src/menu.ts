@@ -86,6 +86,16 @@ export class Menu {
                     }
                 },
                 {
+                    text: Scripts.ExternalUsersModal.name,
+                    onClick: () => {
+                        // Hide the popover
+                        popover.hide();
+
+                        // Display the dialog
+                        new Scripts.ExternalUsersModal.init(this.getSelectedUrls());
+                    }
+                },
+                {
                     text: Scripts.ListInfoModal.name,
                     onClick: () => {
                         // Hide the popover
