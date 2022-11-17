@@ -26,9 +26,11 @@ export class Dashboard {
         // Parse the scripts
         [
             Scripts.DocumentRetentionModal,
+            Scripts.ExternalUsersModal,
             Scripts.ListInfoModal,
             Scripts.SecurityGroupsModal,
-            Scripts.SiteInfoModal
+            Scripts.SiteInfoModal,
+            Scripts.SiteUsageModal
         ].forEach(script => {
             cards.push({
                 header: {
