@@ -1,3 +1,12 @@
+.bs .modal {
+    --bs-modal-color: #000;
+}
+
+.bs .card {
+    --bs-card-color: #000;
+    --bs-card-cap-color: #000;
+}
+
 #sc-admin-link {
     cursor: pointer;
 }
