@@ -12,6 +12,7 @@ interface IRowInfo {
     Group?: string;
     GroupId?: number;
     GroupInfo?: string;
+    Id?: number;
     WebTitle: string;
     WebUrl: string;
 }
@@ -55,11 +56,11 @@ class ExternalUsers {
         return new Promise(resolve => {
             // Show a loading dialog
             LoadingDialog.setHeader("Getting User Information");
-            LoadingDialog.setBody(rootWeb.ServerRelativeUrl);
+            LoadingDialog.setBody(rootWeb.Url);
             LoadingDialog.show();
 
             // Get the users
-            this.getUsers(rootWeb.ServerRelativeUrl).then(users => {
+            this.getUsers(rootWeb.Url).then(users => {
                 let counter = 0;
 
                 // Parse the users
@@ -77,66 +78,6 @@ class ExternalUsers {
                     resolve(null);
                 });
             }, resolve);
-        });
-    }
-
-    // Deletes a group
-    private deleteGroup(webUrl: string, groupName: string, groupId: number) {
-        // Display a loading dialog
-        LoadingDialog.setHeader("Deleting Site Group");
-        LoadingDialog.setBody("Deleting the site group '" + groupName + "'. This will close after the request completes.");
-        LoadingDialog.show();
-
-        // Get the web context
-        ContextInfo.getWeb(webUrl).execute(context => {
-            // Delete the site group
-            Web(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).SiteGroups().removeById(groupId).execute(
-                // Success
-                () => {
-                    // TODO - Display the confirmation
-
-                    // Close the dialog
-                    LoadingDialog.hide();
-                },
-
-                // Error
-                () => {
-                    // TODO - Display an error
-
-                    // Close the dialog
-                    LoadingDialog.hide();
-                }
-            )
-        });
-    }
-
-    // Deletes a user
-    private deleteUser(webUrl: string, roleAssignmentId: number, userName: string) {
-        // Display a loading dialog
-        LoadingDialog.setHeader("Deleting Site User");
-        LoadingDialog.setBody("Deleting the site user '" + userName + "'. This will close after the request completes.");
-        LoadingDialog.show();
-
-        // Get the web context
-        ContextInfo.getWeb(webUrl).execute(context => {
-            // Delete the site group
-            Web(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).RoleAssignments().removeRoleAssignment(roleAssignmentId).execute(
-                // Success
-                () => {
-                    // TODO - Display the confirmation
-
-                    // Close the dialog
-                    LoadingDialog.hide();
-                },
-
-                // Error
-                () => {
-                    // TODO - Display an error
-
-                    // Close the dialog
-                    LoadingDialog.hide();
-                }
-            )
         });
     }
 
@@ -160,8 +101,9 @@ class ExternalUsers {
                                 if (role.Member.LoginName == group.LoginName) {
                                     // Add the user information
                                     this._rows.push({
-                                        WebUrl: rootWeb.ServerRelativeUrl,
+                                        WebUrl: rootWeb.Url,
                                         WebTitle: rootWeb.Title,
+                                        Id: userInfo.Id,
                                         Name: userInfo.Title || userInfo.Name,
                                         Email: userInfo.EMail,
                                         Group: group.Title,
@@ -181,7 +123,7 @@ class ExternalUsers {
                             if (!group.Title.startsWith("SharingLinks.")) {
                                 // Add the user information
                                 this._rows.push({
-                                    WebUrl: rootWeb.ServerRelativeUrl,
+                                    WebUrl: rootWeb.Url,
                                     WebTitle: rootWeb.Title,
                                     Name: userInfo.Title || userInfo.Name,
                                     Email: userInfo.EMail,
@@ -206,7 +148,7 @@ class ExternalUsers {
                             if (docId) {
                                 let doc: Types.SP.File = null;
                                 let webTitle = rootWeb.Title;
-                                let webUrl = rootWeb.ServerRelativeUrl;
+                                let webUrl = rootWeb.Url;
 
                                 // Parse the webs
                                 Helper.Executor(webs, web => {
@@ -221,7 +163,7 @@ class ExternalUsers {
                                                     // Set the document and web url containing the document
                                                     doc = file;
                                                     webTitle = web.Title;
-                                                    webUrl = web.ServerRelativeUrl;
+                                                    webUrl = web.Url;
 
                                                     // Resolve the promise
                                                     resolve(null);
@@ -302,6 +244,34 @@ class ExternalUsers {
                 // Resolve the request
                 resolve(users);
             }, reject);
+        });
+    }
+
+    // Removes a user from a group
+    private removeUser(webUrl: string, user: string, userId: number, group: string) {
+        // Display a loading dialog
+        LoadingDialog.setHeader("Removing User Site User");
+        LoadingDialog.setBody(`Removing the site user '${user}' from the '${group}' group. This will close after the request completes.`);
+        LoadingDialog.show();
+
+        // Get the web context
+        ContextInfo.getWeb(webUrl).execute(context => {
+            // Remove the user from the group
+            Web(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).SiteGroups(group).Users().removeById(userId).execute(
+                // Success
+                () => {
+                    // Close the dialog
+                    LoadingDialog.hide();
+                },
+
+                // Error
+                () => {
+                    // Close the dialog
+                    LoadingDialog.hide();
+
+                    // TODO
+                }
+            )
         });
     }
 
@@ -481,22 +451,25 @@ class ExternalUsers {
                                     {
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
+                                        isDisabled: !(row.GroupId > 0),
                                         onClick: () => {
-                                            // TODO
+                                            // View the group
+                                            window.open(`${row.WebUrl}/${ContextInfo.layoutsUrl}/people.aspx?MembershipGroupId=${row.GroupId}`);
                                         }
                                     },
                                     {
                                         assignTo: btn => { btnDelete = btn; },
-                                        text: "Delete",
+                                        text: "Remove User",
                                         type: Components.ButtonTypes.OutlineDanger,
+                                        isDisabled: !(row.Id > 0),
                                         onClick: () => {
                                             // Confirm the deletion of the group
-                                            if (confirm("Are you sure you want to delete this site group?")) {
+                                            if (confirm("Are you sure you want to remove the user from this group?")) {
                                                 // Disable this button
                                                 btnDelete.disable();
 
                                                 // Delete the site group
-                                                this.deleteGroup(row.WebUrl, row.Group, row.GroupId);
+                                                this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
                                             }
                                         }
                                     }
