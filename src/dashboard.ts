@@ -56,7 +56,7 @@ export class Dashboard {
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {
                                     // Initialize the script
-                                    new script.init();
+                                    new script.init([ContextInfo.siteServerRelativeUrl]);
                                 }
                             }
                         })
