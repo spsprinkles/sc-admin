@@ -390,7 +390,7 @@ class ListInfo {
                         // Ensure the form is valid
                         if (form.isValid()) {
                             let formValues = form.getValues();
-                            let webUrls: string[] = formValues["Urls"].split('\n');
+                            let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
                             // Clear the data
                             this._errors = [];

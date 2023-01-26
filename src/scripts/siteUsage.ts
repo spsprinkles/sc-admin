@@ -111,7 +111,7 @@ class SiteUsage {
                         // Ensure the form is valid
                         if (form.isValid()) {
                             let formValues = form.getValues();
-                            let siteUrls: string[] = formValues["Urls"].split('\n');
+                            let siteUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
                             // Clear the data
                             this._errors = [];
