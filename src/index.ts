@@ -2,7 +2,7 @@ import { Configuration } from "./cfg";
 import { register } from "./jslink";
 import { Dashboard } from "./dashboard";
 import { Menu } from "./menu";
-import "./styles.css";
+import "./styles.scss";
 
 // Global Variable
 window["SCAdmin"] = {
