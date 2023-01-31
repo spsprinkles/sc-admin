@@ -34,24 +34,32 @@ export class Dashboard {
         ].forEach(script => {
             cards.push({
                 header: {
-                    content: script.name
+                    className: "h6",
+                    onRender: (el) => {
+                        let div = document.createElement("div");
+                        div.classList.add("mt-1");
+                        div.innerText = script.name;
+                        el.appendChild(div);
+                    }
                 },
                 body: [{
                     onRender: (el) => {
+                        el.classList.add("d-flex");
+                        el.classList.add("flex-column");
+                        el.classList.add("justify-content-between");
+                        //el.classList.add("p-2");
                         // Render the description
                         let elContent = document.createElement("p");
                         elContent.innerHTML = script.description;
                         el.appendChild(elContent);
 
-                        // Render a popover
-                        Components.Popover({
+                        // Render a tooltip
+                        Components.Tooltip({
                             el,
-                            options: {
-                                content: "Click to run this script"
-                            },
-                            type: Components.PopoverTypes.Primary,
-                            placement: Components.PopoverPlacements.Auto,
+                            content: "Click to run this script",
+                            placement: Components.TooltipPlacements.Bottom,
                             btnProps: {
+                                className: "my-2",
                                 text: "Run",
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {
@@ -59,7 +67,7 @@ export class Dashboard {
                                     new script.init([ContextInfo.siteServerRelativeUrl]);
                                 }
                             }
-                        })
+                        });
                     }
                 }]
             })
@@ -68,7 +76,6 @@ export class Dashboard {
         // Render the cards
         Components.CardGroup({
             el: this._el,
-            className: "sc-admin",
             cards
         });
     }
