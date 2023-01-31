@@ -384,21 +384,28 @@ class ExternalUsers {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": [5],
+                        "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
                 ],
                 // Add some classes to the dataTable elements
-                drawCallback: function () {
-                    jQuery('.table', this._table).removeClass('no-footer');
-                    jQuery('.table', this._table).addClass('tbl-footer');
-                    jQuery('.table', this._table).addClass('table-striped');
-                    jQuery('.table thead th', this._table).addClass('align-middle');
-                    jQuery('.table tbody td', this._table).addClass('align-middle');
-                    jQuery('.dataTables_info', this._table).addClass('text-center');
-                    jQuery('.dataTables_length', this._table).addClass('pt-2');
-                    jQuery('.dataTables_paginate', this._table).addClass('pt-03');
+                createdRow: function (row, data, index) {
+                    jQuery('td', row).addClass('align-middle');
+                },
+                drawCallback: function (settings) {
+                    let api = new jQuery.fn.dataTable.Api(settings) as any;
+                    let div = api.table().container() as HTMLDivElement;
+                    let table = api.table().node() as HTMLTableElement;
+                    div.querySelector(".dataTables_info").classList.add("text-center");
+                    div.querySelector(".dataTables_length").classList.add("pt-2");
+                    div.querySelector(".dataTables_paginate").classList.add("pt-03");
+                    table.classList.remove("no-footer");
+                    table.classList.add("tbl-footer");
+                    table.classList.add("table-striped");
+                },
+                headerCallback: function (thead, data, start, end, display) {
+                    jQuery('th', thead).addClass('align-middle');
                 },
                 // Order by the 1st column by default; ascending
                 order: [[0, "asc"]]
@@ -434,9 +441,39 @@ class ExternalUsers {
                 },
                 {
                     name: "RoleInfo",
-                    title: "Role/Share Information"
+                    title: "Role/Share Information",
+                    onRenderCell: (el) => {
+                        // Add the data-filter attribute for searching notes properly
+                        el.setAttribute("data-filter", el.innerHTML);
+                        // Add the data-order attribute for sorting notes properly
+                        el.setAttribute("data-order", el.innerHTML);
+
+                        // Declare a span element
+                        let span = document.createElement("span");
+                        span.className = "notes";
+
+                        // Return the plain text if less than 50 chars
+                        if ( el.innerHTML.length < 50 ) {
+                            span.innerHTML = el.innerHTML;
+                        } else {
+                            // Truncate to the last white space character in the text after 50 chars and add an ellipsis
+                            span.innerHTML = el.innerHTML.substring(0, 50).replace(/\s([^\s]*)$/, '') + '&#8230';
+
+                            // Add a tooltip containing the text
+                            Components.Tooltip({
+                                content: "<small>" + el.innerHTML + "</small>",
+                                target: span
+                            });
+                        }
+
+                        // Clear the element
+                        el.innerHTML = "";
+                        // Append the span
+                        el.appendChild(span);
+                    }
                 },
                 {
+                    className: "text-end",
                     name: "",
                     title: "",
                     onRenderCell: (el, col, row: IRowInfo) => {
