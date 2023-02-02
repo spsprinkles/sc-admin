@@ -7,10 +7,10 @@
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
+    "iconPath": "images/AppIcon.png",
     "developer": {
       "name": "Gunjan Datta",
       "websiteUrl": "https://spsprinkles.com",
-      "iconPath": "images/AppIcon.png",
       "privacyUrl": "",
       "termsOfUseUrl": "",
       "mpnId": ""
