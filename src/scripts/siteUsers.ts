@@ -423,12 +423,12 @@ class SiteUsers {
                                         type: Components.ButtonTypes.OutlineDanger,
                                         isDisabled: !(row.Id > 0),
                                         onClick: () => {
-                                            // Confirm the deletion of the group
-                                            if (confirm("Are you sure you want to remove the user from this group?")) {
+                                            // Confirm the removal of the user
+                                            if (confirm("Are you sure you want to remove the user from this site collection?")) {
                                                 // Disable this button
                                                 btnDelete.disable();
 
-                                                // Delete the site group
+                                                // Remove the user
                                                 this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
                                             }
                                         }
@@ -444,13 +444,12 @@ class SiteUsers {
                                 type: Components.ButtonTypes.OutlineDanger,
                                 onClick: () => {
                                     // Confirm the deletion of the group
-                                    if (confirm("Are you sure you want to delete this user?")) {
+                                    if (confirm("Are you sure you want to remove the user from this site collection?")) {
                                         // Disable this button
                                         btnDelete.disable();
 
-                                        // Delete the site group
-                                        // TODO
-                                        //this.deleteUser(row.WebUrl, row.RoleAssignmentId, row.SiteGroupName);
+                                        // Remove the user
+                                        this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
                                     }
                                 }
                             });
