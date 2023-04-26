@@ -30,7 +30,8 @@ export class Dashboard {
             Scripts.ListInfoModal,
             Scripts.SecurityGroupsModal,
             Scripts.SiteInfoModal,
-            Scripts.SiteUsageModal
+            Scripts.SiteUsageModal,
+            Scripts.SiteUsersModal
         ].forEach(script => {
             cards.push({
                 header: {
