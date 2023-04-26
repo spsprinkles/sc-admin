@@ -133,8 +133,7 @@ class StorageMetrics {
                                             odata.Select.push("ServerRelativeUrl");
 
                                             // Include the storage metrics
-                                            odata.Expand.push("RootFolder")
-                                            odata.Select.push("RootFolder/StorageMetrics");
+                                            odata.Expand.push("RootFolder/StorageMetrics")
                                         },
                                         onComplete: webs => {
                                             // Analyze the site
@@ -175,7 +174,7 @@ class StorageMetrics {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Site Usage");
+        Modal.setHeader("Storage Metrics");
 
         // Render the table
         let elTable = document.createElement("div");
@@ -186,7 +185,7 @@ class StorageMetrics {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 8,
+                        "targets": 7,
                         "orderable": false,
                         "searchable": false
                     }
@@ -227,19 +226,19 @@ class StorageMetrics {
                 },
                 {
                     name: "LastModified",
-                    title: "Storage"
+                    title: "Last Modified"
                 },
                 {
                     name: "TotalFileCount",
-                    title: "Percentage Used"
+                    title: "Total File Count"
                 },
                 {
                     name: "TotalFileStreamSize",
-                    title: "Discussion Storage"
+                    title: "Total File Stream Size"
                 },
                 {
                     name: "TotalSize",
-                    title: "Hits"
+                    title: "Total Size"
                 },
                 {
                     className: "text-end",

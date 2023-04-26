@@ -31,7 +31,8 @@ export class Dashboard {
             Scripts.SecurityGroupsModal,
             Scripts.SiteInfoModal,
             Scripts.SiteUsageModal,
-            Scripts.SiteUsersModal
+            Scripts.SiteUsersModal,
+            Scripts.StorageMetricsModal
         ].forEach(script => {
             cards.push({
                 header: {
