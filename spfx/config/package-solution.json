@@ -3,7 +3,7 @@
   "solution": {
     "name": "Site Collection Admin Tool",
     "id": "c23bade1-1067-49a9-a100-d528bbb1b567",
-    "version": "0.0.3.0",
+    "version": "0.0.5.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

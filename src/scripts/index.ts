@@ -6,3 +6,4 @@ export * from "./securityGroups";
 export * from "./siteInfo";
 export * from "./siteUsage";
 export * from "./siteUsers";
+export * from "./storageMetrics";

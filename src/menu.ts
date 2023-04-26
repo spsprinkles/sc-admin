@@ -134,6 +134,16 @@ export class Menu {
                         // Display the dialog
                         new Scripts.SiteUsageModal.init(this.getSelectedUrls());
                     }
+                },
+                {
+                    text: Scripts.StorageMetricsModal.name,
+                    onClick: () => {
+                        // Hide the popover
+                        popover.hide();
+
+                        // Display the dialog
+                        new Scripts.StorageMetricsModal.init(this.getSelectedUrls());
+                    }
                 }
             ]
         });
