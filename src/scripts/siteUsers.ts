@@ -202,8 +202,45 @@ class SiteUsers {
                     description: "Enter the user display or login name to search for.",
                     errorMessage: "Please enter the user information.",
                     type: Components.FormControlTypes.TextField,
-                    required: true
+                    required: true,
+                    onValidate: (ctrl, results) => {
+                        // See if user has been entered
+                        if (!results.isValid) {
+                            // See if the people picker has a value
+                            let selectedUser = form.getControl("PeoplePicker").getValue();
+                            if (selectedUser.length > 0) {
+                                // Set the results
+                                results.isValid = true;
+                            }
+                        }
+
+                        // Return the results
+                        return results;
+                    }
                 },
+                {
+                    label: "Search...",
+                    name: "PeoplePicker",
+                    description: "Enter a minimum of 3 characters to search for a user.",
+                    errorMessage: "No user was selected...",
+                    allowGroups: false,
+                    type: Components.FormControlTypes.PeoplePicker,
+                    required: true,
+                    onValidate: (ctrl, results) => {
+                        // See if user has been entered
+                        if (!results.isValid) {
+                            // See if the people picker has a value
+                            let selectedUser = form.getControl("UserName").getValue();
+                            if (selectedUser) {
+                                // Set the results
+                                results.isValid = true;
+                            }
+                        }
+
+                        // Return the results
+                        return results;
+                    }
+                } as Components.IFormControlPropsPeoplePicker,
                 {
                     label: "Site Url(s)",
                     name: "Urls",
@@ -231,6 +268,7 @@ class SiteUsers {
                         if (form.isValid()) {
                             let formValues = form.getValues();
                             let userName: string = formValues["UserName"].trim();
+                            let user: Types.SP.User = formValues["PeoplePicker"][0];
                             let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
                             // Clear the data
@@ -255,7 +293,7 @@ class SiteUsers {
                                         recursiveFl: false,
                                         onComplete: webs => {
                                             // Analyze the site
-                                            this.analyzeSites(webs[0], webs, userName).then(resolve);
+                                            this.analyzeSites(webs[0], webs, userName || user.UserPrincipalName || user.Email || user.LoginName).then(resolve);
                                         },
                                         onError: () => {
                                             // Add the url to the errors list
@@ -423,12 +461,12 @@ class SiteUsers {
                                         type: Components.ButtonTypes.OutlineDanger,
                                         isDisabled: !(row.Id > 0),
                                         onClick: () => {
-                                            // Confirm the deletion of the group
-                                            if (confirm("Are you sure you want to remove the user from this group?")) {
+                                            // Confirm the removal of the user
+                                            if (confirm("Are you sure you want to remove the user from this site collection?")) {
                                                 // Disable this button
                                                 btnDelete.disable();
 
-                                                // Delete the site group
+                                                // Remove the user
                                                 this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
                                             }
                                         }
@@ -444,13 +482,12 @@ class SiteUsers {
                                 type: Components.ButtonTypes.OutlineDanger,
                                 onClick: () => {
                                     // Confirm the deletion of the group
-                                    if (confirm("Are you sure you want to delete this user?")) {
+                                    if (confirm("Are you sure you want to remove the user from this site collection?")) {
                                         // Disable this button
                                         btnDelete.disable();
 
-                                        // Delete the site group
-                                        // TODO
-                                        //this.deleteUser(row.WebUrl, row.RoleAssignmentId, row.SiteGroupName);
+                                        // Remove the user
+                                        this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
                                     }
                                 }
                             });
