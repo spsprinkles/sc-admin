@@ -300,5 +300,5 @@ class SiteInfo {
 export const SiteInfoModal: IScript = {
     init: SiteInfo,
     name: "Site Information",
-    description: "Scans for site <br/>information."
+    description: "Scans for site information."
 };
