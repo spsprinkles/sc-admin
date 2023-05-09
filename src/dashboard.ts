@@ -1,4 +1,4 @@
-import { Components, ContextInfo } from "gd-sprest-bs";
+import { Components, ContextInfo, Types, Web } from "gd-sprest-bs";
 import * as Scripts from "./scripts";
 
 export class Dashboard {
@@ -15,8 +15,55 @@ export class Dashboard {
             ContextInfo.setPageContext(context.pageContext);
         }
 
+        // Ensure the user is an Owner or Admin
+        this.isOwnerOrAdmin().then(
+            // Render the solution if the user is an owner/admin
+            this.render,
+
+            // Not Owner/Admin
+            () => {
+                // Render an alert
+                Components.Alert({
+                    el: this._el,
+                    content: "You are not an owner/admin of the site.",
+                    type: Components.AlertTypes.Danger
+                });
+            }
+        )
+
         // Render the dashboard
         this.render();
+    }
+
+    // Sees if the user is an owner or admin
+    private isOwnerOrAdmin(): PromiseLike<void> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            // Get the web information
+            Web().query({
+                Expand: ["AssociatedOwnerGroup/Users", "CurrentUser"]
+            }).execute(web => {
+                // See if the user is an admin
+                if (web.CurrentUser.IsSiteAdmin) { resolve(); }
+                else {
+                    // Parse the users
+                    let users = (web.AssociatedOwnerGroup as any as Types.SP.GroupOData).Users.results || [];
+                    for (let i = 0; i < users.length; i++) {
+                        let user = users[i];
+
+                        // See if the user is in the group
+                        if (user.Id == web.CurrentUser.Id) {
+                            // Resolve the request and return
+                            resolve();
+                            return;
+                        }
+                    }
+
+                    // Reject the request
+                    reject();
+                }
+            },)
+        });
     }
 
     // Renders the scripts as a card
