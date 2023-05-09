@@ -62,7 +62,7 @@ export class Dashboard {
                     // Reject the request
                     reject();
                 }
-            },)
+            },reject);
         });
     }
 
