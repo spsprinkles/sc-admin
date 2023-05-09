@@ -7,8 +7,8 @@ specifiers:
   css-loader: ^6.7.2
   datatables.net: ^1.13.3
   datatables.net-bs5: ^1.13.3
-  dattatable: ^2.6.7
-  gd-sprest-bs: ^10.10.16
+  dattatable: ^2.7.2
+  gd-sprest-bs: ^10.10.17
   jquery: ^3.6.3
   moment: ^2.29.4
   moment-locales-webpack-plugin: ^1.2.0
@@ -25,8 +25,8 @@ specifiers:
 dependencies:
   datatables.net: 1.13.4
   datatables.net-bs5: 1.13.4
-  dattatable: 2.6.7_j6vag7p453qyi7kehdpqry3vna
-  gd-sprest-bs: 10.10.16
+  dattatable: 2.7.2_rxwx352xrgflwguhc6n365ewom
+  gd-sprest-bs: 10.10.17
   jquery: 3.6.4
   moment: 2.29.4
   text-encoding: 0.7.0
@@ -1784,8 +1784,8 @@ packages:
       jquery: 3.6.4
     dev: false
 
-  /dattatable/2.6.7_j6vag7p453qyi7kehdpqry3vna:
-    resolution: {integrity: sha512-cdb0G9TbetgTpO4W5FWsxcQAzWxJbh8V6zKoYHsCmR1/xxfx+fLDGRmRcNOFEw71IGmSvAfOhSFXPqCch3XwTg==}
+  /dattatable/2.7.2_rxwx352xrgflwguhc6n365ewom:
+    resolution: {integrity: sha512-+p+yoS4quUXzpncUJfqhPIDLXnGlclKd+7a/m8FjD7MSfX9vy+qPXZEc4Sydf317cVc0xCDoNzllHMBlqP3hOw==}
     peerDependencies:
       datatables.net: '*'
       datatables.net-bs5: '*'
@@ -1795,7 +1795,7 @@ packages:
     dependencies:
       datatables.net: 1.13.4
       datatables.net-bs5: 1.13.4
-      gd-sprest-bs: 10.10.16
+      gd-sprest-bs: 10.10.17
       jquery: 3.6.4
       moment: 2.29.4
     dev: false
@@ -1989,8 +1989,8 @@ packages:
       tippy.js: 6.3.7
     dev: false
 
-  /gd-sprest-bs/10.10.16:
-    resolution: {integrity: sha512-9hO/nJZ8v82K+fMhTWjqto62/oTuWzrQU/Xx936++hLad02QLu30oAgop68e5xP5qL/kI204mLx/cZbw+sjHTQ==}
+  /gd-sprest-bs/10.10.17:
+    resolution: {integrity: sha512-Z22EciVNQDLNLS+PEs0nU98mnDSwOfzAQjvekYwdbtJGG/5g53Qn4uN1RhkZLb6LOxuPqNHullUX1fDhL676ag==}
     dependencies:
       flatpickr: 4.6.13
       gd-bs: 6.1.3
