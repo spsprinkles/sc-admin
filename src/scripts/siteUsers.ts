@@ -330,7 +330,7 @@ class SiteUsers {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Site Users");
+        Modal.setHeader("Site Users Information");
 
         // Render the table
         let elTable = document.createElement("div");
@@ -508,7 +508,7 @@ class SiteUsers {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", CSVExportFields, this._rows);
+                        new ExportCSV("site_users_info.csv", CSVExportFields, this._rows);
                     }
                 },
                 {
