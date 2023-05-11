@@ -24,12 +24,13 @@ interface IUserInfo {
     Id: number;
     Name: string;
     Title: string;
+    UserName: string;
 }
 
 // CSV Export Fields
 const CSVExportFields = [
     "WebTitle", "WebUrl",
-    "Name", "Email", "Group", "GroupInfo",
+    "Name", "UserName", "Email", "Group", "GroupInfo",
     "Role", "RoleInfo"
 ];
 
@@ -52,7 +53,7 @@ class SiteUsers {
     }
 
     // Analyzes the site
-    private analyzeSites(rootWeb: Types.SP.WebOData, webs: Types.SP.WebOData[], userName: string) {
+    private analyzeSites(rootWeb: Types.SP.WebOData, webs: Types.SP.WebOData[], user: string | Types.SP.User) {
         // Return a promise
         return new Promise(resolve => {
             // Show a loading dialog
@@ -61,7 +62,7 @@ class SiteUsers {
             LoadingDialog.show();
 
             // Get the users
-            this.getUsers(rootWeb.Url, userName).then(users => {
+            this.getUsers(rootWeb.Url, user).then(users => {
                 let counter = 0;
 
                 // Parse the users
@@ -126,34 +127,65 @@ class SiteUsers {
     }
 
     // Gets the external users
-    private getUsers(siteUrl: string, userName: string): PromiseLike<IUserInfo[]> {
+    private getUsers(siteUrl: string, user: string | Types.SP.User): PromiseLike<IUserInfo[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
             let users: IUserInfo[] = [];
 
-            // Get the user information list
-            Web(siteUrl).Lists("User Information List").Items().query({
-                Filter: `substringof('${userName}', Name) or substringof('${userName}', Title)`,
-                Select: ["Id", "Name", "EMail", "Title"],
-                GetAllItems: true,
-                Top: 5000
-            }).execute(items => {
-                // Parse the items
-                for (let i = 0; i < items.results.length; i++) {
-                    let item = items.results[i];
+            // See if we are searching by a string
+            if (typeof (user) === "string") {
+                // Get the user information list
+                Web(siteUrl).Lists("User Information List").Items().query({
+                    Filter: `substringof('${user}', Name) or substringof('${user}', Title) or substringof('${user}', UserName)`,
+                    Select: ["Id", "Name", "EMail", "Title", "UserName"],
+                    GetAllItems: true,
+                    Top: 5000
+                }).execute(items => {
+                    // Parse the items
+                    for (let i = 0; i < items.results.length; i++) {
+                        let item = items.results[i];
 
-                    // Add the user
-                    users.push({
-                        EMail: item["EMail"],
-                        Id: item.Id,
-                        Name: item["Name"],
-                        Title: item.Title
-                    });
-                }
+                        // Add the user
+                        users.push({
+                            EMail: item["EMail"],
+                            Id: item.Id,
+                            Name: item["Name"],
+                            Title: item.Title,
+                            UserName: item["UserName"]
+                        });
+                    }
 
-                // Resolve the request
-                resolve(users);
-            }, reject);
+                    // Resolve the request
+                    resolve(users);
+                }, reject);
+            } else {
+                // Get the users
+                Web(siteUrl).Lists("User Information List").Items().query({
+                    GetAllItems: true,
+                    Select: ["Id", "Name", "EMail", "Title", "UserName"],
+                    Top: 5000
+                }).execute(items => {
+                    // Parse the items
+                    for (let i = 0; i < items.results.length; i++) {
+                        let item = items.results[i];
+
+                        // See if this is the target user
+                        if (item["EMail"] == user.Email || item["Name"] == user.LoginName || item["UserName"] == user.UserPrincipalName) {
+                            // Add the user
+                            users.push({
+                                EMail: item["EMail"],
+                                Id: item.Id,
+                                Name: item["Name"],
+                                Title: item.Title,
+                                UserName: item["UserName"]
+                            });
+                        }
+                    }
+
+                    // Resolve the request
+                    resolve(users);
+                }, reject);
+            }
         });
     }
 
@@ -293,7 +325,7 @@ class SiteUsers {
                                         recursiveFl: false,
                                         onComplete: webs => {
                                             // Analyze the site
-                                            this.analyzeSites(webs[0], webs, userName || user.UserPrincipalName || user.Email || user.LoginName).then(resolve);
+                                            this.analyzeSites(webs[0], webs, userName || user).then(resolve);
                                         },
                                         onError: () => {
                                             // Add the url to the errors list
@@ -330,7 +362,7 @@ class SiteUsers {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Site Users");
+        Modal.setHeader("Site Users Information");
 
         // Render the table
         let elTable = document.createElement("div");
@@ -508,7 +540,7 @@ class SiteUsers {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", CSVExportFields, this._rows);
+                        new ExportCSV("site_users_info.csv", CSVExportFields, this._rows);
                     }
                 },
                 {
