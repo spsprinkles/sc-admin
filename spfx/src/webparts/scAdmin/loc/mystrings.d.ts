@@ -1,5 +1,7 @@
 declare interface IScAdminWebPartStrings {
-  DescriptionFieldLabel: string;
+  TimeFormatFieldDescription: string;
+  TimeFormatFieldLabel: string;
+  TimeFormatFieldValue: string;
 }
 
 declare module 'ScAdminWebPartStrings' {

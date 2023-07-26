@@ -13,7 +13,7 @@ const GlobalVariable = {
     description: Strings.ProjectDescription,
     Menu,
     register,
-    render: (el, context?, sourceUrl?: string) => {
+    render: (el, context?, timeFormat?: string, sourceUrl?: string) => {
         // See if the page context exists
         if (context) {
             // Set the context
@@ -21,6 +21,9 @@ const GlobalVariable = {
 
             // Update the configuration
             Configuration.setWebUrl(sourceUrl || ContextInfo.webServerRelativeUrl);
+
+            // See if the timeFormat is set
+            timeFormat ? Strings.TimeFormat = timeFormat : null;
         }
 
         // Create the application
