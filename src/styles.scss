@@ -4,7 +4,23 @@
         --bs-card-cap-color: #000;
         max-width: 15rem;
     }
-
+    .card-group.cg-1 {
+        margin-bottom: -1px;
+        >.card:first-child {
+            border-bottom-left-radius: 0;
+        }
+        >.card:last-child {
+            border-bottom-right-radius: 0;
+        }
+    }
+    .card-group.cg-2 {
+        >.card:first-child {
+            border-top-left-radius: 0;
+        }
+        >.card:last-child {
+            border-top-right-radius: 0;
+        }
+    }
     .card-group .card {
         .card-body p {
             margin: 0;

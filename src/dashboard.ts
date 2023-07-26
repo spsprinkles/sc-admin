@@ -168,14 +168,15 @@ export class Dashboard {
         // Render the cards
         Components.CardGroup({
             el: this._el,
-            cards: cards1
+            cards: cards1,
+            className: "cg-1"
         });
 
         // Render the cards
         Components.CardGroup({
             el: this._el,
             cards: cards2,
-            className: "mt-3"
+            className: "cg-2"
         });
     }
 }
