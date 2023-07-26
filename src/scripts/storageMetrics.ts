@@ -1,7 +1,9 @@
 import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
 import * as jQuery from "jquery";
+import * as moment from "moment";
 import { ExportCSV, Webs, IScript } from "../common";
+import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
@@ -226,7 +228,10 @@ class StorageMetrics {
                 },
                 {
                     name: "LastModified",
-                    title: "Last Modified"
+                    title: "Last Modified",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        el.innerHTML = item.LastModified ? moment(item.LastModified).format(Strings.TimeFormat) : "";
+                    }
                 },
                 {
                     name: "TotalFileCount",

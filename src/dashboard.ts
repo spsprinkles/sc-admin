@@ -1,19 +1,14 @@
-import { Components, ContextInfo, Types, Web } from "gd-sprest-bs";
+import { Components, Types, Web } from "gd-sprest-bs";
 import * as Scripts from "./scripts";
+import Strings from "./strings";
 
 export class Dashboard {
     private _el: HTMLElement = null;
 
     // Constructor
-    constructor(el: HTMLElement, context?) {
+    constructor(el: HTMLElement) {
         // Set the properties
         this._el = el;
-
-        // See if the context exists
-        if (context) {
-            // Set the context
-            ContextInfo.setPageContext(context.pageContext);
-        }
 
         // Ensure the user is an Owner or Admin
         this.isOwnerOrAdmin().then(
@@ -109,7 +104,7 @@ export class Dashboard {
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {
                                     // Initialize the script
-                                    new script.init([ContextInfo.siteServerRelativeUrl]);
+                                    new script.init([Strings.SourceUrl]);
                                 }
                             }
                         });
@@ -156,7 +151,7 @@ export class Dashboard {
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {
                                     // Initialize the script
-                                    new script.init([ContextInfo.siteServerRelativeUrl]);
+                                    new script.init([Strings.SourceUrl]);
                                 }
                             }
                         });
@@ -178,5 +173,12 @@ export class Dashboard {
             cards: cards2,
             className: "cg-2"
         });
+
+        // Render the footer
+        let footer = document.createElement("div");
+        footer.className = "d-flex justify-content-end pe-1";
+        footer.id = "footer";
+        footer.innerHTML = `<label class="text-dark">v${Strings.Version}</label>`;
+        this._el.appendChild(footer);
     }
 }

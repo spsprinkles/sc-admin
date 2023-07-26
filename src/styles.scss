@@ -57,6 +57,18 @@
     }
 }
 
+/* Apply changes to the Settings Panel */
+div.spPropertyPaneContainer div[aria-label='Site Admin Tool property pane'] div[data-automation-id='propertyPaneGroupContent'] {
+    /* Align version to the right */
+    >div:last-child label {
+        text-align: right;
+    }
+}
+
+#footer {
+    max-width: 60rem;
+}
+
 #sc-admin-link {
     cursor: pointer;
 }

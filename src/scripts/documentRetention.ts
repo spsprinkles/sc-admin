@@ -3,6 +3,7 @@ import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { ExportCSV, Webs, IScript } from "../common";
+import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
@@ -342,7 +343,10 @@ class DocumentRetention {
                 },
                 {
                     name: "LastModifiedDate",
-                    title: "Last Modified Date"
+                    title: "Last Modified",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        el.innerHTML = item.LastModifiedDate ? moment(item.LastModifiedDate).format(Strings.TimeFormat) : "";
+                    }
                 },
                 {
                     className: "text-end",
