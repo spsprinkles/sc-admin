@@ -1,6 +1,4 @@
 declare interface IScAdminWebPartStrings {
-  PropertyPaneDescription: string;
-  BasicGroupName: string;
   DescriptionFieldLabel: string;
 }
 

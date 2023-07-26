@@ -1,21 +1,19 @@
 import { Version } from '@microsoft/sp-core-library';
-import {
-  IPropertyPaneConfiguration,
-  PropertyPaneTextField
-} from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { escape } from '@microsoft/sp-lodash-subset';
-
-import styles from './ScAdminWebPart.module.scss';
+import { IPropertyPaneConfiguration, PropertyPaneLabel } from '@microsoft/sp-property-pane';
+import { BaseClientSideWebPart, WebPartContext } from '@microsoft/sp-webpart-base';
 import * as strings from 'ScAdminWebPartStrings';
+
+// Reference the solution
+import "../../../../dist/sc-admin.min.js";
+declare const SCAdmin: {
+  description: string;
+  render: (el: HTMLElement, context: WebPartContext) => void;
+  version: string;
+};
 
 export interface IScAdminWebPartProps {
   description: string;
 }
-
-// Reference the solution
-import "../../../../dist/sc-admin.min.js";
-declare var SCAdmin;
 
 export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPartProps> {
 
@@ -25,26 +23,25 @@ export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPar
   }
 
   protected get dataVersion(): Version {
-    return Version.parse('1.0');
+    return Version.parse(SCAdmin.version);
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
       pages: [
         {
-          header: {
-            description: strings.PropertyPaneDescription
-          },
           groups: [
             {
-              groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneLabel('version', {
+                  text: "v" + SCAdmin.version
                 })
               ]
             }
-          ]
+          ],
+          header: {
+            description: SCAdmin.description
+          },
         }
       ]
     };

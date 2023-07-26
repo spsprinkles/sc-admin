@@ -18,7 +18,7 @@ const Strings = {
     DateFormat: "YYYY-MMM-DD",
     GlobalVariable: "SCAdmin",
     ProjectName: "Site Admin Tool",
-    ProjectDescription: "Tool to help manage SharePoint sites.",
+    ProjectDescription: "A tool to help manage SharePoint sites.",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     Version: "0.0.6"
 };
