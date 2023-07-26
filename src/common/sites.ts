@@ -49,7 +49,7 @@ export class Sites {
                 Expand: ["RootWeb"],
                 GetAllItems: true,
                 OrderBy: [],
-                Select: ["Id", "Title", "Url"],
+                Select: ["Id", "Title", "ServerRelativeUrl", "Url"],
                 Top: 5000
             };
 

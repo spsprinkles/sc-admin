@@ -50,7 +50,7 @@ export class Webs {
                 Expand: [],
                 GetAllItems: true,
                 OrderBy: [],
-                Select: ["Id", "Title", "Url"],
+                Select: ["Id", "ServerRelativeUrl", "Title", "Url"],
                 Top: 5000
             };
 
@@ -58,6 +58,7 @@ export class Webs {
             if (this._props.recursiveFl) {
                 // Include the sub web information
                 odata.Expand.push("Webs");
+                odata.Select.push("Webs/ServerRelativeUrl");
                 odata.Select.push("Webs/Url");
             }
 
