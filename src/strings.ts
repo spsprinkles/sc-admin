@@ -15,11 +15,11 @@ export const setContext = (context, sourceUrl?: string) => {
  */
 const Strings = {
     AppElementId: "sc-admin",
-    DateFormat: "YYYY-MMM-DD",
     GlobalVariable: "SCAdmin",
     ProjectName: "Site Admin Tool",
     ProjectDescription: "A tool to help manage SharePoint sites.",
     SourceUrl: ContextInfo.webServerRelativeUrl,
+    TimeFormat: "YYYY-MMM-DD HH:mm:ss",
     Version: "0.0.6"
 };
 export default Strings;
