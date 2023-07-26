@@ -101,7 +101,7 @@ export class Dashboard {
                         // Render a tooltip
                         Components.Tooltip({
                             el,
-                            content: "Click to run this script",
+                            content: "Run this report",
                             placement: Components.TooltipPlacements.Bottom,
                             btnProps: {
                                 className: "mt-3",
@@ -148,7 +148,7 @@ export class Dashboard {
                         // Render a tooltip
                         Components.Tooltip({
                             el,
-                            content: "Click to run this script",
+                            content: "Run this report",
                             placement: Components.TooltipPlacements.Bottom,
                             btnProps: {
                                 className: "mt-3",

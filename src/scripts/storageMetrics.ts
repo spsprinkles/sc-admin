@@ -298,5 +298,5 @@ class StorageMetrics {
 export const StorageMetricsModal: IScript = {
     init: StorageMetrics,
     name: "Storage Metrics",
-    description: "Scans for site for storage metrics."
+    description: "Scans site(s) for storage metrics."
 };

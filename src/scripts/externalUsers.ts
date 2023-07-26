@@ -570,6 +570,6 @@ class ExternalUsers {
 // Script Information
 export const ExternalUsersModal: IScript = {
     init: ExternalUsers,
-    name: "External Users Information",
-    description: "Scan site(s) for external users information."
+    name: "External User Information",
+    description: "Scan site(s) for external user information."
 };

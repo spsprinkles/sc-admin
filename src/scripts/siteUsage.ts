@@ -294,5 +294,5 @@ class SiteUsage {
 export const SiteUsageModal: IScript = {
     init: SiteUsage,
     name: "Site Usage",
-    description: "Scans for site collection(s) for usage information."
+    description: "Scans site collection(s) for usage information."
 };
