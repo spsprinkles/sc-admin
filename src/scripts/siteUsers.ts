@@ -62,7 +62,7 @@ class SiteUsers {
             LoadingDialog.show();
 
             // Get the users
-            this.getUsers(rootWeb.Url, user).then(users => {
+            this.getUsers(rootWeb.Url, user, rootWeb.ParentWeb).then(users => {
                 let counter = 0;
 
                 // Parse the users
@@ -127,10 +127,17 @@ class SiteUsers {
     }
 
     // Gets the external users
-    private getUsers(siteUrl: string, user: string | Types.SP.User): PromiseLike<IUserInfo[]> {
+    private getUsers(siteUrl: string, user: string | Types.SP.User, parentWeb: Types.SP.WebInformation): PromiseLike<IUserInfo[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
             let users: IUserInfo[] = [];
+
+            // See if this is a root web
+            if (parentWeb.Id) {
+                // Skip this web
+                resolve(users);
+                return;
+            }
 
             // See if we are searching by a string
             if (typeof (user) === "string") {
@@ -316,6 +323,7 @@ class SiteUsers {
                                         url: webUrl,
                                         onQueryWeb: (odata) => {
                                             // Include the site group information
+                                            odata.Expand.push("ParentWeb");
                                             odata.Expand.push("RoleAssignments");
                                             odata.Expand.push("RoleAssignments/Groups");
                                             odata.Expand.push("RoleAssignments/Member");

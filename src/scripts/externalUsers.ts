@@ -60,7 +60,7 @@ class ExternalUsers {
             LoadingDialog.show();
 
             // Get the users
-            this.getUsers(rootWeb.Url).then(users => {
+            this.getUsers(rootWeb.Url, rootWeb.ParentWeb).then(users => {
                 let counter = 0;
 
                 // Parse the users
@@ -216,10 +216,17 @@ class ExternalUsers {
     }
 
     // Gets the external users
-    private getUsers(siteUrl: string): PromiseLike<IUserInfo[]> {
+    private getUsers(siteUrl: string, parentWeb: Types.SP.WebInformation): PromiseLike<IUserInfo[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
             let users: IUserInfo[] = [];
+
+            // See if this is a root web
+            if (parentWeb.Id) {
+                // Skip this web
+                resolve(users);
+                return;
+            }
 
             // Get the user information list
             Web(siteUrl).Lists("User Information List").Items().query({
@@ -327,6 +334,7 @@ class ExternalUsers {
                                         url: webUrl,
                                         onQueryWeb: (odata) => {
                                             // Include the site group information
+                                            odata.Expand.push("ParentWeb");
                                             odata.Expand.push("RoleAssignments");
                                             odata.Expand.push("RoleAssignments/Groups");
                                             odata.Expand.push("RoleAssignments/Member");
@@ -453,7 +461,7 @@ class ExternalUsers {
                         span.className = "notes";
 
                         // Return the plain text if less than 50 chars
-                        if ( el.innerHTML.length < 50 ) {
+                        if (el.innerHTML.length < 50) {
                             span.innerHTML = el.innerHTML;
                         } else {
                             // Truncate to the last white space character in the text after 50 chars and add an ellipsis
