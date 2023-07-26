@@ -173,5 +173,12 @@ export class Dashboard {
             cards: cards2,
             className: "cg-2"
         });
+
+        // Render the footer
+        let footer = document.createElement("div");
+        footer.className = "d-flex justify-content-end pe-1";
+        footer.id = "footer";
+        footer.innerHTML = `<label class="text-dark">v${Strings.Version}</label>`;
+        this._el.appendChild(footer);
     }
 }
