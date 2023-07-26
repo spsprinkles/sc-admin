@@ -63,7 +63,6 @@ export class Sites {
             Site(url).query(odata).execute(
                 // Success
                 site => {
-                    site.RootWeb
                     // Add the web
                     this._sites.push(site);
 
