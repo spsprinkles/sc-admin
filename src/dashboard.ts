@@ -104,7 +104,7 @@ export class Dashboard {
                             content: "Click to run this script",
                             placement: Components.TooltipPlacements.Bottom,
                             btnProps: {
-                                className: "my-2",
+                                className: "mt-3",
                                 text: "Run",
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {
@@ -151,7 +151,7 @@ export class Dashboard {
                             content: "Click to run this script",
                             placement: Components.TooltipPlacements.Bottom,
                             btnProps: {
-                                className: "my-2",
+                                className: "mt-3",
                                 text: "Run",
                                 type: Components.ButtonTypes.OutlinePrimary,
                                 onClick: () => {

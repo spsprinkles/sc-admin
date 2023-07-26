@@ -2,15 +2,18 @@
     .card {
         --bs-card-color: #000;
         --bs-card-cap-color: #000;
+        max-width: 14rem;
     }
 
     .card-group .card {
         .card-body p {
             margin: 0;
         }
-
         .card-header {
-            min-height: 32%;
+            align-items: center;
+            display: flex;
+            min-height: 4rem;
+            padding-bottom: .75rem;
         }
     }
 
