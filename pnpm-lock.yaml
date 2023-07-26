@@ -8,7 +8,7 @@ specifiers:
   datatables.net: ^1.13.4
   datatables.net-bs5: ^1.13.4
   dattatable: ^2.7.2
-  gd-sprest-bs: ^10.10.17
+  gd-sprest-bs: ^10.10.29
   jquery: ^3.6.3
   moment: ^2.29.4
   moment-locales-webpack-plugin: ^1.2.0
@@ -25,8 +25,8 @@ specifiers:
 dependencies:
   datatables.net: 1.13.4
   datatables.net-bs5: 1.13.4
-  dattatable: 2.7.2_rxwx352xrgflwguhc6n365ewom
-  gd-sprest-bs: 10.10.17
+  dattatable: 2.7.2_txdk2rdhziuqsop65quvmvgaue
+  gd-sprest-bs: 10.10.29
   jquery: 3.6.4
   moment: 2.29.4
   text-encoding: 0.7.0
@@ -1277,8 +1277,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@popperjs/core/2.11.7:
-    resolution: {integrity: sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw==}
+  /@popperjs/core/2.11.8:
+    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
     dev: false
 
   /@types/eslint-scope/3.7.4:
@@ -1590,16 +1590,16 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /bootstrap-icons/1.10.4:
-    resolution: {integrity: sha512-eI3HyIUmpGKRiRv15FCZccV+2sreGE2NnmH8mtxV/nPOzQVu0sPEj8HhF1MwjJ31IhjF0rgMvtYOX5VqIzcb/A==}
+  /bootstrap-icons/1.10.5:
+    resolution: {integrity: sha512-oSX26F37V7QV7NCE53PPEL45d7EGXmBgHG3pDpZvcRaKVzWMqIRL9wcqJUyEha1esFtM3NJzvmxFXDxjJYD0jQ==}
     dev: false
 
-  /bootstrap/5.2.3_@popperjs+core@2.11.7:
-    resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
+  /bootstrap/5.3.0_@popperjs+core@2.11.8:
+    resolution: {integrity: sha512-UnBV3E3v4STVNQdms6jSGO2CvOkjUMdDAVR2V5N4uCMdaIkaQjbcEAMqRimDHIs4uqBYzDAKCQwCB+97tJgHQw==}
     peerDependencies:
-      '@popperjs/core': ^2.11.6
+      '@popperjs/core': ^2.11.7
     dependencies:
-      '@popperjs/core': 2.11.7
+      '@popperjs/core': 2.11.8
     dev: false
 
   /braces/3.0.2:
@@ -1734,8 +1734,8 @@ packages:
       browserslist: 4.21.4
     dev: true
 
-  /core-js/3.30.1:
-    resolution: {integrity: sha512-ZNS5nbiSwDTq4hFosEDqm65izl2CWmLz0hARJMyNQBgkUZMIF51cQiMvIQKA6hvuaeWxQDP3hEedM1JZIgTldQ==}
+  /core-js/3.31.1:
+    resolution: {integrity: sha512-2sKLtfq1eFST7l7v62zaqXacPc7uG8ZAya8ogijLhTtaKNcpzpB4TMoTw2Si+8GYKRwFPMMtUT0263QFWFfqyQ==}
     requiresBuild: true
     dev: false
 
@@ -1784,7 +1784,7 @@ packages:
       jquery: 3.6.4
     dev: false
 
-  /dattatable/2.7.2_rxwx352xrgflwguhc6n365ewom:
+  /dattatable/2.7.2_txdk2rdhziuqsop65quvmvgaue:
     resolution: {integrity: sha512-+p+yoS4quUXzpncUJfqhPIDLXnGlclKd+7a/m8FjD7MSfX9vy+qPXZEc4Sydf317cVc0xCDoNzllHMBlqP3hOw==}
     peerDependencies:
       datatables.net: '*'
@@ -1795,7 +1795,7 @@ packages:
     dependencies:
       datatables.net: 1.13.4
       datatables.net-bs5: 1.13.4
-      gd-sprest-bs: 10.10.17
+      gd-sprest-bs: 10.10.29
       jquery: 3.6.4
       moment: 2.29.4
     dev: false
@@ -1979,22 +1979,22 @@ packages:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: false
 
-  /gd-bs/6.1.3:
-    resolution: {integrity: sha512-xKY16U3ZeAAR/ejJAfBf2DuRkfQOnWDNsrAb71ICUOgRBxLr+aZfKZDjP1EgLLFYyUr8UEx6j3Iz9yAZyu0V/w==}
+  /gd-bs/6.2.0:
+    resolution: {integrity: sha512-L/ZaF5iqNEfFT900GEJxlkbHk3148jHew1w1iAPrVuXxYoryLMRIrpOivmHeuY6u0FU0KjQhg+fEI1cGx7a8ug==}
     dependencies:
-      '@popperjs/core': 2.11.7
-      bootstrap: 5.2.3_@popperjs+core@2.11.7
-      bootstrap-icons: 1.10.4
-      core-js: 3.30.1
+      '@popperjs/core': 2.11.8
+      bootstrap: 5.3.0_@popperjs+core@2.11.8
+      bootstrap-icons: 1.10.5
+      core-js: 3.31.1
       tippy.js: 6.3.7
     dev: false
 
-  /gd-sprest-bs/10.10.17:
-    resolution: {integrity: sha512-Z22EciVNQDLNLS+PEs0nU98mnDSwOfzAQjvekYwdbtJGG/5g53Qn4uN1RhkZLb6LOxuPqNHullUX1fDhL676ag==}
+  /gd-sprest-bs/10.10.29:
+    resolution: {integrity: sha512-4kxiiV6kRd3Mq6SnmiVt3NUXqBGiBwM64gcHOy7i6c5+DxzfEaSO+TOGpo0eDt3NpOUrg71BKj+8qYGy47ArEA==}
     dependencies:
       flatpickr: 4.6.13
-      gd-bs: 6.1.3
-      gd-sprest: 7.4.9
+      gd-bs: 6.2.0
+      gd-sprest: 7.5.6
       gd-sprest-def: 1.3.0
       quill: 1.3.7
     dev: false
@@ -2003,8 +2003,8 @@ packages:
     resolution: {integrity: sha512-BlGwVsx7AeNHDgy7kZkhxCczogXPFoWHW9u8u+NCxTKXDf+DvWuf4JrqSOub1w/u9gR29JDWFm1vjDmeWrm0Pw==}
     dev: false
 
-  /gd-sprest/7.4.9:
-    resolution: {integrity: sha512-osZnhG+ipaJ8X9hjKJX4uxrfXylSc6OdHMprL/rZDrRi7da+QNwTDvbs508RwZb2bRqmMyTB3tDDfVhSPtpT1A==}
+  /gd-sprest/7.5.6:
+    resolution: {integrity: sha512-szRYHtoDkZYMZi0BFQG07qezk9QmYgEG2OM1d5EsU4YpYHBb/h3JsQzOGXjYIZxrN1zq3D7nso+CoDBh1B/tvQ==}
     dependencies:
       gd-sprest-def: 1.3.0
     dev: false
@@ -2795,7 +2795,7 @@ packages:
   /tippy.js/6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
     dependencies:
-      '@popperjs/core': 2.11.7
+      '@popperjs/core': 2.11.8
     dev: false
 
   /to-fast-properties/2.0.0:

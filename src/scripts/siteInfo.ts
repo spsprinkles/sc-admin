@@ -5,14 +5,25 @@ import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
+    Owners: string;
+    SCAs: string;
     WebDescription: string;
     WebTitle: string;
     WebUrl: string;
 }
 
+/** User Information */
+interface IUserInfo {
+    EMail: string;
+    Id: number;
+    Name: string;
+    Title: string;
+    UserName: string;
+}
+
 // CSV Export Fields
 const CSVExportFields = [
-    "WebId", "WebTitle", "WebUrl", "WebDescription"
+    "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
 ];
 
 /**
@@ -39,11 +50,37 @@ class SiteInfo {
         return new Promise(resolve => {
             // Parse the webs
             Helper.Executor(webs, web => {
-                // Add a row for this entry
-                this._rows.push({
-                    WebDescription: web.Description,
-                    WebTitle: web.Title,
-                    WebUrl: web.Url
+                // Return a promise
+                return new Promise(resolve => {
+                    // Get the owners
+                    this.getOwners(web.ServerRelativeUrl).then(owners => {
+                        let siteOwners = [];
+                        for (let i = 0; i < owners.length; i++) {
+                            // Add the owner email
+                            siteOwners.push(owners[i].EMail || owners[i].Name || owners[i].UserName || owners[i].Title);
+                        }
+
+                        // Get the scas
+                        this.getSCAs(web.ServerRelativeUrl).then(admins => {
+                            let siteAdmins = [];
+                            for (let i = 0; i < admins.length; i++) {
+                                // Add the admin email
+                                siteAdmins.push(admins[i].EMail || admins[i].Name || admins[i].UserName || admins[i].Title);
+                            }
+
+                            // Add a row for this entry
+                            this._rows.push({
+                                Owners: siteOwners.join(', '),
+                                SCAs: siteAdmins.join(', '),
+                                WebDescription: web.Description,
+                                WebTitle: web.Title,
+                                WebUrl: web.Url
+                            });
+
+                            // Check the next web
+                            resolve(null);
+                        });
+                    });
                 });
             }).then(() => {
                 // Check the next site collection
@@ -79,6 +116,70 @@ class SiteInfo {
                     LoadingDialog.hide();
                 }
             );
+        });
+    }
+
+    // Gets the site owners
+    private getOwners(siteUrl: string): PromiseLike<IUserInfo[]> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            let users: IUserInfo[] = [];
+
+            // Query the user information list for admins
+            Web(siteUrl).AssociatedOwnerGroup().Users().query({
+                GetAllItems: true,
+                Top: 5000
+            }).execute(items => {
+                // Parse the items
+                for (let i = 0; i < items.results.length; i++) {
+                    let item = items.results[i];
+
+                    // Add the user
+                    users.push({
+                        EMail: item.Email,
+                        Id: item.Id,
+                        Name: item.LoginName,
+                        Title: item.Title,
+                        UserName: item.UserPrincipalName
+                    });
+                }
+
+                // Resolve the request
+                resolve(users);
+            }, reject);
+        });
+    }
+
+    // Gets the site collection admins
+    private getSCAs(siteUrl: string): PromiseLike<IUserInfo[]> {
+        // Return a promise
+        return new Promise((resolve, reject) => {
+            let users: IUserInfo[] = [];
+
+            // Query the user information list for admins
+            Web(siteUrl).Lists("User Information List").Items().query({
+                Filter: `IsSiteAdmin eq 1`,
+                Select: ["Id", "Name", "EMail", "Title", "UserName"],
+                GetAllItems: true,
+                Top: 5000
+            }).execute(items => {
+                // Parse the items
+                for (let i = 0; i < items.results.length; i++) {
+                    let item = items.results[i];
+
+                    // Add the user
+                    users.push({
+                        EMail: item["EMail"],
+                        Id: item.Id,
+                        Name: item["Name"],
+                        Title: item.Title,
+                        UserName: item["UserName"]
+                    });
+                }
+
+                // Resolve the request
+                resolve(users);
+            }, reject);
         });
     }
 
@@ -224,6 +325,14 @@ class SiteInfo {
                 {
                     name: "WebDescription",
                     title: "Description"
+                },
+                {
+                    name: "SCAs",
+                    title: "Site Admins"
+                },
+                {
+                    name: "Owners",
+                    title: "Owners"
                 },
                 {
                     className: "text-end",
