@@ -61,7 +61,7 @@ class SiteInfo {
                         }
 
                         // Get the scas
-                        this.getSCAs(web.ServerRelativeUrl).then(admins => {
+                        this.getSCAs(web.ServerRelativeUrl, web.ParentWeb).then(admins => {
                             let siteAdmins = [];
                             for (let i = 0; i < admins.length; i++) {
                                 // Add the admin email
@@ -151,10 +151,17 @@ class SiteInfo {
     }
 
     // Gets the site collection admins
-    private getSCAs(siteUrl: string): PromiseLike<IUserInfo[]> {
+    private getSCAs(siteUrl: string, parentWeb: Types.SP.WebInformation): PromiseLike<IUserInfo[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
             let users: IUserInfo[] = [];
+
+            // See if this is a root web
+            if (parentWeb.Id) {
+                // Skip this web
+                resolve(users);
+                return;
+            }
 
             // Query the user information list for admins
             Web(siteUrl).Lists("User Information List").Items().query({
@@ -233,6 +240,9 @@ class SiteInfo {
                                     new Webs({
                                         url: webUrl,
                                         onQueryWeb: (odata) => {
+                                            // Include the parent web
+                                            odata.Expand.push("ParentWeb");
+
                                             // Include the web description
                                             odata.Select.push("Description");
                                         },
@@ -311,7 +321,7 @@ class SiteInfo {
                     jQuery('th', thead).addClass('align-middle');
                 },
                 // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                order: [[1, "asc"]]
             },
             columns: [
                 {
