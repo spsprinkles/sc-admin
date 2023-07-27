@@ -1,8 +1,6 @@
 import { ContextInfo } from "gd-sprest-bs";
 import { Configuration } from "./cfg";
-import { register } from "./jslink";
 import { Dashboard } from "./dashboard";
-import { Menu } from "./menu";
 import Strings, { setContext } from "./strings";
 import "./styles.scss";
 
@@ -11,8 +9,6 @@ const GlobalVariable = {
     Configuration,
     Dashboard: null,
     description: Strings.ProjectDescription,
-    Menu,
-    register,
     render: (el, context?, timeFormat?: string, sourceUrl?: string) => {
         // See if the page context exists
         if (context) {
@@ -40,7 +36,4 @@ let elApp = document.querySelector("#" + Strings.AppElementId) as HTMLElement;
 if (elApp) {
     // Render the application
     GlobalVariable.render(elApp);
-} else {
-    // Register the JSLink
-    register();
 }
