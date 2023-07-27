@@ -1,5 +1,5 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
+import { Components, Helper, HubSites, Search, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -28,10 +28,10 @@ const CSVExportFields = [
 ];
 
 /**
- * Sites
+ * Hub Site Info
  * Displays a dialog to get the site information.
  */
-class SiteInfo {
+class HubSiteInfo {
     private _errors: string[] = null;
     private _rows: IRowInfo[] = null;
     private _urls: string[] = null;
@@ -91,33 +91,65 @@ class SiteInfo {
         });
     }
 
-    // Deletes a web
-    private deleteWeb(webUrl: string) {
-        // Display a loading dialog
-        LoadingDialog.setHeader("Deleting Web");
-        LoadingDialog.setBody("Deleting the web: " + webUrl);
-        LoadingDialog.show();
+    // Gets the hub sites
+    private getHubSites(): PromiseLike<string[]> {
+        // Return a promise
+        return new Promise(resolve => {
+            // Show a loading dialog
+            LoadingDialog.setHeader("Getting Hub Sites");
+            LoadingDialog.setBody("Getting the hub sites you have access to...");
+            LoadingDialog.show();
 
-        // Get the web context
-        ContextInfo.getWeb(webUrl).execute(context => {
-            // Delete the site group
-            Web(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).delete().execute(
-                // Success
-                () => {
-                    // TODO - Display the confirmation
+            // Get the hub sites
+            HubSites().execute(sites => {
+                let urls = [];
 
-                    // Close the dialog
+                // Parse the sites
+                Helper.Executor(sites.results, site => {
+                    // Append the hub site
+                    urls.push(site.SiteUrl);
+
+                    // Return a promise
+                    return new Promise(resolve => {
+                        // Get the associated sites
+                        Search().postquery({
+                            Querytext: `DepartmentId=${site.ID} contentclass=sts_site -SiteId:${site.ID}`
+                        }).execute(results => {
+                            // Parse the results
+                            for (let i = 0; i < results.postquery.PrimaryQueryResult.RelevantResults.RowCount; i++) {
+                                let row = results.postquery.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
+
+                                // Parse the cells
+                                for (let j = 0; j < row.Cells.results.length; j++) {
+                                    let cell = row.Cells.results[j];
+
+                                    // See if this is the url
+                                    if (cell.Key == "SiteName") {
+                                        // Add the url and break from the loop
+                                        urls.push(cell.Value);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Check the next site
+                            resolve(null);
+                        });
+                    });
+                }).then(() => {
+                    // Hide the dialog
                     LoadingDialog.hide();
-                },
 
-                // Error
-                () => {
-                    // TODO - Display an error
+                    // Resolve the request
+                    resolve(urls);
+                });
+            }, () => {
+                // Hide the dialog
+                LoadingDialog.hide();
 
-                    // Close the dialog
-                    LoadingDialog.hide();
-                }
-            );
+                // Return nothing
+                resolve([]);
+            })
         });
     }
 
@@ -198,7 +230,7 @@ class SiteInfo {
         Modal.setType(Components.ModalTypes.Large);
 
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader("Hub Site Information");
 
         // Render the form
         let form = Components.Form({
@@ -222,6 +254,17 @@ class SiteInfo {
         // Render the footer
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
+                {
+                    text: "Load Hub Sites",
+                    type: Components.ButtonTypes.OutlinePrimary,
+                    onClick: () => {
+                        // Get the hub sites the user has access to
+                        this.getHubSites().then(sites => {
+                            // Set the web urls
+                            form.getControl("Urls").setValue(sites.join('\n'));
+                        });
+                    }
+                },
                 {
                     text: "Analyze",
                     type: Components.ButtonTypes.OutlineSuccess,
@@ -364,21 +407,6 @@ class SiteInfo {
                                         // Show the security group
                                         window.open(row.WebUrl, "_blank");
                                     }
-                                },
-                                {
-                                    assignTo: btn => { btnDelete = btn; },
-                                    text: "Delete",
-                                    type: Components.ButtonTypes.OutlineDanger,
-                                    onClick: () => {
-                                        // Confirm the deletion of the group
-                                        if (confirm("Are you sure you want to delete this web?")) {
-                                            // Disable this button
-                                            btnDelete.disable();
-
-                                            // Delete the site group
-                                            this.deleteWeb(row.WebUrl);
-                                        }
-                                    }
                                 }
                             ]
                         });
@@ -398,7 +426,7 @@ class SiteInfo {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("site_information.csv", CSVExportFields, this._rows);
+                        new ExportCSV("hub_site_information.csv", CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -418,8 +446,8 @@ class SiteInfo {
 }
 
 // Script Information
-export const SiteInfoModal: IScript = {
-    init: SiteInfo,
-    name: "Site Information",
-    description: "Scan for site details, admins, & owners."
+export const HubSiteInfoModal: IScript = {
+    init: HubSiteInfo,
+    name: "Hub Site Information",
+    description: "Scan the hub sites for details, admins, & owners."
 };

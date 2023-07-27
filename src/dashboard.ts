@@ -65,6 +65,7 @@ export class Dashboard {
     private render() {
         let cards1: Components.ICardProps[] = [];
         let cards2: Components.ICardProps[] = [];
+        let cards3: Components.ICardProps[] = [];
 
         // Parse the scripts
         [
@@ -160,6 +161,50 @@ export class Dashboard {
             })
         });
 
+        // Parse the scripts
+        [
+            Scripts.HubSiteInfoModal
+        ].forEach(script => {
+            cards3.push({
+                header: {
+                    className: "h6",
+                    onRender: (el) => {
+                        let div = document.createElement("div");
+                        div.classList.add("mt-1");
+                        div.innerText = script.name;
+                        el.appendChild(div);
+                    }
+                },
+                body: [{
+                    onRender: (el) => {
+                        el.classList.add("d-flex");
+                        el.classList.add("flex-column");
+                        el.classList.add("justify-content-between");
+                        // Render the description
+                        let elContent = document.createElement("p");
+                        elContent.innerHTML = script.description;
+                        el.appendChild(elContent);
+
+                        // Render a tooltip
+                        Components.Tooltip({
+                            el,
+                            content: "Run this report",
+                            placement: Components.TooltipPlacements.Bottom,
+                            btnProps: {
+                                className: "mt-3",
+                                text: "Run",
+                                type: Components.ButtonTypes.OutlinePrimary,
+                                onClick: () => {
+                                    // Initialize the script
+                                    new script.init([Strings.SourceUrl]);
+                                }
+                            }
+                        });
+                    }
+                }]
+            })
+        });
+
         // Render the cards
         Components.CardGroup({
             el: this._el,
@@ -172,6 +217,13 @@ export class Dashboard {
             el: this._el,
             cards: cards2,
             className: "cg-2"
+        });
+
+        // Render the cards
+        Components.CardGroup({
+            el: this._el,
+            cards: cards3,
+            className: "cg-3"
         });
 
         // Render the footer
