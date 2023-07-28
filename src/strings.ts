@@ -20,6 +20,6 @@ const Strings = {
     ProjectDescription: "A tool to help manage SharePoint sites.",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
-    Version: "0.0.7"
+    Version: "0.0.8"
 };
 export default Strings;
