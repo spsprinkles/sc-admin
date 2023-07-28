@@ -449,5 +449,5 @@ class HubSiteInfo {
 export const HubSiteInfoModal: IScript = {
     init: HubSiteInfo,
     name: "Hub Site Information",
-    description: "Scan the hub sites for details, admins, & owners."
+    description: "Scan hub site(s) for details, admins, & owners."
 };
