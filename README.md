@@ -1,12 +1,16 @@
 [![Build & Package](https://github.com/spsprinkles/sc-admin/actions/workflows/webpack.yml/badge.svg)](https://github.com/spsprinkles/sc-admin/actions/workflows/webpack.yml)
 
-# Site Collection Administration Tool
+# Site Administration Tool
+## A tool to help manage SharePoint sites.
+![SiteAdminTool](https://github.com/spsprinkles/sc-admin/assets/24440567/ed14e330-b018-4528-a0f0-d147466cf48e)
 
-## Building the Solution
+## Download the latest [release](https://github.com/spsprinkles/sc-admin/releases/tag/v0.0.8) as an SPFx webpart and deploy it directly to SharePoint Online.
+
+## Building the Solution (for on-premises SharePoint)
 
 ### Required Software
 
-* NodeJS (LTS)
+* NodeJS 16.x (LTS)
 * Code Editor (Visual Studio Code)
 
 ### Install Libraries
