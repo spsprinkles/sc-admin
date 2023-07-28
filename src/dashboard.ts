@@ -71,8 +71,7 @@ export class Dashboard {
         [
             Scripts.DocumentRetentionModal,
             Scripts.ExternalUsersModal,
-            Scripts.ListInfoModal,
-            Scripts.SecurityGroupsModal
+            Scripts.HubSiteInfoModal
         ].forEach(script => {
             cards1.push({
                 header: {
@@ -116,10 +115,9 @@ export class Dashboard {
 
         // Parse the scripts
         [
-            Scripts.SiteInfoModal,
-            Scripts.SiteUsageModal,
-            Scripts.SiteUsersModal,
-            Scripts.StorageMetricsModal
+            Scripts.ListInfoModal,
+            Scripts.SecurityGroupsModal,
+            Scripts.SiteInfoModal
         ].forEach(script => {
             cards2.push({
                 header: {
@@ -163,7 +161,9 @@ export class Dashboard {
 
         // Parse the scripts
         [
-            Scripts.HubSiteInfoModal
+            Scripts.SiteUsageModal,
+            Scripts.SiteUsersModal,
+            Scripts.StorageMetricsModal
         ].forEach(script => {
             cards3.push({
                 header: {
