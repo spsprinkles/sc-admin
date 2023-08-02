@@ -107,9 +107,23 @@ class ListInfo {
                         LoadingDialog.show();
 
                         // Get the target web
-                        Web(url).execute(
+                        Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
                             // Exists
                             (web) => {
+                                // Ensure the user doesn't have permissions to manage lists
+                                if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
+                                    // Update the validation
+                                    let ctrl = form.getControl("WebUrl");
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "You do not have permissions to create lists on this web."
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+                                    return;
+                                }
+
                                 // Get the list information
                                 var list = new List({
                                     listName: listInfo.ListName,
