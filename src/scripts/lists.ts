@@ -162,6 +162,7 @@ class ListInfo {
                                         // Parse the default view fields
                                         let defaultView = list.ListViews[0];
                                         cfgProps.ListCfg[0].ViewInformation = [{
+                                            Default: true,
                                             ViewName: defaultView.Title,
                                             ViewFields: [],
                                             ViewQuery: defaultView.ViewQuery
