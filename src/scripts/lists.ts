@@ -160,11 +160,18 @@ class ListInfo {
                                         };
 
                                         // Parse the content type fields
+                                        let lookupFields: Types.SP.FieldLookup[] = [];
                                         for (let i = 0; i < list.ListContentTypes[0].Fields.results.length; i++) {
                                             let fldInfo = list.ListContentTypes[0].Fields.results[i];
 
                                             // Skip internal fields
                                             if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
+
+                                            // See if this is a lookup field
+                                            if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
+                                                // Add the field
+                                                lookupFields.push(fldInfo);
+                                            }
 
                                             // Add the field information
                                             cfgProps.ListCfg[0].CustomFields.push({
@@ -196,15 +203,64 @@ class ListInfo {
                                         let cfg = Helper.SPConfig(cfgProps);
                                         cfg.setWebUrl(web.ServerRelativeUrl);
                                         cfg.install().then(() => {
-                                            // Update the validation
-                                            let ctrl = form.getControl("WebUrl");
-                                            ctrl.updateValidation(ctrl.el, {
-                                                isValid: true,
-                                                validMessage: "The list was copied successfully to the destination url."
-                                            });
+                                            // Update the loading dialog
+                                            LoadingDialog.setHeader("Reading Destination Web");
+                                            LoadingDialog.setBody("Getting the context information of the destination web...");
 
-                                            // Hide the loading dialog
-                                            LoadingDialog.hide();
+                                            // Get the digest value for the destination web
+                                            ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
+                                                // Update the loading dialog
+                                                LoadingDialog.setHeader("Updating the List");
+                                                LoadingDialog.setBody("Updating the lookup field(s)...");
+
+                                                // Parse the lookup fields
+                                                Helper.Executor(lookupFields, lookupField => {
+                                                    // Return a promise
+                                                    return new Promise(resolve => {
+                                                        // Get the lookup field source list
+                                                        Web(listInfo.WebUrl).Lists().getById(lookupField.LookupList).execute(srcList => {
+                                                            // Get the lookup list in the destination site
+                                                            Web(web.ServerRelativeUrl).Lists(srcList.Title).execute(dstList => {
+                                                                // Update the field schema xml
+                                                                let fieldDef = lookupField.SchemaXml.replace(`List="${lookupField.LookupList}"`, `List="{${dstList.Id}}"`);
+                                                                Web(web.ServerRelativeUrl, {
+                                                                    requestDigest: context.GetContextWebInformation.FormDigestValue
+                                                                }).Lists(list.ListInfo.Title).Fields(lookupField.InternalName).update({
+                                                                    SchemaXml: fieldDef
+                                                                }).execute(() => {
+                                                                    // Updated the lookup list
+                                                                    console.log(`Updated the lookup field ${lookupField.InternalName} lookup list successfully.`);
+
+                                                                    // Check the next field
+                                                                    resolve(null);
+                                                                })
+                                                            }, () => {
+                                                                // Error getting the lookup list
+                                                                console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${web.ServerRelativeUrl}.`);
+
+                                                                // Check the next field
+                                                                resolve(null);
+                                                            });
+                                                        }, () => {
+                                                            // Error getting the lookup list
+                                                            console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${listInfo.WebUrl}.`);
+
+                                                            // Check the next field
+                                                            resolve(null);
+                                                        });
+                                                    });
+                                                }).then(() => {
+                                                    // Update the validation
+                                                    let ctrl = form.getControl("WebUrl");
+                                                    ctrl.updateValidation(ctrl.el, {
+                                                        isValid: true,
+                                                        validMessage: "The list was copied successfully to the destination url."
+                                                    });
+
+                                                    // Hide the loading dialog
+                                                    LoadingDialog.hide();
+                                                });
+                                            });
                                         });
                                     }
                                 });
