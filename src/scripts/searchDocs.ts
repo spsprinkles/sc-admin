@@ -1,5 +1,5 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, SPTypes, Search, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { ExportCSV, Webs, IScript } from "../common";
@@ -185,7 +185,7 @@ class DocumentSearch {
                     name: "FileTypes",
                     type: Components.FormControlTypes.TextField,
                     required: true,
-                    value: "docx doc pdf xlsx xls pptx ppt"
+                    value: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx"
                 },
                 {
                     label: "Site Url(s)",
