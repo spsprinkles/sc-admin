@@ -56,6 +56,10 @@
     .modal {
         --bs-modal-color: #000;
     }
+
+    .offcanvas {
+        z-index: 1090;
+    }
     
     .sc-admin-menu.dropdown-menu {
         border: none;
