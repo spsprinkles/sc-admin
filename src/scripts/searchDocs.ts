@@ -1,5 +1,5 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, SPTypes, Search, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { ExportCSV, Webs, IScript } from "../common";
@@ -7,25 +7,28 @@ import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
+    Author: string;
+    DocumentExt: string;
     DocumentName: string;
     DocumentUrl: string;
-    LastModifiedDate?: string;
-    ListName: string;
-    WebTitle: string;
+    LastModifiedDate: string;
+    ListId: string;
+    SearchResult: string;
+    WebId: string;
     WebUrl: string;
 }
 
 // CSV Export Fields
 const CSVExportFields = [
-    "DocumentName", "DocumentUrl", "LastModifiedDate",
-    "ListName", "WebTitle", "WebUrl"
+    "DocumentName", "DocumentExt", "DocumentUrl", "Author",
+    "LastModifiedDate", "ListId", "WebId", "WebUrl", "SearchResult"
 ];
 
 /**
- * Document Retention
- * Displays a dialog to get the site information.
+ * Document Search
+ * Displays a dialog to search documents by key words.
  */
-class DocumentRetention {
+class DocumentSearch {
     private _errors: string[] = null;
     private _rows: IRowInfo[] = null;
     private _urls: string[] = null;
@@ -39,72 +42,55 @@ class DocumentRetention {
         this.render();
     }
 
-    // Analyzes the site collection
-    private analyzeSites(webs: Types.SP.WebOData[], date: string) {
-        // Display a loading dialog
-        LoadingDialog.setHeader("Analyzing the Site Collection");
-        LoadingDialog.setBody("This will close after the information is analyzed...");
-        LoadingDialog.show();
+    // Analyzes the results
+    private analyzeResult(results: Types.Microsoft.Office.Server.Search.REST.SearchResult) {
+        // Ensure results exist
+        if (results.PrimaryQueryResult == null) { return; }
 
-        // Return a promise
-        return new Promise(resolve => {
-            // Create the date
-            let dt = moment(date).toISOString();
+        // Parse the results
+        for (let i = 0; i < results.PrimaryQueryResult.RelevantResults.RowCount; i++) {
+            let result = results.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
+            let rowInfo: IRowInfo = {} as any;
 
-            // Parse the webs
-            Helper.Executor(webs, web => {
-                // Update the loading dialog
-                LoadingDialog.setBody("Analyzing the document libraries for site:<br/>" + web.Url);
+            // Parse the cells
+            for (let j = 0; j < result.Cells.results.length; j++) {
+                let cell = result.Cells.results[j];
 
-                // Return a promise
-                return new Promise(resolve => {
-                    // Parse the lists
-                    Helper.Executor(web.Lists.results, list => {
-                        // Ensure this is a document library
-                        if (list.BaseTemplate != SPTypes.ListTemplateType.DocumentLibrary) { return; }
+                // See if this is a target value
+                switch (cell.Key) {
+                    case "Author":
+                        rowInfo.Author = cell.Value;
+                        break;
+                    case "FileExtension":
+                        rowInfo.DocumentExt = cell.Value;
+                        break;
+                    case "HitHighlightedSummary":
+                        rowInfo.SearchResult = cell.Value;
+                        break;
+                    case "LastModifiedTime":
+                        rowInfo.LastModifiedDate = cell.Value;
+                        break;
+                    case "ListId":
+                        rowInfo.ListId = cell.Value;
+                        break;
+                    case "Path":
+                        rowInfo.DocumentUrl = cell.Value;
+                        break;
+                    case "SiteName":
+                        rowInfo.WebUrl = cell.Value;
+                        break;
+                    case "Title":
+                        rowInfo.DocumentName = cell.Value;
+                        break;
+                    case "WebId":
+                        rowInfo.WebId = cell.Value;
+                        break;
+                }
+            }
 
-                        // Return a promise
-                        return new Promise((resolve, reject) => {
-                            // Query the list
-                            list.Items().query({
-                                Filter: "Modified lt '" + dt + "'",
-                                Select: ["Id", "FileLeafRef", "FileRef", "FileSizeDisplay", "Modified"],
-                                GetAllItems: true,
-                                Top: 5000
-                            }).execute(items => {
-                                // Parse the items
-                                Helper.Executor(items.results, item => {
-                                    // Ensure this is an item
-                                    if (item["FileSizeDisplay"]) {
-                                        // Add a row for this entry
-                                        this._rows.push({
-                                            DocumentName: item["FileLeafRef"],
-                                            DocumentUrl: item["FileRef"],
-                                            LastModifiedDate: item["Modified"],
-                                            ListName: list.Title,
-                                            WebTitle: web.Title,
-                                            WebUrl: web.Url
-                                        });
-                                    }
-                                });
-
-                                // Check the next list
-                                resolve(null);
-                            }, reject);
-                        });
-                    }).then(() => {
-                        // Check the next web
-                        resolve(null);
-                    });
-                });
-            }).then(() => {
-                // Hide the dialog
-                LoadingDialog.hide();
-
-                // Check the next site collection
-                resolve(null);
-            });
-        });
+            // Append the row
+            this._rows.push(rowInfo);
+        }
     }
 
     // Deletes a document
@@ -181,17 +167,25 @@ class DocumentRetention {
         // Render the form
         let form = Components.Form({
             controls: [
+                /* TODO - Add a category dropdown that will put keywords in the search terms
                 {
                     label: "Search Sub-Sites?",
                     name: "RecurseWebs",
                     type: Components.FormControlTypes.Switch
                 },
+                */
                 {
-                    label: "Document Date",
-                    name: "DocumentDate",
-                    type: Components.FormControlTypes.DateTime,
+                    label: "Search Terms",
+                    name: "SearchTerms",
+                    type: Components.FormControlTypes.TextField,
+                    required: true
+                },
+                {
+                    label: "File Types",
+                    name: "FileTypes",
+                    type: Components.FormControlTypes.TextField,
                     required: true,
-                    value: defaultDate
+                    value: "docx doc pdf xlsx xls pptx ppt"
                 },
                 {
                     label: "Site Url(s)",
@@ -200,16 +194,10 @@ class DocumentRetention {
                     errorMessage: "Please enter a site url.",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
-                    rows: 10,
+                    rows: 5,
                     value: this._urls.join('\n')
                 } as Components.IFormControlPropsTextField
-            ],
-            onRendered: (ctrls) => {
-                ctrls[0].el.parentElement.classList.add("row");
-                ctrls[0].el.classList.add("col");
-                ctrls[0].el.querySelector(".form-check").parentElement.classList.remove("row");
-                ctrls[0].el.querySelector(".form-check").classList.remove("col-12");
-            }
+            ]
         });
 
         // Render the body
@@ -219,49 +207,75 @@ class DocumentRetention {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
-                    text: "Analyze",
+                    text: "Search",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Ensure the form is valid
                         if (form.isValid()) {
                             let formValues = form.getValues();
+                            let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
+                            let queryText = formValues["SearchTerms"].split(' ').join(" OR ");
                             let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
                             // Clear the data
                             this._errors = [];
                             this._rows = [];
 
+                            // Display a loading dialog
+                            LoadingDialog.setHeader("Searching Webs");
+                            LoadingDialog.setBody("This will close after the searches are completed...");
+                            LoadingDialog.show();
+
                             // Parse the webs
                             Helper.Executor(webUrls, webUrl => {
                                 // Return a promise
                                 return new Promise((resolve) => {
-                                    new Webs({
-                                        url: webUrl,
-                                        recursiveFl: formValues["RecurseWebs"],
-                                        onQueryWeb: odata => {
-                                            // Include the lsits
-                                            odata.Expand.push("Lists");
+                                    // Update the dialog
+                                    LoadingDialog.setBody("Searching " + webUrl);
 
-                                            // Select the title and type only
-                                            odata.Select.push("Lists/BaseTemplate");
-                                            odata.Select.push("Lists/Title");
+                                    // Get the context information of the web
+                                    ContextInfo.getWeb(webUrl).execute(
+                                        // Success
+                                        (context) => {
+                                            // Search the site
+                                            Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
+                                                Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
+                                                RefinementFilters: {
+                                                    results: [`fileExtension:or("${fileExtensions}")`]
+                                                },
+                                                SelectProperties: {
+                                                    results: [
+                                                        "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
+                                                        "ListId", "Path", "SiteName", "Title", "WebId"
+                                                    ]
+                                                }
+                                            }).execute(results => {
+                                                // Analyze the results
+                                                this.analyzeResult(results.postquery);
 
-                                            return odata;
+                                                // Check the next web
+                                                resolve(null);
+                                            }, () => {
+                                                // Error getting the search results
+                                                this._errors.push(webUrl);
+                                                resolve(null);
+                                            });
                                         },
-                                        onComplete: webs => {
-                                            // Analyze the site
-                                            this.analyzeSites(webs, formValues["DocumentDate"]).then(resolve);
-                                        },
-                                        onError: () => {
-                                            // Add the url to the errors list
+
+                                        // Error
+                                        () => {
+                                            // Append the error and check the next web
                                             this._errors.push(webUrl);
                                             resolve(null);
                                         }
-                                    })
+                                    )
                                 });
                             }).then(() => {
                                 // Render the summary
                                 this.renderSummary();
+
+                                // Hide the dialog
+                                LoadingDialog.hide();
                             });
                         }
                     }
@@ -326,20 +340,32 @@ class DocumentRetention {
             },
             columns: [
                 {
-                    name: "WebTitle",
-                    title: "Title"
+                    name: "WebId",
+                    title: "Web Id"
                 },
                 {
                     name: "WebUrl",
-                    title: "Url"
+                    title: "Web Url"
+                },
+                {
+                    name: "ListId",
+                    title: "List Id"
                 },
                 {
                     name: "DocumentName",
                     title: "Document Name"
                 },
                 {
+                    name: "DocumentExt",
+                    title: "Document Extension"
+                },
+                {
                     name: "DocumentUrl",
                     title: "Document Url"
+                },
+                {
+                    name: "Author",
+                    title: "Author"
                 },
                 {
                     name: "LastModifiedDate",
@@ -347,6 +373,10 @@ class DocumentRetention {
                     onRenderCell: (el, col, item: IRowInfo) => {
                         el.innerHTML = item.LastModifiedDate ? moment(item.LastModifiedDate).format(Strings.TimeFormat) : "";
                     }
+                },
+                {
+                    name: "SearchResult",
+                    title: "Search Result"
                 },
                 {
                     className: "text-end",
@@ -364,7 +394,7 @@ class DocumentRetention {
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
                                         // Show the security group
-                                        window.open(this.isWopi(row.DocumentName) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
+                                        window.open(this.isWopi(`${row.DocumentName}.${row.DocumentExt}`) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
                                     }
                                 },
                                 {
@@ -400,7 +430,7 @@ class DocumentRetention {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("documet_retention.csv", CSVExportFields, this._rows);
+                        new ExportCSV("documet_search.csv", CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -420,8 +450,8 @@ class DocumentRetention {
 }
 
 // Script Information
-export const DocumentRetentionModal: IScript = {
-    init: DocumentRetention,
-    name: "Document Retention",
-    description: "Scans for files older than a specified date."
+export const DocumentSearchModal: IScript = {
+    init: DocumentSearch,
+    name: "Document Search",
+    description: "Searches for documents by key words for a site."
 };
