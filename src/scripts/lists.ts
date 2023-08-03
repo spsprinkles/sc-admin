@@ -1,4 +1,4 @@
-import { DataTable, LoadingDialog, Modal } from "dattatable";
+import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
@@ -64,6 +64,228 @@ class ListInfo {
                 resolve(null);
             });
         });
+    }
+
+    // Copies a list
+    private copyList(listInfo: IRowInfo) {
+        // Clear the canvas
+        CanvasForm.clear();
+
+        // Set the header
+        CanvasForm.setHeader("Copy List");
+
+        // Set the body
+        let form = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [
+                {
+                    label: "Web Url",
+                    name: "WebUrl",
+                    type: Components.FormControlTypes.TextField,
+                    required: true,
+                    description: "The destination url of the site to copy the list to.",
+                    errorMessage: "The destination url is required."
+                }
+            ]
+        });
+
+        // Set the footer
+        Components.Tooltip({
+            el: CanvasForm.BodyElement,
+            content: "Click to copy the list.",
+            btnProps: {
+                text: "Copy",
+                type: Components.ButtonTypes.OutlinePrimary,
+                onClick: () => {
+                    // Ensure the form is valid
+                    if (form.isValid()) {
+                        let url = form.getValues()["WebUrl"];
+
+                        // Show a loading Dialog
+                        LoadingDialog.setHeader("Reading Target Web");
+                        LoadingDialog.setBody("Getting the destination web information...");
+                        LoadingDialog.show();
+
+                        // Get the target web
+                        Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
+                            // Exists
+                            (web) => {
+                                // Ensure the user doesn't have permissions to manage lists
+                                if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
+                                    // Update the validation
+                                    let ctrl = form.getControl("WebUrl");
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "You do not have permissions to create lists on this web."
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+                                    return;
+                                }
+
+                                // Get the list information
+                                var list = new List({
+                                    listName: listInfo.ListName,
+                                    webUrl: listInfo.WebUrl,
+                                    itemQuery: { Filter: "Id eq 0" },
+                                    onInitError: () => {
+                                        // Update the validation
+                                        let ctrl = form.getControl("WebUrl");
+                                        ctrl.updateValidation(ctrl.el, {
+                                            isValid: false,
+                                            invalidMessage: "Error loading the list information. Please check your permissions to the list."
+                                        });
+
+                                        // Hide the loading dialog
+                                        LoadingDialog.hide();
+                                    },
+                                    onInitialized: () => {
+                                        // Update the loading dialog
+                                        LoadingDialog.setHeader("Analyzing the List");
+                                        LoadingDialog.setBody("Getting the list information...");
+
+                                        // Create the configuration
+                                        let cfgProps: Helper.ISPConfigProps = {
+                                            ListCfg: [{
+                                                ListInformation: {
+                                                    BaseTemplate: list.ListInfo.BaseTemplate,
+                                                    Title: list.ListInfo.Title,
+                                                    AllowContentTypes: list.ListInfo.AllowContentTypes,
+                                                    Hidden: list.ListInfo.Hidden,
+                                                    NoCrawl: list.ListInfo.NoCrawl
+                                                },
+                                                CustomFields: []
+                                            }]
+                                        };
+
+                                        // Parse the content type fields
+                                        let lookupFields: Types.SP.FieldLookup[] = [];
+                                        for (let i = 0; i < list.ListContentTypes[0].Fields.results.length; i++) {
+                                            let fldInfo = list.ListContentTypes[0].Fields.results[i];
+
+                                            // Skip internal fields
+                                            if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
+
+                                            // See if this is a lookup field
+                                            if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
+                                                // Add the field
+                                                lookupFields.push(fldInfo);
+                                            }
+
+                                            // Add the field information
+                                            cfgProps.ListCfg[0].CustomFields.push({
+                                                name: fldInfo.InternalName,
+                                                schemaXml: fldInfo.SchemaXml
+                                            });
+                                        }
+
+                                        // Parse the default view fields
+                                        let defaultView = list.ListViews[0];
+                                        cfgProps.ListCfg[0].ViewInformation = [{
+                                            Default: true,
+                                            ViewName: defaultView.Title,
+                                            ViewFields: [],
+                                            ViewQuery: defaultView.ViewQuery
+                                        }];
+                                        for (let i = 0; i < defaultView.ViewFields.Items.results.length; i++) {
+                                            let fieldName = defaultView.ViewFields.Items.results[i];
+
+                                            // Add the field
+                                            cfgProps.ListCfg[0].ViewInformation[0].ViewFields.push(fieldName);
+                                        }
+
+                                        // Update the loading dialog
+                                        LoadingDialog.setHeader("Creating the List");
+                                        LoadingDialog.setBody("Creating the destination list...");
+
+                                        // Create the list
+                                        let cfg = Helper.SPConfig(cfgProps);
+                                        cfg.setWebUrl(web.ServerRelativeUrl);
+                                        cfg.install().then(() => {
+                                            // Update the loading dialog
+                                            LoadingDialog.setHeader("Reading Destination Web");
+                                            LoadingDialog.setBody("Getting the context information of the destination web...");
+
+                                            // Get the digest value for the destination web
+                                            ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
+                                                // Update the loading dialog
+                                                LoadingDialog.setHeader("Updating the List");
+                                                LoadingDialog.setBody("Updating the lookup field(s)...");
+
+                                                // Parse the lookup fields
+                                                Helper.Executor(lookupFields, lookupField => {
+                                                    // Return a promise
+                                                    return new Promise(resolve => {
+                                                        // Get the lookup field source list
+                                                        Web(listInfo.WebUrl).Lists().getById(lookupField.LookupList).execute(srcList => {
+                                                            // Get the lookup list in the destination site
+                                                            Web(web.ServerRelativeUrl).Lists(srcList.Title).execute(dstList => {
+                                                                // Update the field schema xml
+                                                                let fieldDef = lookupField.SchemaXml.replace(`List="${lookupField.LookupList}"`, `List="{${dstList.Id}}"`);
+                                                                Web(web.ServerRelativeUrl, {
+                                                                    requestDigest: context.GetContextWebInformation.FormDigestValue
+                                                                }).Lists(list.ListInfo.Title).Fields(lookupField.InternalName).update({
+                                                                    SchemaXml: fieldDef
+                                                                }).execute(() => {
+                                                                    // Updated the lookup list
+                                                                    console.log(`Updated the lookup field ${lookupField.InternalName} lookup list successfully.`);
+
+                                                                    // Check the next field
+                                                                    resolve(null);
+                                                                })
+                                                            }, () => {
+                                                                // Error getting the lookup list
+                                                                console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${web.ServerRelativeUrl}.`);
+
+                                                                // Check the next field
+                                                                resolve(null);
+                                                            });
+                                                        }, () => {
+                                                            // Error getting the lookup list
+                                                            console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${listInfo.WebUrl}.`);
+
+                                                            // Check the next field
+                                                            resolve(null);
+                                                        });
+                                                    });
+                                                }).then(() => {
+                                                    // Update the validation
+                                                    let ctrl = form.getControl("WebUrl");
+                                                    ctrl.updateValidation(ctrl.el, {
+                                                        isValid: true,
+                                                        validMessage: "The list was copied successfully to the destination url."
+                                                    });
+
+                                                    // Hide the loading dialog
+                                                    LoadingDialog.hide();
+                                                });
+                                            });
+                                        });
+                                    }
+                                });
+                            },
+
+                            // Doesn't exist
+                            () => {
+                                // Update the validation
+                                let ctrl = form.getControl("WebUrl");
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "The target web doesn't exist, or you do not have access to it."
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            }
+                        );
+                    }
+                }
+            }
+        });
+
+        // Show the canvas form
+        CanvasForm.show();
     }
 
     // Deletes a list
@@ -523,7 +745,7 @@ class ListInfo {
                         let span = document.createElement("span");
 
                         // Return the plain text if less than 50 chars
-                        if ( el.innerHTML.length < 50 ) {
+                        if (el.innerHTML.length < 50) {
                             span.innerHTML = el.innerHTML;
                         } else {
                             // Truncate to the last white space character in the text after 50 chars and add an ellipsis
@@ -579,6 +801,14 @@ class ListInfo {
                                             this.deleteList(row.WebUrl, row.ListName);
                                         }
                                     }
+                                },
+                                {
+                                    text: "Copy",
+                                    type: Components.ButtonTypes.OutlineSuccess,
+                                    onClick: () => {
+                                        // Display the copy form
+                                        this.copyList(row);
+                                    }
                                 }
                             ]
                         });
@@ -621,5 +851,5 @@ class ListInfo {
 export const ListInfoModal: IScript = {
     init: ListInfo,
     name: "List Information",
-    description: "Scan site(s) for list & library information."
+    description: "Scan site(s) for list & library information. Ability to copy a list structure to another web."
 };
