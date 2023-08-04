@@ -301,7 +301,7 @@ class DocumentSearch {
         Modal.setType(Components.ModalTypes.Full);
 
         // Show the modal dialog
-        Modal.setHeader("Document Retention");
+        Modal.setHeader("Document Search");
 
         // Render the table
         let elTable = document.createElement("div");
