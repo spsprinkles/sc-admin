@@ -19,11 +19,19 @@
             border-top-left-radius: 0;
         }
         >.card:last-child {
-            border-bottom-right-radius: 0;
             border-top-right-radius: 0;
         }
     }
     .card-group.cg-3 {
+        margin-top: -1px;
+        >.card:first-child {
+            border-top-left-radius: 0;
+        }
+        >.card:last-child {
+            border-top-right-radius: 0;
+        }
+    }
+    .card-group.cg-4 {
         margin-top: -1px;
         >.card:first-child {
             border-top-left-radius: 0;
@@ -81,7 +89,7 @@ div.spPropertyPaneContainer div[aria-label='Site Admin Tool property pane'] div[
 }
 
 #footer {
-    max-width: 45rem;
+    max-width: 60rem;
 }
 
 #sc-admin-link {
