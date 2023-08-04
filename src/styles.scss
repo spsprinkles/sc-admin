@@ -19,7 +19,6 @@
             border-top-left-radius: 0;
         }
         >.card:last-child {
-            border-bottom-right-radius: 0;
             border-top-right-radius: 0;
         }
     }
@@ -90,7 +89,7 @@ div.spPropertyPaneContainer div[aria-label='Site Admin Tool property pane'] div[
 }
 
 #footer {
-    max-width: 45rem;
+    max-width: 60rem;
 }
 
 #sc-admin-link {
