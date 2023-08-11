@@ -11,14 +11,15 @@ interface IRowInfo {
     ListName: string;
     ListType: string;
     ListUrl: string;
+    ListViewCount: number;
     WebTitle: string;
     WebUrl: string;
 }
 
 // CSV Export Fields
 const CSVExportFields = [
-    "ListDescription", "ListId", "ListItemCount", "ListName",
-    "ListType", "ListUrl", "WebTitle", "WebUrl"
+    "ListDescription", "ListId", "ListItemCount", "ListViewCount",
+    "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
 ];
 
 /**
@@ -55,6 +56,7 @@ class ListInfo {
                         ListName: list.Title,
                         ListType: this.getListType(list.BaseTemplate),
                         ListUrl: (list.RootFolder as any as Types.SP.Folder).ServerRelativeUrl,
+                        ListViewCount: (list.Views as any as Types.SP.IViewCollection).results.length,
                         WebTitle: web.Title,
                         WebUrl: web.Url
                     });
@@ -67,225 +69,194 @@ class ListInfo {
     }
 
     // Copies a list
-    private copyList(listInfo: IRowInfo) {
-        // Clear the canvas
-        CanvasForm.clear();
+    private copyList(listInfo: IRowInfo, form: Components.IForm): PromiseLike<string> {
+        return new Promise(resolve => {
+            // Show a loading Dialog
+            LoadingDialog.setHeader("Reading Target Web");
+            LoadingDialog.setBody("Getting the destination web information...");
+            LoadingDialog.show();
 
-        // Set the header
-        CanvasForm.setHeader("Copy List");
+            // Get the target web
+            let formValues = form.getValues();
+            let url = formValues["WebUrl"];
+            Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
+                // Exists
+                (web) => {
+                    // Ensure the user doesn't have permissions to manage lists
+                    if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
+                        // Update the validation
+                        let ctrl = form.getControl("WebUrl");
+                        ctrl.updateValidation(ctrl.el, {
+                            isValid: false,
+                            invalidMessage: "You do not have permissions to create lists on this web."
+                        });
 
-        // Set the body
-        let form = Components.Form({
-            el: CanvasForm.BodyElement,
-            controls: [
-                {
-                    label: "Web Url",
-                    name: "WebUrl",
-                    type: Components.FormControlTypes.TextField,
-                    required: true,
-                    description: "The destination url of the site to copy the list to.",
-                    errorMessage: "The destination url is required."
-                }
-            ]
-        });
+                        // Hide the loading dialog
+                        LoadingDialog.hide();
+                        return;
+                    }
 
-        // Set the footer
-        Components.Tooltip({
-            el: CanvasForm.BodyElement,
-            content: "Click to copy the list.",
-            btnProps: {
-                text: "Copy",
-                type: Components.ButtonTypes.OutlinePrimary,
-                onClick: () => {
-                    // Ensure the form is valid
-                    if (form.isValid()) {
-                        let url = form.getValues()["WebUrl"];
+                    // Get the list information
+                    var list = new List({
+                        listName: formValues["ListName"],
+                        webUrl: listInfo.WebUrl,
+                        itemQuery: { Filter: "Id eq 0" },
+                        onInitError: () => {
+                            // Update the validation
+                            let ctrl = form.getControl("WebUrl");
+                            ctrl.updateValidation(ctrl.el, {
+                                isValid: false,
+                                invalidMessage: "Error loading the list information. Please check your permissions to the list."
+                            });
 
-                        // Show a loading Dialog
-                        LoadingDialog.setHeader("Reading Target Web");
-                        LoadingDialog.setBody("Getting the destination web information...");
-                        LoadingDialog.show();
+                            // Hide the loading dialog
+                            LoadingDialog.hide();
+                        },
+                        onInitialized: () => {
+                            // Update the loading dialog
+                            LoadingDialog.setHeader("Analyzing the List");
+                            LoadingDialog.setBody("Getting the list information...");
 
-                        // Get the target web
-                        Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
-                            // Exists
-                            (web) => {
-                                // Ensure the user doesn't have permissions to manage lists
-                                if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
-                                    // Update the validation
-                                    let ctrl = form.getControl("WebUrl");
-                                    ctrl.updateValidation(ctrl.el, {
-                                        isValid: false,
-                                        invalidMessage: "You do not have permissions to create lists on this web."
-                                    });
+                            // Create the configuration
+                            let cfgProps: Helper.ISPConfigProps = {
+                                ListCfg: [{
+                                    ListInformation: {
+                                        BaseTemplate: list.ListInfo.BaseTemplate,
+                                        Title: list.ListInfo.Title,
+                                        AllowContentTypes: list.ListInfo.AllowContentTypes,
+                                        Hidden: list.ListInfo.Hidden,
+                                        NoCrawl: list.ListInfo.NoCrawl
+                                    },
+                                    CustomFields: [],
+                                    ViewInformation: []
+                                }]
+                            };
 
-                                    // Hide the loading dialog
-                                    LoadingDialog.hide();
-                                    return;
+                            // Parse the content type fields
+                            let lookupFields: Types.SP.FieldLookup[] = [];
+                            for (let i = 0; i < list.ListContentTypes[0].Fields.results.length; i++) {
+                                let fldInfo = list.ListContentTypes[0].Fields.results[i];
+
+                                // Skip internal fields
+                                if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
+
+                                // See if this is a lookup field
+                                if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
+                                    // Add the field
+                                    lookupFields.push(fldInfo);
                                 }
 
-                                // Get the list information
-                                var list = new List({
-                                    listName: listInfo.ListName,
-                                    webUrl: listInfo.WebUrl,
-                                    itemQuery: { Filter: "Id eq 0" },
-                                    onInitError: () => {
+                                // Add the field information
+                                cfgProps.ListCfg[0].CustomFields.push({
+                                    name: fldInfo.InternalName,
+                                    schemaXml: fldInfo.SchemaXml
+                                });
+                            }
+
+                            // Parse the views
+                            for (let i = 0; i < list.ListViews.length; i++) {
+                                let viewInfo = list.ListViews[i];
+
+                                // Add the view
+                                cfgProps.ListCfg[0].ViewInformation.push({
+                                    Default: true,
+                                    ViewName: viewInfo.Title,
+                                    ViewFields: viewInfo.ViewFields.Items.results,
+                                    ViewQuery: viewInfo.ViewQuery
+                                });
+                            }
+
+                            // Update the loading dialog
+                            LoadingDialog.setHeader("Creating the List");
+                            LoadingDialog.setBody("Creating the destination list...");
+
+                            // Create the list
+                            let cfg = Helper.SPConfig(cfgProps);
+                            cfg.setWebUrl(web.ServerRelativeUrl);
+                            cfg.install().then(() => {
+                                // Update the loading dialog
+                                LoadingDialog.setHeader("Reading Destination Web");
+                                LoadingDialog.setBody("Getting the context information of the destination web...");
+
+                                // Get the digest value for the destination web
+                                ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
+                                    // Update the loading dialog
+                                    LoadingDialog.setHeader("Updating the List");
+                                    LoadingDialog.setBody("Updating the lookup field(s)...");
+
+                                    // Parse the lookup fields
+                                    Helper.Executor(lookupFields, lookupField => {
+                                        // Return a promise
+                                        return new Promise(resolve => {
+                                            // Get the lookup field source list
+                                            Web(listInfo.WebUrl).Lists().getById(lookupField.LookupList).execute(srcList => {
+                                                // Get the lookup list in the destination site
+                                                Web(web.ServerRelativeUrl).Lists(srcList.Title).execute(dstList => {
+                                                    // Update the field schema xml
+                                                    let fieldDef = lookupField.SchemaXml.replace(`List="${lookupField.LookupList}"`, `List="{${dstList.Id}}"`);
+                                                    Web(web.ServerRelativeUrl, {
+                                                        requestDigest: context.GetContextWebInformation.FormDigestValue
+                                                    }).Lists(list.ListInfo.Title).Fields(lookupField.InternalName).update({
+                                                        SchemaXml: fieldDef
+                                                    }).execute(() => {
+                                                        // Updated the lookup list
+                                                        console.log(`Updated the lookup field ${lookupField.InternalName} lookup list successfully.`);
+
+                                                        // Check the next field
+                                                        resolve(null);
+                                                    })
+                                                }, () => {
+                                                    // Error getting the lookup list
+                                                    console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${web.ServerRelativeUrl}.`);
+
+                                                    // Check the next field
+                                                    resolve(null);
+                                                });
+                                            }, () => {
+                                                // Error getting the lookup list
+                                                console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${listInfo.WebUrl}.`);
+
+                                                // Check the next field
+                                                resolve(null);
+                                            });
+                                        });
+                                    }).then(() => {
                                         // Update the validation
                                         let ctrl = form.getControl("WebUrl");
                                         ctrl.updateValidation(ctrl.el, {
-                                            isValid: false,
-                                            invalidMessage: "Error loading the list information. Please check your permissions to the list."
+                                            isValid: true,
+                                            validMessage: "The list was copied successfully to the destination url."
                                         });
 
-                                        // Hide the loading dialog
-                                        LoadingDialog.hide();
-                                    },
-                                    onInitialized: () => {
-                                        // Update the loading dialog
-                                        LoadingDialog.setHeader("Analyzing the List");
-                                        LoadingDialog.setBody("Getting the list information...");
+                                        // Get the new list's url
+                                        Web(listInfo.WebUrl).Lists(listInfo.ListName).RootFolder().execute(folder => {
+                                            // Hide the loading dialog
+                                            LoadingDialog.hide();
 
-                                        // Create the configuration
-                                        let cfgProps: Helper.ISPConfigProps = {
-                                            ListCfg: [{
-                                                ListInformation: {
-                                                    BaseTemplate: list.ListInfo.BaseTemplate,
-                                                    Title: list.ListInfo.Title,
-                                                    AllowContentTypes: list.ListInfo.AllowContentTypes,
-                                                    Hidden: list.ListInfo.Hidden,
-                                                    NoCrawl: list.ListInfo.NoCrawl
-                                                },
-                                                CustomFields: []
-                                            }]
-                                        };
-
-                                        // Parse the content type fields
-                                        let lookupFields: Types.SP.FieldLookup[] = [];
-                                        for (let i = 0; i < list.ListContentTypes[0].Fields.results.length; i++) {
-                                            let fldInfo = list.ListContentTypes[0].Fields.results[i];
-
-                                            // Skip internal fields
-                                            if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
-
-                                            // See if this is a lookup field
-                                            if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
-                                                // Add the field
-                                                lookupFields.push(fldInfo);
-                                            }
-
-                                            // Add the field information
-                                            cfgProps.ListCfg[0].CustomFields.push({
-                                                name: fldInfo.InternalName,
-                                                schemaXml: fldInfo.SchemaXml
-                                            });
-                                        }
-
-                                        // Parse the default view fields
-                                        let defaultView = list.ListViews[0];
-                                        cfgProps.ListCfg[0].ViewInformation = [{
-                                            Default: true,
-                                            ViewName: defaultView.Title,
-                                            ViewFields: [],
-                                            ViewQuery: defaultView.ViewQuery
-                                        }];
-                                        for (let i = 0; i < defaultView.ViewFields.Items.results.length; i++) {
-                                            let fieldName = defaultView.ViewFields.Items.results[i];
-
-                                            // Add the field
-                                            cfgProps.ListCfg[0].ViewInformation[0].ViewFields.push(fieldName);
-                                        }
-
-                                        // Update the loading dialog
-                                        LoadingDialog.setHeader("Creating the List");
-                                        LoadingDialog.setBody("Creating the destination list...");
-
-                                        // Create the list
-                                        let cfg = Helper.SPConfig(cfgProps);
-                                        cfg.setWebUrl(web.ServerRelativeUrl);
-                                        cfg.install().then(() => {
-                                            // Update the loading dialog
-                                            LoadingDialog.setHeader("Reading Destination Web");
-                                            LoadingDialog.setBody("Getting the context information of the destination web...");
-
-                                            // Get the digest value for the destination web
-                                            ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
-                                                // Update the loading dialog
-                                                LoadingDialog.setHeader("Updating the List");
-                                                LoadingDialog.setBody("Updating the lookup field(s)...");
-
-                                                // Parse the lookup fields
-                                                Helper.Executor(lookupFields, lookupField => {
-                                                    // Return a promise
-                                                    return new Promise(resolve => {
-                                                        // Get the lookup field source list
-                                                        Web(listInfo.WebUrl).Lists().getById(lookupField.LookupList).execute(srcList => {
-                                                            // Get the lookup list in the destination site
-                                                            Web(web.ServerRelativeUrl).Lists(srcList.Title).execute(dstList => {
-                                                                // Update the field schema xml
-                                                                let fieldDef = lookupField.SchemaXml.replace(`List="${lookupField.LookupList}"`, `List="{${dstList.Id}}"`);
-                                                                Web(web.ServerRelativeUrl, {
-                                                                    requestDigest: context.GetContextWebInformation.FormDigestValue
-                                                                }).Lists(list.ListInfo.Title).Fields(lookupField.InternalName).update({
-                                                                    SchemaXml: fieldDef
-                                                                }).execute(() => {
-                                                                    // Updated the lookup list
-                                                                    console.log(`Updated the lookup field ${lookupField.InternalName} lookup list successfully.`);
-
-                                                                    // Check the next field
-                                                                    resolve(null);
-                                                                })
-                                                            }, () => {
-                                                                // Error getting the lookup list
-                                                                console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${web.ServerRelativeUrl}.`);
-
-                                                                // Check the next field
-                                                                resolve(null);
-                                                            });
-                                                        }, () => {
-                                                            // Error getting the lookup list
-                                                            console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${listInfo.WebUrl}.`);
-
-                                                            // Check the next field
-                                                            resolve(null);
-                                                        });
-                                                    });
-                                                }).then(() => {
-                                                    // Update the validation
-                                                    let ctrl = form.getControl("WebUrl");
-                                                    ctrl.updateValidation(ctrl.el, {
-                                                        isValid: true,
-                                                        validMessage: "The list was copied successfully to the destination url."
-                                                    });
-
-                                                    // Hide the loading dialog
-                                                    LoadingDialog.hide();
-                                                });
-                                            });
+                                            // Resolve the request
+                                            resolve(folder.ServerRelativeUrl)
                                         });
-                                    }
+                                    });
                                 });
-                            },
+                            });
+                        }
+                    });
+                },
 
-                            // Doesn't exist
-                            () => {
-                                // Update the validation
-                                let ctrl = form.getControl("WebUrl");
-                                ctrl.updateValidation(ctrl.el, {
-                                    isValid: false,
-                                    invalidMessage: "The target web doesn't exist, or you do not have access to it."
-                                });
+                // Doesn't exist
+                () => {
+                    // Update the validation
+                    let ctrl = form.getControl("WebUrl");
+                    ctrl.updateValidation(ctrl.el, {
+                        isValid: false,
+                        invalidMessage: "The target web doesn't exist, or you do not have access to it."
+                    });
 
-                                // Hide the loading dialog
-                                LoadingDialog.hide();
-                            }
-                        );
-                    }
+                    // Hide the loading dialog
+                    LoadingDialog.hide();
                 }
-            }
+            );
         });
-
-        // Show the canvas form
-        CanvasForm.show();
     }
 
     // Deletes a list
@@ -627,6 +598,7 @@ class ListInfo {
                                         onQueryWeb: (odata) => {
                                             // Include the list information
                                             odata.Expand.push("Lists/RootFolder");
+                                            odata.Expand.push("Lists/Views");
                                             odata.Select.push("Lists/BaseTemplate");
                                             odata.Select.push("Lists/Description");
                                             odata.Select.push("Lists/Id");
@@ -769,6 +741,10 @@ class ListInfo {
                     title: "List Item Count"
                 },
                 {
+                    name: "ListViewCount",
+                    title: "List View Count"
+                },
+                {
                     className: "text-end",
                     name: "",
                     title: "",
@@ -807,7 +783,7 @@ class ListInfo {
                                     type: Components.ButtonTypes.OutlineSuccess,
                                     onClick: () => {
                                         // Display the copy form
-                                        this.copyList(row);
+                                        this.showCopyListForm(row);
                                     }
                                 }
                             ]
@@ -844,6 +820,95 @@ class ListInfo {
 
         // Show the modal
         Modal.show();
+    }
+
+    // Shows the copy list form
+    private showCopyListForm(listInfo: IRowInfo) {
+        // Clear the canvas
+        CanvasForm.clear();
+
+        // Set the header
+        CanvasForm.setHeader("Copy List");
+
+        // Set the body
+        let form = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [
+                {
+                    label: "Source List",
+                    name: "SourceList",
+                    description: "The url of the source list.",
+                    type: Components.FormControlTypes.Readonly,
+                    value: listInfo.ListUrl
+                },
+                {
+                    label: "List Name",
+                    name: "ListName",
+                    type: Components.FormControlTypes.TextField,
+                    value: listInfo.ListName,
+                    description: "The list name to create.",
+                    errorMessage: "A list name is required."
+                },
+                {
+                    label: "Web Url",
+                    name: "WebUrl",
+                    type: Components.FormControlTypes.TextField,
+                    required: true,
+                    description: "The destination url of the site to copy the list to.",
+                    errorMessage: "The destination url is required."
+                }
+            ]
+        });
+
+        // Set the footer
+        let btnView: Components.IButton = null;
+        let newListUrl: string = null;
+        Components.TooltipGroup({
+            el: CanvasForm.BodyElement,
+            tooltips: [
+                {
+                    content: "Click to copy the list.",
+                    btnProps: {
+                        text: "Copy",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: () => {
+                            // Disable the view button
+                            btnView.disable();
+
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                // Copy the list
+                                this.copyList(listInfo, form).then(url => {
+                                    // Set the url
+                                    newListUrl = url;
+
+                                    // Enable the button
+                                    btnView.enable();
+                                });
+                            }
+                        }
+                    }
+                },
+                {
+                    content: "View the new list.",
+                    btnProps: {
+                        assignTo: btn => {
+                            btnView = btn;
+                        },
+                        text: "View",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        isDisabled: true,
+                        onClick: () => {
+                            // Show the list in a new tab
+                            newListUrl ? window.open(newListUrl, "_blank") : null;
+                        }
+                    }
+                }
+            ]
+        });
+
+        // Show the canvas form
+        CanvasForm.show();
     }
 }
 
