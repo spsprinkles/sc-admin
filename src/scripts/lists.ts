@@ -155,7 +155,8 @@ class ListInfo {
                                                     Hidden: list.ListInfo.Hidden,
                                                     NoCrawl: list.ListInfo.NoCrawl
                                                 },
-                                                CustomFields: []
+                                                CustomFields: [],
+                                                ViewInformation: []
                                             }]
                                         };
 
@@ -180,19 +181,17 @@ class ListInfo {
                                             });
                                         }
 
-                                        // Parse the default view fields
-                                        let defaultView = list.ListViews[0];
-                                        cfgProps.ListCfg[0].ViewInformation = [{
-                                            Default: true,
-                                            ViewName: defaultView.Title,
-                                            ViewFields: [],
-                                            ViewQuery: defaultView.ViewQuery
-                                        }];
-                                        for (let i = 0; i < defaultView.ViewFields.Items.results.length; i++) {
-                                            let fieldName = defaultView.ViewFields.Items.results[i];
+                                        // Parse the views
+                                        for (let i = 0; i < list.ListViews.length; i++) {
+                                            let viewInfo = list.ListViews[i];
 
-                                            // Add the field
-                                            cfgProps.ListCfg[0].ViewInformation[0].ViewFields.push(fieldName);
+                                            // Add the view
+                                            cfgProps.ListCfg[0].ViewInformation.push({
+                                                Default: true,
+                                                ViewName: viewInfo.Title,
+                                                ViewFields: viewInfo.ViewFields.Items.results,
+                                                ViewQuery: viewInfo.ViewQuery
+                                            });
                                         }
 
                                         // Update the loading dialog
