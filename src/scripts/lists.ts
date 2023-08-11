@@ -855,6 +855,9 @@ class ListInfo {
                         text: "Copy",
                         type: Components.ButtonTypes.OutlinePrimary,
                         onClick: () => {
+                            // Disable the view button
+                            btnView.disable();
+
                             // Ensure the form is valid
                             if (form.isValid()) {
                                 // Copy the list
