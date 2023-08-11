@@ -75,7 +75,8 @@ class ListInfo {
             LoadingDialog.show();
 
             // Get the target web
-            let url = form.getValues()["WebUrl"];
+            let formValues = form.getValues();
+            let url = formValues["WebUrl"];
             Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
                 // Exists
                 (web) => {
@@ -95,7 +96,7 @@ class ListInfo {
 
                     // Get the list information
                     var list = new List({
-                        listName: listInfo.ListName,
+                        listName: formValues["ListName"],
                         webUrl: listInfo.WebUrl,
                         itemQuery: { Filter: "Id eq 0" },
                         onInitError: () => {
@@ -829,8 +830,17 @@ class ListInfo {
                 {
                     label: "Source List",
                     name: "SourceList",
+                    description: "The url of the source list.",
                     type: Components.FormControlTypes.Readonly,
                     value: listInfo.ListUrl
+                },
+                {
+                    label: "List Name",
+                    name: "ListName",
+                    type: Components.FormControlTypes.TextField,
+                    value: listInfo.ListName,
+                    description: "The list name to create.",
+                    errorMessage: "A list name is required."
                 },
                 {
                     label: "Web Url",
