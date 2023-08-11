@@ -11,14 +11,15 @@ interface IRowInfo {
     ListName: string;
     ListType: string;
     ListUrl: string;
+    ListViewCount: number;
     WebTitle: string;
     WebUrl: string;
 }
 
 // CSV Export Fields
 const CSVExportFields = [
-    "ListDescription", "ListId", "ListItemCount", "ListName",
-    "ListType", "ListUrl", "WebTitle", "WebUrl"
+    "ListDescription", "ListId", "ListItemCount", "ListViewCount",
+    "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
 ];
 
 /**
@@ -55,6 +56,7 @@ class ListInfo {
                         ListName: list.Title,
                         ListType: this.getListType(list.BaseTemplate),
                         ListUrl: (list.RootFolder as any as Types.SP.Folder).ServerRelativeUrl,
+                        ListViewCount: (list.Views as any as Types.SP.IViewCollection).results.length,
                         WebTitle: web.Title,
                         WebUrl: web.Url
                     });
@@ -596,6 +598,7 @@ class ListInfo {
                                         onQueryWeb: (odata) => {
                                             // Include the list information
                                             odata.Expand.push("Lists/RootFolder");
+                                            odata.Expand.push("Lists/Views");
                                             odata.Select.push("Lists/BaseTemplate");
                                             odata.Select.push("Lists/Description");
                                             odata.Select.push("Lists/Id");
@@ -736,6 +739,10 @@ class ListInfo {
                 {
                     name: "ListItemCount",
                     title: "List Item Count"
+                },
+                {
+                    name: "ListViewCount",
+                    title: "List View Count"
                 },
                 {
                     className: "text-end",
