@@ -161,19 +161,9 @@ class DocumentSearch {
         // Set the header
         Modal.setHeader("Site Information");
 
-        // Set the default date for retention
-        let defaultDate = moment(Date.now()).subtract("months", "24").toISOString();
-
         // Render the form
         let form = Components.Form({
             controls: [
-                /* TODO - Add a category dropdown that will put keywords in the search terms
-                {
-                    label: "Search Sub-Sites?",
-                    name: "RecurseWebs",
-                    type: Components.FormControlTypes.Switch
-                },
-                */
                 {
                     label: "Search Terms",
                     name: "SearchTerms",
@@ -268,7 +258,7 @@ class DocumentSearch {
                                             this._errors.push(webUrl);
                                             resolve(null);
                                         }
-                                    )
+                                    );
                                 });
                             }).then(() => {
                                 // Render the summary
