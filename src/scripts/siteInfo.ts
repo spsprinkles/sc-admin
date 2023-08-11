@@ -49,6 +49,11 @@ class SiteInfo {
     private analyzeSites(webs: Types.SP.WebOData[]) {
         // Return a promise
         return new Promise(resolve => {
+            // Show a loading dialog
+            LoadingDialog.setHeader("Analyzing the Data");
+            LoadingDialog.setBody("Getting additional user information...");
+            LoadingDialog.show();
+
             // Parse the webs
             Helper.Executor(webs, web => {
                 // Return a promise
@@ -85,6 +90,9 @@ class SiteInfo {
                     });
                 });
             }).then(() => {
+                // Hide the loading dialog
+                LoadingDialog.hide();
+
                 // Check the next site collection
                 resolve(null);
             });
