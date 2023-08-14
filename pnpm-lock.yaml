@@ -8,7 +8,7 @@ specifiers:
   datatables.net: ^1.13.5
   datatables.net-bs5: ^1.13.5
   dattatable: ^2.7.9
-  gd-sprest-bs: ^10.10.36
+  gd-sprest-bs: ^10.10.40
   jquery: ^3.7.0
   moment: ^2.29.4
   moment-locales-webpack-plugin: ^1.2.0
@@ -25,8 +25,8 @@ specifiers:
 dependencies:
   datatables.net: 1.13.5
   datatables.net-bs5: 1.13.5
-  dattatable: 2.7.9_f7gzukuohndet2g6glnbesbh7i
-  gd-sprest-bs: 10.10.36
+  dattatable: 2.7.9_tp6ejhgrvw4gcoajxoszu2kigy
+  gd-sprest-bs: 10.10.40
   jquery: 3.7.0
   moment: 2.29.4
   text-encoding: 0.7.0
@@ -1784,7 +1784,7 @@ packages:
       jquery: 3.7.0
     dev: false
 
-  /dattatable/2.7.9_f7gzukuohndet2g6glnbesbh7i:
+  /dattatable/2.7.9_tp6ejhgrvw4gcoajxoszu2kigy:
     resolution: {integrity: sha512-xk2fNjZDADhWUyC+O69MjTWhqpZYDNkRCfg0gEGuqCF5psJRiIGmXuwiVTIPfhIe0pJZL4VFi8LRa3stW3VSVg==}
     peerDependencies:
       datatables.net: '*'
@@ -1795,7 +1795,7 @@ packages:
     dependencies:
       datatables.net: 1.13.5
       datatables.net-bs5: 1.13.5
-      gd-sprest-bs: 10.10.36
+      gd-sprest-bs: 10.10.40
       jquery: 3.7.0
       moment: 2.29.4
     dev: false
@@ -1988,12 +1988,12 @@ packages:
       tippy.js: 6.3.7
     dev: false
 
-  /gd-sprest-bs/10.10.36:
-    resolution: {integrity: sha512-eTHs6yikGBXjW8Jwpvba7tw1IznjNHIz5VkUVuGOasP8zQduYQKZHai6a57OhYmqmifQAw1OemWdYmcXHHsA4w==}
+  /gd-sprest-bs/10.10.40:
+    resolution: {integrity: sha512-c7Fvg7eORXcf4aA15b+sYXnu1A7rdRZGwupovyFi0JSPLtO/9m51f9vLOWLcfhcWHa8UVeSRrmwW22GobXsNfQ==}
     dependencies:
       flatpickr: 4.6.13
       gd-bs: 6.2.1
-      gd-sprest: 7.6.2
+      gd-sprest: 7.6.4
       gd-sprest-def: 1.3.3
       quill: 1.3.7
     dev: false
@@ -2002,8 +2002,8 @@ packages:
     resolution: {integrity: sha512-Fe00tNX5S0anQt3z7n5DkpT6/dvBxvP+8/k3ebQmpSLiIefq1nWMt2qrNMLGRYy0z2G+4AQrVZxLPZMNpRlFXA==}
     dev: false
 
-  /gd-sprest/7.6.2:
-    resolution: {integrity: sha512-N0pAKRfddRH6VctHLjiK+0Y90HIdJIr1NSSHQh1Mm11vbzaQDAsxst9DN5UA989JAEEgtfC+S5EGPKeJEV1hkQ==}
+  /gd-sprest/7.6.4:
+    resolution: {integrity: sha512-xmkDqrlxFtxNBbfTPD7eWVJDJ7KPEh8sniNvAQRXKHlPU45CkeEIW1c17AFc6GN+pSUqLM2Z7feAsMT2i7M9Eg==}
     dependencies:
       gd-sprest-def: 1.3.3
     dev: false
