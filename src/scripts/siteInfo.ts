@@ -1,10 +1,11 @@
-import { DataTable, LoadingDialog, Modal } from "dattatable";
+import { CanvasForm, DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
+    IsRootWeb: boolean;
     Owners: string;
     SCAs: string;
     WebDescription: string;
@@ -24,7 +25,7 @@ interface IUserInfo {
 
 // CSV Export Fields
 const CSVExportFields = [
-    "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
+    "IsRootWeb", "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
 ];
 
 /**
@@ -50,7 +51,7 @@ class SiteInfo {
         // Return a promise
         return new Promise(resolve => {
             // Show a loading dialog
-            LoadingDialog.setHeader("Analyzing the Data");
+            LoadingDialog.setHeader("Analyzing the data");
             LoadingDialog.setBody("Getting additional user information...");
             LoadingDialog.show();
 
@@ -76,6 +77,7 @@ class SiteInfo {
 
                             // Add a row for this entry
                             this._rows.push({
+                                IsRootWeb: web.ParentWeb && web.ParentWeb.Id ? false : true,
                                 Owners: siteOwners.join(', '),
                                 SCAs: siteAdmins.join(', '),
                                 WebDescription: web.Description,
@@ -200,6 +202,213 @@ class SiteInfo {
         });
     }
 
+    // Manages the SCAs
+    private manageSCAs(webInfo: IRowInfo) {
+        // Set the header
+        CanvasForm.clear();
+        CanvasForm.setHeader("Site Admins");
+
+        // Show a loading dialog
+        LoadingDialog.setHeader("Loading Site Admins");
+        LoadingDialog.setBody("This will close after the user information is loaded...");
+        LoadingDialog.show();
+
+        // Render the add form
+        let formAdd = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [{
+                name: "User",
+                title: "User:",
+                description: "Search for a Site Admin to add",
+                type: Components.FormControlTypes.PeoplePicker,
+                allowGroups: false,
+                required: true
+            } as Components.IFormControlPropsPeoplePicker]
+        });
+
+        let label = document.createElement("label");
+        label.className = "mb-3";
+        label.innerHTML = "Manage Site:<br/>" + webInfo.WebUrl;
+        CanvasForm.BodyElement.prepend(label);
+
+        // Add a button to add the user
+        Components.Tooltip({
+            el: CanvasForm.BodyElement,
+            content: "Click to add the user as a Site Admin",
+            placement: Components.TooltipPlacements.Left,
+            btnProps: {
+                className: "float-end mb-3",
+                text: "Add",
+                type: Components.ButtonTypes.OutlinePrimary,
+                onClick: () => {
+                    // Ensure the form is valid
+                    if (formAdd.isValid()) {
+                        // Show a loading dialog
+                        LoadingDialog.setHeader("Adding User");
+                        LoadingDialog.setBody("This will close after the user is added");
+                        LoadingDialog.show();
+
+                        // Get the user
+                        let ctrl = formAdd.getControl("User");
+                        let userInfo = ctrl.getValue()[0] as Types.SP.User;
+
+                        // Get the context of the target web
+                        ContextInfo.getWeb(webInfo.WebUrl).execute(context => {
+                            // Ensure they are added to the web user info list
+                            Web(webInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).ensureUser(userInfo.LoginName).execute(user => {
+                                // Update the user
+                                user.update({
+                                    IsSiteAdmin: true
+                                }).execute(() => {
+                                    // Successfully added the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: true,
+                                        validMessage: "Successfully added the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+
+                                    // Reload the form
+                                    this.manageSCAs(webInfo);
+                                }, () => {
+                                    // Error adding the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "Error adding the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+                                });
+                            }, () => {
+                                // Error adding the user
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "Error adding the user to the web"
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            });
+                        }, () => {
+                            // Error adding the user
+                            ctrl.updateValidation(ctrl.el, {
+                                isValid: false,
+                                invalidMessage: "Error getting the context information of the web"
+                            });
+
+                            // Hide the loading dialog
+                            LoadingDialog.hide();
+                        });
+                    }
+                }
+            }
+        });
+
+        // Query the web's site users
+        Web(webInfo.WebUrl).SiteUsers().query({
+            Filter: "IsSiteAdmin eq true"
+        }).execute(users => {
+            let items: Components.IDropdownItem[] = [];
+
+            // Parse the users
+            for (let i = 0; i < users.results.length; i++) {
+                let user = users.results[i];
+
+                // Add the user
+                items.push({
+                    text: user.Title,
+                    data: user,
+                    value: user.Id.toString()
+                });
+            }
+
+            // Set the body
+            let formRemove = Components.Form({
+                el: CanvasForm.BodyElement,
+                controls: [{
+                    name: "User",
+                    title: "User:",
+                    description: "Select a Site Admin to remove",
+                    type: Components.FormControlTypes.Dropdown,
+                    required: true,
+                    items
+                } as Components.IFormControlPropsDropdown]
+            });
+
+            // Add a button to add the user
+            Components.Tooltip({
+                el: CanvasForm.BodyElement,
+                content: "Click to remove the selected Site Admin",
+                placement: Components.TooltipPlacements.Left,
+                btnProps: {
+                    className: "float-end",
+                    text: "Remove",
+                    type: Components.ButtonTypes.OutlinePrimary,
+                    onClick: () => {
+                        // Ensure the form is valid
+                        if (formRemove.isValid()) {
+                            // Show a loading dialog
+                            LoadingDialog.setHeader("Removing User");
+                            LoadingDialog.setBody("This will close after the user is removed");
+                            LoadingDialog.show();
+
+                            // Get the user
+                            let ctrl = formRemove.getControl("User");
+                            let selectedItem = ctrl.dropdown.getValue() as Components.IDropdownItem;
+                            let userInfo: Types.SP.User = selectedItem.data;
+
+                            // Get the context of the target web
+                            ContextInfo.getWeb(webInfo.WebUrl).execute(context => {
+                                // Update the user
+                                Web(webInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).SiteUsers(userInfo.Id).update({
+                                    IsSiteAdmin: false
+                                }).execute(user => {
+                                    // Successfully added the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: true,
+                                        validMessage: "Successfully removed the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+
+                                    // Reload the form
+                                    this.manageSCAs(webInfo);
+                                }, () => {
+                                    // Error adding the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "Error removing the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+                                });
+                            }, () => {
+                                // Error adding the user
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "Error getting the context information of the web"
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Hide the loading dialog
+            LoadingDialog.hide();
+
+            // Show the canvas form
+            CanvasForm.show();
+        });
+    }
+
     // Renders the dialog
     private render() {
         // Set the type
@@ -307,7 +516,7 @@ class SiteInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 3,
+                        "targets": 5,
                         "orderable": false,
                         "searchable": false
                     }
@@ -386,6 +595,15 @@ class SiteInfo {
                                             // Delete the site group
                                             this.deleteWeb(row.WebUrl);
                                         }
+                                    }
+                                },
+                                {
+                                    text: "Site Admins",
+                                    type: Components.ButtonTypes.OutlinePrimary,
+                                    isDisabled: !row.IsRootWeb,
+                                    onClick: () => {
+                                        // Show the add form
+                                        this.manageSCAs(row);
                                     }
                                 }
                             ]
