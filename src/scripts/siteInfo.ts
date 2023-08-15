@@ -5,6 +5,7 @@ import { ExportCSV, Webs, IScript } from "../common";
 
 // Row Information
 interface IRowInfo {
+    IsRootWeb: boolean;
     Owners: string;
     SCAs: string;
     WebDescription: string;
@@ -24,7 +25,7 @@ interface IUserInfo {
 
 // CSV Export Fields
 const CSVExportFields = [
-    "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
+    "IsRootWeb", "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
 ];
 
 /**
@@ -176,6 +177,7 @@ class SiteInfo {
 
                             // Add a row for this entry
                             this._rows.push({
+                                IsRootWeb: web.ParentWeb ? false : true,
                                 Owners: siteOwners.join(', '),
                                 SCAs: siteAdmins.join(', '),
                                 WebDescription: web.Description,
@@ -607,6 +609,7 @@ class SiteInfo {
                                 {
                                     text: "Add Admin",
                                     type: Components.ButtonTypes.OutlinePrimary,
+                                    isDisabled: !row.IsRootWeb,
                                     onClick: () => {
                                         // Show the add form
                                         this.addSCA(row);
@@ -615,6 +618,7 @@ class SiteInfo {
                                 {
                                     text: "Remove Admin",
                                     type: Components.ButtonTypes.OutlinePrimary,
+                                    isDisabled: !row.IsRootWeb,
                                     onClick: () => {
                                         // Show the remove form
                                         this.removeSCA(row);
