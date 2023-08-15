@@ -177,7 +177,7 @@ class SiteInfo {
 
                             // Add a row for this entry
                             this._rows.push({
-                                IsRootWeb: web.ParentWeb ? false : true,
+                                IsRootWeb: web.ParentWeb && web.ParentWeb.Id ? false : true,
                                 Owners: siteOwners.join(', '),
                                 SCAs: siteAdmins.join(', '),
                                 WebDescription: web.Description,
