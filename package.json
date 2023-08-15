@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/datta-framework/sc-admin#readme",
   "dependencies": {
-    "datatables.net": "^1.13.5",
-    "datatables.net-bs5": "^1.13.5",
+    "datatables.net": "^1.13.6",
+    "datatables.net-bs5": "^1.13.6",
     "dattatable": "^2.7.9",
     "gd-sprest-bs": "^10.10.44",
     "jquery": "^3.7.0",
@@ -31,12 +31,12 @@
     "text-encoding": "^0.7.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
-    "@babel/preset-env": "^7.22.9",
+    "@babel/core": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
     "babel-loader": "^9.1.3",
     "css-loader": "^6.8.1",
     "moment-locales-webpack-plugin": "^1.2.0",
-    "sass": "^1.64.1",
+    "sass": "^1.65.1",
     "sass-loader": "^13.3.2",
     "style-loader": "^3.3.3",
     "ts-loader": "^9.4.4",
