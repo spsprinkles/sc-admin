@@ -309,7 +309,20 @@ class DocumentRetention {
                 },
                 {
                     name: "Author",
-                    title: "Author"
+                    title: "Author(s)",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        // Clear the cell
+                        el.innerHTML = "";
+
+                        // Validate Author exists & split by ;
+                        let authors = (item.Author && item.Author.split(";")) || [item.Author];
+
+                        // Parse the Authors
+                        authors.forEach(author => {
+                            // Append the Author
+                            el.innerHTML += (author + "<br/>");
+                        });
+                    }
                 },
                 {
                     name: "LastModifiedDate",
