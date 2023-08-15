@@ -2,7 +2,7 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import * as moment from "moment";
-import { ExportCSV, IScript } from "../common";
+import { ExportCSV, isWopi, IScript } from "../common";
 import Strings from "../strings";
 
 // Row Information
@@ -118,36 +118,6 @@ class DocumentRetention {
                 }
             )
         });
-    }
-
-    // Determines if the document can be viewed in office online servers
-    private isWopi(fileName: string) {
-        // Determine if the file type is supported by WOPI
-        let extension: any = fileName.split('.');
-        extension = extension[extension.length - 1].toLowerCase();
-        switch (extension) {
-            // Office Doc Types
-            case "csv":
-            case "doc":
-            case "docx":
-            case "dot":
-            case "dotx":
-            case "pot":
-            case "potx":
-            case "pps":
-            case "ppsx":
-            case "ppt":
-            case "pptx":
-            case "xls":
-            case "xlsx":
-            case "xlt":
-            case "xltx":
-                return true;
-            // Default
-            default: {
-                return false;
-            }
-        }
     }
 
     // Renders the dialog
@@ -369,8 +339,16 @@ class DocumentRetention {
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
-                                        // Show the security group
-                                        window.open(this.isWopi(`${row.DocumentName}.${row.DocumentExt}`) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
+                                        // View the document
+                                        window.open(isWopi(`${row.DocumentName}.${row.DocumentExt}`) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
+                                    }
+                                },
+                                {
+                                    text: "Download",
+                                    type: Components.ButtonTypes.OutlinePrimary,
+                                    onClick: () => {
+                                        // Download the document
+                                        window.open(`${row.WebUrl}/_layouts/15/download.aspx?SourceUrl=${row.DocumentUrl}`, "_blank");
                                     }
                                 },
                                 {

@@ -1,4 +1,5 @@
 export * from "./exportCSV";
+export * from "./isWopi";
 export * from "./sites";
 export * from "./webs";
 
