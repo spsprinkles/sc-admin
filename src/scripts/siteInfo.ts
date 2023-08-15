@@ -49,7 +49,7 @@ class SiteInfo {
     private addSCA(webInfo: IRowInfo) {
         // Set the header
         CanvasForm.clear();
-        CanvasForm.setHeader("Add SCA");
+        CanvasForm.setHeader("Add Site Admin");
 
         // Set the body
         let form = Components.Form({
@@ -57,18 +57,25 @@ class SiteInfo {
             controls: [{
                 name: "User",
                 title: "User:",
-                description: "The user to add as a site collection administrator",
+                description: "Search for a Site Admin to add",
                 type: Components.FormControlTypes.PeoplePicker,
                 allowGroups: false,
                 required: true
             } as Components.IFormControlPropsPeoplePicker]
         });
 
+        let label = document.createElement("label");
+        label.className = "mb-3";
+        label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
+        CanvasForm.BodyElement.prepend(label);
+
         // Add a button to add the user
         Components.Tooltip({
             el: CanvasForm.BodyElement,
-            content: "Click to add the selected user as an admin.",
+            content: "Click to add the user as a Site Admin",
+            placement: Components.TooltipPlacements.Left,
             btnProps: {
+                className: "float-end",
                 text: "Add",
                 type: Components.ButtonTypes.OutlinePrimary,
                 onClick: () => {
@@ -76,7 +83,7 @@ class SiteInfo {
                     if (form.isValid()) {
                         // Show a loading dialog
                         LoadingDialog.setHeader("Adding User");
-                        LoadingDialog.setBody("This will close after the user is added.");
+                        LoadingDialog.setBody("This will close after the user is added");
                         LoadingDialog.show();
 
                         // Get the user
@@ -94,7 +101,7 @@ class SiteInfo {
                                     // Successfully added the user
                                     ctrl.updateValidation(ctrl.el, {
                                         isValid: true,
-                                        validMessage: "Successfully added the user as a site collection admin."
+                                        validMessage: "Successfully added the user as a Site Admin"
                                     });
 
                                     // Hide the loading dialog
@@ -103,7 +110,7 @@ class SiteInfo {
                                     // Error adding the user
                                     ctrl.updateValidation(ctrl.el, {
                                         isValid: false,
-                                        invalidMessage: "Error adding the user as a site collection admin."
+                                        invalidMessage: "Error adding the user as a Site Admin"
                                     });
 
                                     // Hide the loading dialog
@@ -113,7 +120,7 @@ class SiteInfo {
                                 // Error adding the user
                                 ctrl.updateValidation(ctrl.el, {
                                     isValid: false,
-                                    invalidMessage: "Error adding the user to the web."
+                                    invalidMessage: "Error adding the user to the web"
                                 });
 
                                 // Hide the loading dialog
@@ -123,7 +130,7 @@ class SiteInfo {
                             // Error adding the user
                             ctrl.updateValidation(ctrl.el, {
                                 isValid: false,
-                                invalidMessage: "Error getting the context information of the web."
+                                invalidMessage: "Error getting the context information of the web"
                             });
 
                             // Hide the loading dialog
@@ -143,7 +150,7 @@ class SiteInfo {
         // Return a promise
         return new Promise(resolve => {
             // Show a loading dialog
-            LoadingDialog.setHeader("Analyzing the Data");
+            LoadingDialog.setHeader("Analyzing the data");
             LoadingDialog.setBody("Getting additional user information...");
             LoadingDialog.show();
 
@@ -297,7 +304,7 @@ class SiteInfo {
     private removeSCA(webInfo: IRowInfo) {
         // Set the header
         CanvasForm.clear();
-        CanvasForm.setHeader("Remove SCA");
+        CanvasForm.setHeader("Remove Site Admin");
 
         // Show a loading dialog
         LoadingDialog.setHeader("Loading Site Admins");
@@ -328,18 +335,25 @@ class SiteInfo {
                 controls: [{
                     name: "User",
                     title: "User:",
-                    description: "Select a site admin to remove.",
+                    description: "Select a Site Admin to remove",
                     type: Components.FormControlTypes.Dropdown,
                     required: true,
                     items
                 } as Components.IFormControlPropsDropdown]
             });
 
+            let label = document.createElement("label");
+            label.className = "mb-3";
+            label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
+            CanvasForm.BodyElement.prepend(label);
+
             // Add a button to add the user
             Components.Tooltip({
                 el: CanvasForm.BodyElement,
-                content: "Click to remove the selected admin.",
+                content: "Click to remove the selected Site Admin",
+                placement: Components.TooltipPlacements.Left,
                 btnProps: {
+                    className: "float-end",
                     text: "Remove",
                     type: Components.ButtonTypes.OutlinePrimary,
                     onClick: () => {
@@ -347,7 +361,7 @@ class SiteInfo {
                         if (form.isValid()) {
                             // Show a loading dialog
                             LoadingDialog.setHeader("Removing User");
-                            LoadingDialog.setBody("This will close after the user is removed.");
+                            LoadingDialog.setBody("This will close after the user is removed");
                             LoadingDialog.show();
 
                             // Get the user
@@ -364,7 +378,7 @@ class SiteInfo {
                                     // Successfully added the user
                                     ctrl.updateValidation(ctrl.el, {
                                         isValid: true,
-                                        validMessage: "Successfully removed the user as a site collection admin."
+                                        validMessage: "Successfully removed the user as a Site Admin"
                                     });
 
                                     // Hide the loading dialog
@@ -373,7 +387,7 @@ class SiteInfo {
                                     // Error adding the user
                                     ctrl.updateValidation(ctrl.el, {
                                         isValid: false,
-                                        invalidMessage: "Error removing the user as a site collection admin."
+                                        invalidMessage: "Error removing the user as a Site Admin"
                                     });
 
                                     // Hide the loading dialog
@@ -383,7 +397,7 @@ class SiteInfo {
                                 // Error adding the user
                                 ctrl.updateValidation(ctrl.el, {
                                     isValid: false,
-                                    invalidMessage: "Error getting the context information of the web."
+                                    invalidMessage: "Error getting the context information of the web"
                                 });
 
                                 // Hide the loading dialog
@@ -509,7 +523,7 @@ class SiteInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 3,
+                        "targets": 5,
                         "orderable": false,
                         "searchable": false
                     }
@@ -591,7 +605,7 @@ class SiteInfo {
                                     }
                                 },
                                 {
-                                    text: "Add SCA",
+                                    text: "Add Admin",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
                                         // Show the add form
@@ -599,7 +613,7 @@ class SiteInfo {
                                     }
                                 },
                                 {
-                                    text: "Remove SCA",
+                                    text: "Remove Admin",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
                                         // Show the remove form
