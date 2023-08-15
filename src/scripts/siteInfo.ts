@@ -46,106 +46,6 @@ class SiteInfo {
         this.render();
     }
 
-    // Adds an SCA
-    private addSCA(webInfo: IRowInfo) {
-        // Set the header
-        CanvasForm.clear();
-        CanvasForm.setHeader("Add Site Admin");
-
-        // Set the body
-        let form = Components.Form({
-            el: CanvasForm.BodyElement,
-            controls: [{
-                name: "User",
-                title: "User:",
-                description: "Search for a Site Admin to add",
-                type: Components.FormControlTypes.PeoplePicker,
-                allowGroups: false,
-                required: true
-            } as Components.IFormControlPropsPeoplePicker]
-        });
-
-        let label = document.createElement("label");
-        label.className = "mb-3";
-        label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
-        CanvasForm.BodyElement.prepend(label);
-
-        // Add a button to add the user
-        Components.Tooltip({
-            el: CanvasForm.BodyElement,
-            content: "Click to add the user as a Site Admin",
-            placement: Components.TooltipPlacements.Left,
-            btnProps: {
-                className: "float-end",
-                text: "Add",
-                type: Components.ButtonTypes.OutlinePrimary,
-                onClick: () => {
-                    // Ensure the form is valid
-                    if (form.isValid()) {
-                        // Show a loading dialog
-                        LoadingDialog.setHeader("Adding User");
-                        LoadingDialog.setBody("This will close after the user is added");
-                        LoadingDialog.show();
-
-                        // Get the user
-                        let ctrl = form.getControl("User");
-                        let userInfo = ctrl.getValue()[0] as Types.SP.User;
-
-                        // Get the context of the target web
-                        ContextInfo.getWeb(webInfo.WebUrl).execute(context => {
-                            // Ensure they are added to the web user info list
-                            Web(webInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).ensureUser(userInfo.LoginName).execute(user => {
-                                // Update the user
-                                user.update({
-                                    IsSiteAdmin: true
-                                }).execute(() => {
-                                    // Successfully added the user
-                                    ctrl.updateValidation(ctrl.el, {
-                                        isValid: true,
-                                        validMessage: "Successfully added the user as a Site Admin"
-                                    });
-
-                                    // Hide the loading dialog
-                                    LoadingDialog.hide();
-                                }, () => {
-                                    // Error adding the user
-                                    ctrl.updateValidation(ctrl.el, {
-                                        isValid: false,
-                                        invalidMessage: "Error adding the user as a Site Admin"
-                                    });
-
-                                    // Hide the loading dialog
-                                    LoadingDialog.hide();
-                                });
-                            }, () => {
-                                // Error adding the user
-                                ctrl.updateValidation(ctrl.el, {
-                                    isValid: false,
-                                    invalidMessage: "Error adding the user to the web"
-                                });
-
-                                // Hide the loading dialog
-                                LoadingDialog.hide();
-                            });
-                        }, () => {
-                            // Error adding the user
-                            ctrl.updateValidation(ctrl.el, {
-                                isValid: false,
-                                invalidMessage: "Error getting the context information of the web"
-                            });
-
-                            // Hide the loading dialog
-                            LoadingDialog.hide();
-                        });
-                    }
-                }
-            }
-        });
-
-        // Show the canvas form
-        CanvasForm.show();
-    }
-
     // Analyzes the site
     private analyzeSites(webs: Types.SP.WebOData[]) {
         // Return a promise
@@ -302,16 +202,109 @@ class SiteInfo {
         });
     }
 
-    // Remove an SCA
-    private removeSCA(webInfo: IRowInfo) {
+    // Manages the SCAs
+    private manageSCAs(webInfo: IRowInfo) {
         // Set the header
         CanvasForm.clear();
-        CanvasForm.setHeader("Remove Site Admin");
+        CanvasForm.setHeader("Manage Site Admins");
 
         // Show a loading dialog
         LoadingDialog.setHeader("Loading Site Admins");
         LoadingDialog.setBody("This will close after the user information is loaded...");
         LoadingDialog.show();
+
+        // Render the add form
+        let formAdd = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [{
+                name: "User",
+                title: "User:",
+                description: "Search for a Site Admin to add",
+                type: Components.FormControlTypes.PeoplePicker,
+                allowGroups: false,
+                required: true
+            } as Components.IFormControlPropsPeoplePicker]
+        });
+
+        let label = document.createElement("label");
+        label.className = "mb-3";
+        label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
+        CanvasForm.BodyElement.prepend(label);
+
+        // Add a button to add the user
+        Components.Tooltip({
+            el: CanvasForm.BodyElement,
+            content: "Click to add the user as a Site Admin",
+            placement: Components.TooltipPlacements.Left,
+            btnProps: {
+                className: "float-end",
+                text: "Add",
+                type: Components.ButtonTypes.OutlinePrimary,
+                onClick: () => {
+                    // Ensure the form is valid
+                    if (formAdd.isValid()) {
+                        // Show a loading dialog
+                        LoadingDialog.setHeader("Adding User");
+                        LoadingDialog.setBody("This will close after the user is added");
+                        LoadingDialog.show();
+
+                        // Get the user
+                        let ctrl = formAdd.getControl("User");
+                        let userInfo = ctrl.getValue()[0] as Types.SP.User;
+
+                        // Get the context of the target web
+                        ContextInfo.getWeb(webInfo.WebUrl).execute(context => {
+                            // Ensure they are added to the web user info list
+                            Web(webInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).ensureUser(userInfo.LoginName).execute(user => {
+                                // Update the user
+                                user.update({
+                                    IsSiteAdmin: true
+                                }).execute(() => {
+                                    // Successfully added the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: true,
+                                        validMessage: "Successfully added the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+
+                                    // Reload the form
+                                    this.manageSCAs(webInfo);
+                                }, () => {
+                                    // Error adding the user
+                                    ctrl.updateValidation(ctrl.el, {
+                                        isValid: false,
+                                        invalidMessage: "Error adding the user as a Site Admin"
+                                    });
+
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+                                });
+                            }, () => {
+                                // Error adding the user
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "Error adding the user to the web"
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            });
+                        }, () => {
+                            // Error adding the user
+                            ctrl.updateValidation(ctrl.el, {
+                                isValid: false,
+                                invalidMessage: "Error getting the context information of the web"
+                            });
+
+                            // Hide the loading dialog
+                            LoadingDialog.hide();
+                        });
+                    }
+                }
+            }
+        });
 
         // Query the web's site users
         Web(webInfo.WebUrl).SiteUsers().query({
@@ -332,7 +325,7 @@ class SiteInfo {
             }
 
             // Set the body
-            let form = Components.Form({
+            let formRemove = Components.Form({
                 el: CanvasForm.BodyElement,
                 controls: [{
                     name: "User",
@@ -360,14 +353,14 @@ class SiteInfo {
                     type: Components.ButtonTypes.OutlinePrimary,
                     onClick: () => {
                         // Ensure the form is valid
-                        if (form.isValid()) {
+                        if (formRemove.isValid()) {
                             // Show a loading dialog
                             LoadingDialog.setHeader("Removing User");
                             LoadingDialog.setBody("This will close after the user is removed");
                             LoadingDialog.show();
 
                             // Get the user
-                            let ctrl = form.getControl("User");
+                            let ctrl = formRemove.getControl("User");
                             let selectedItem = ctrl.dropdown.getValue() as Components.IDropdownItem;
                             let userInfo: Types.SP.User = selectedItem.data;
 
@@ -385,6 +378,9 @@ class SiteInfo {
 
                                     // Hide the loading dialog
                                     LoadingDialog.hide();
+
+                                    // Reload the form
+                                    this.manageSCAs(webInfo);
                                 }, () => {
                                     // Error adding the user
                                     ctrl.updateValidation(ctrl.el, {
@@ -607,21 +603,12 @@ class SiteInfo {
                                     }
                                 },
                                 {
-                                    text: "Add Admin",
+                                    text: "Manage Admins",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     isDisabled: !row.IsRootWeb,
                                     onClick: () => {
                                         // Show the add form
-                                        this.addSCA(row);
-                                    }
-                                },
-                                {
-                                    text: "Remove Admin",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    isDisabled: !row.IsRootWeb,
-                                    onClick: () => {
-                                        // Show the remove form
-                                        this.removeSCA(row);
+                                        this.manageSCAs(row);
                                     }
                                 }
                             ]
