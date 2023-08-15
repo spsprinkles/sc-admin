@@ -257,7 +257,7 @@ class ExternalUsers {
     // Removes a user from a group
     private removeUser(webUrl: string, user: string, userId: number, group: string) {
         // Display a loading dialog
-        LoadingDialog.setHeader("Removing User Site User");
+        LoadingDialog.setHeader("Removing Site User");
         LoadingDialog.setBody(`Removing the site user '${user}' from the '${group}' group. This will close after the request completes.`);
         LoadingDialog.show();
 
@@ -296,8 +296,8 @@ class ExternalUsers {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,
@@ -415,8 +415,8 @@ class ExternalUsers {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 2nd column by default; ascending
+                order: [[1, "asc"]]
             },
             columns: [
                 {
@@ -441,15 +441,15 @@ class ExternalUsers {
                 },
                 {
                     name: "GroupInfo",
-                    title: "Group Information"
+                    title: "Group Detail"
                 },
                 {
                     name: "Role",
-                    title: "Role"
+                    title: "Permission"
                 },
                 {
                     name: "RoleInfo",
-                    title: "Role/Share Information",
+                    title: "Permission Detail",
                     onRenderCell: (el) => {
                         // Add the data-filter attribute for searching notes properly
                         el.setAttribute("data-filter", el.innerHTML);
