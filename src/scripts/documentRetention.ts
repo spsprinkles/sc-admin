@@ -23,7 +23,6 @@ const CSVExportFields = [
     "LastModifiedDate", "ListId", "WebId", "WebUrl"
 ];
 
-
 /**
  * Document Retention
  * Displays a dialog to get the site information.
@@ -129,7 +128,7 @@ class DocumentRetention {
         Modal.setHeader("Site Information");
 
         // Set the default date for retention
-        let defaultDate = moment(Date.now()).subtract("months", "24").toISOString();
+        let defaultDate = moment(Date.now()).subtract(24, "months").toISOString();
 
         // Render the form
         let form = Components.Form({
@@ -258,7 +257,7 @@ class DocumentRetention {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 5,
+                        "targets": 7,
                         "orderable": false,
                         "searchable": false
                     }
@@ -281,8 +280,8 @@ class DocumentRetention {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 4th column by default; ascending
+                order: [[3, "asc"]]
             },
             columns: [
                 {
@@ -298,16 +297,15 @@ class DocumentRetention {
                     title: "List Id"
                 },
                 {
-                    name: "DocumentName",
-                    title: "Document Name"
-                },
-                {
-                    name: "DocumentExt",
-                    title: "Document Extension"
-                },
-                {
                     name: "DocumentUrl",
                     title: "Document Url"
+                },
+                {
+                    name: "DocumentName",
+                    title: "File Name",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        el.innerHTML = item.DocumentName + "." + item.DocumentExt;
+                    }
                 },
                 {
                     name: "Author",
@@ -315,14 +313,10 @@ class DocumentRetention {
                 },
                 {
                     name: "LastModifiedDate",
-                    title: "Last Modified",
+                    title: "Modified",
                     onRenderCell: (el, col, item: IRowInfo) => {
                         el.innerHTML = item.LastModifiedDate ? moment(item.LastModifiedDate).format(Strings.TimeFormat) : "";
                     }
-                },
-                {
-                    name: "SearchResult",
-                    title: "Search Result"
                 },
                 {
                     className: "text-end",
