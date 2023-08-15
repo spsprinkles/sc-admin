@@ -97,7 +97,7 @@ class DocumentSearch {
     private deleteDocument(webUrl: string, docTitle: string, docUrl: string) {
         // Display a loading dialog
         LoadingDialog.setHeader("Deleting Document");
-        LoadingDialog.setBody("Deleting the document '" + docTitle + "'. This will close after the request completes.");
+        LoadingDialog.setBody("Deleting the document: '" + docTitle + "'. This will close after the request completes.");
         LoadingDialog.show();
 
         // Get the web context
@@ -150,8 +150,8 @@ class DocumentSearch {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 5,
@@ -272,7 +272,7 @@ class DocumentSearch {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 5,
+                        "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
@@ -295,8 +295,8 @@ class DocumentSearch {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 4th column by default; ascending
+                order: [[3, "asc"]]
             },
             columns: [
                 {
@@ -312,24 +312,36 @@ class DocumentSearch {
                     title: "List Id"
                 },
                 {
-                    name: "DocumentName",
-                    title: "Document Name"
-                },
-                {
-                    name: "DocumentExt",
-                    title: "Document Extension"
-                },
-                {
                     name: "DocumentUrl",
                     title: "Document Url"
                 },
                 {
+                    name: "DocumentName",
+                    title: "File Name",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        el.innerHTML = item.DocumentName + "." + item.DocumentExt;
+                    }
+                },
+                {
                     name: "Author",
-                    title: "Author"
+                    title: "Author(s)",
+                    onRenderCell: (el, col, item: IRowInfo) => {
+                        // Clear the cell
+                        el.innerHTML = "";
+
+                        // Validate Author exists & split by ;
+                        let authors = (item.Author && item.Author.split(";")) || [item.Author];
+
+                        // Parse the Authors
+                        authors.forEach(author => {
+                            // Append the Author
+                            el.innerHTML += (author + "<br/>");
+                        });
+                    }
                 },
                 {
                     name: "LastModifiedDate",
-                    title: "Last Modified",
+                    title: "Modified",
                     onRenderCell: (el, col, item: IRowInfo) => {
                         el.innerHTML = item.LastModifiedDate ? moment(item.LastModifiedDate).format(Strings.TimeFormat) : "";
                     }
@@ -421,5 +433,5 @@ class DocumentSearch {
 export const DocumentSearchModal: IScript = {
     init: DocumentSearch,
     name: "Document Search",
-    description: "Searches for documents by key words for a site."
+    description: "Searches for documents by key word(s) within a site."
 };
