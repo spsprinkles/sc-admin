@@ -206,7 +206,7 @@ class SiteInfo {
     private manageSCAs(webInfo: IRowInfo) {
         // Set the header
         CanvasForm.clear();
-        CanvasForm.setHeader("Manage Site Admins");
+        CanvasForm.setHeader("Site Admins");
 
         // Show a loading dialog
         LoadingDialog.setHeader("Loading Site Admins");
@@ -228,7 +228,7 @@ class SiteInfo {
 
         let label = document.createElement("label");
         label.className = "mb-3";
-        label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
+        label.innerHTML = "Manage Site:<br/>" + webInfo.WebUrl;
         CanvasForm.BodyElement.prepend(label);
 
         // Add a button to add the user
@@ -237,7 +237,7 @@ class SiteInfo {
             content: "Click to add the user as a Site Admin",
             placement: Components.TooltipPlacements.Left,
             btnProps: {
-                className: "float-end",
+                className: "float-end mb-3",
                 text: "Add",
                 type: Components.ButtonTypes.OutlinePrimary,
                 onClick: () => {
@@ -336,11 +336,6 @@ class SiteInfo {
                     items
                 } as Components.IFormControlPropsDropdown]
             });
-
-            let label = document.createElement("label");
-            label.className = "mb-3";
-            label.innerHTML = "Site Admins for site:<br/>" + webInfo.WebUrl;
-            CanvasForm.BodyElement.prepend(label);
 
             // Add a button to add the user
             Components.Tooltip({
@@ -603,7 +598,7 @@ class SiteInfo {
                                     }
                                 },
                                 {
-                                    text: "Manage Admins",
+                                    text: "Site Admins",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     isDisabled: !row.IsRootWeb,
                                     onClick: () => {
