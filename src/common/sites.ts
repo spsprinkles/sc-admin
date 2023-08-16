@@ -23,7 +23,7 @@ export class Sites {
         this._props = props;
 
         // Display a loading dialog
-        LoadingDialog.setHeader("Loading Site Collection Information");
+        LoadingDialog.setHeader("Loading Site Information");
         LoadingDialog.setBody("This will close after the site information is collected...");
         LoadingDialog.show();
 
@@ -57,7 +57,7 @@ export class Sites {
             this._props.onQuerySite ? this._props.onQuerySite(odata) : null;
 
             // Update the body
-            LoadingDialog.setBody("This will close after the webs information is collected.<br/>" + url);
+            LoadingDialog.setBody("This will close after the web information is collected...<br/>" + url);
 
             // Query the web
             Site(url).query(odata).execute(

@@ -25,7 +25,7 @@ export class Webs {
 
         // Display a loading dialog
         LoadingDialog.setHeader("Loading Web Information");
-        LoadingDialog.setBody("This will close after the webs information is collected...");
+        LoadingDialog.setBody("This will close after the web information is collected...");
         LoadingDialog.show();
 
         // Clear the webs
@@ -66,7 +66,7 @@ export class Webs {
             this._props.onQueryWeb ? this._props.onQueryWeb(odata) : null;
 
             // Update the body
-            LoadingDialog.setBody("This will close after the webs information is collected.<br/>" + url);
+            LoadingDialog.setBody("This will close after the web information is collected...<br/>" + url);
 
             // Query the web
             Web(url).query(odata).execute(
