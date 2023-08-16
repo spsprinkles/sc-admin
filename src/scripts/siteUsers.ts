@@ -199,8 +199,8 @@ class SiteUsers {
     // Removes a user from a group
     private removeUser(webUrl: string, user: string, userId: number, group: string) {
         // Display a loading dialog
-        LoadingDialog.setHeader("Removing User Site User");
-        LoadingDialog.setBody(`Removing the site user '${user}' will remove them from all group(s). This will close after the request completes.`);
+        LoadingDialog.setHeader("Removing Site User");
+        LoadingDialog.setBody(`Removing the site user '${user}' from all groups. This will close after the request completes.`);
         LoadingDialog.show();
 
         // Get the web context
@@ -236,10 +236,10 @@ class SiteUsers {
         let form = Components.Form({
             controls: [
                 {
-                    label: "User/Login Name",
+                    label: "User or Group Search by Text",
                     name: "UserName",
-                    description: "Enter the user display or login name to search for.",
-                    errorMessage: "Please enter the user information.",
+                    description: "Type a user or group display or login name for the search",
+                    errorMessage: "Please enter the user or group information",
                     type: Components.FormControlTypes.TextField,
                     required: true,
                     onValidate: (ctrl, results) => {
@@ -258,9 +258,9 @@ class SiteUsers {
                     }
                 },
                 {
-                    label: "Search...",
+                    label: "People Search by Lookup",
                     name: "PeoplePicker",
-                    description: "Enter a minimum of 3 characters to search for a user.",
+                    description: "Enter a minimum of 3 characters to search for a user",
                     errorMessage: "No user was selected...",
                     allowGroups: false,
                     type: Components.FormControlTypes.PeoplePicker,
@@ -283,8 +283,8 @@ class SiteUsers {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,
@@ -381,7 +381,7 @@ class SiteUsers {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 8,
+                        "targets": 9,
                         "orderable": false,
                         "searchable": false
                     }
@@ -404,8 +404,8 @@ class SiteUsers {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 2nd & 3rd column by default; ascending
+                order: [[1, "asc"],[2, "asc"]]
             },
             columns: [
                 {
@@ -422,7 +422,7 @@ class SiteUsers {
                 },
                 {
                     name: "LoginName",
-                    title: "Login Name"
+                    title: "Login"
                 },
                 {
                     name: "Email",
@@ -434,15 +434,44 @@ class SiteUsers {
                 },
                 {
                     name: "GroupInfo",
-                    title: "Group Information"
+                    title: "Group Detail",
+                    onRenderCell: (el) => {
+                        // Add the data-filter attribute for searching notes properly
+                        el.setAttribute("data-filter", el.innerHTML);
+                        // Add the data-order attribute for sorting notes properly
+                        el.setAttribute("data-order", el.innerHTML);
+
+                        // Declare a span element
+                        let span = document.createElement("span");
+                        span.className = "notes";
+
+                        // Return the plain text if less than 50 chars
+                        if (el.innerHTML.length < 50) {
+                            span.innerHTML = el.innerHTML;
+                        } else {
+                            // Truncate to the last white space character in the text after 50 chars and add an ellipsis
+                            span.innerHTML = el.innerHTML.substring(0, 50).replace(/\s([^\s]*)$/, '') + '&#8230';
+
+                            // Add a tooltip containing the text
+                            Components.Tooltip({
+                                content: "<small>" + el.innerHTML + "</small>",
+                                target: span
+                            });
+                        }
+
+                        // Clear the element
+                        el.innerHTML = "";
+                        // Append the span
+                        el.appendChild(span);
+                    }
                 },
                 {
                     name: "Role",
-                    title: "Role"
+                    title: "Permission"
                 },
                 {
                     name: "RoleInfo",
-                    title: "Role/Share Information",
+                    title: "Permission Detail",
                     onRenderCell: (el) => {
                         // Add the data-filter attribute for searching notes properly
                         el.setAttribute("data-filter", el.innerHTML);
@@ -502,7 +531,7 @@ class SiteUsers {
                                         isDisabled: !(row.Id > 0),
                                         onClick: () => {
                                             // Confirm the removal of the user
-                                            if (confirm("Are you sure you want to remove the user from this site collection?")) {
+                                            if (confirm("Are you sure you want to remove the user from this site?")) {
                                                 // Disable this button
                                                 btnDelete.disable();
 
@@ -522,7 +551,7 @@ class SiteUsers {
                                 type: Components.ButtonTypes.OutlineDanger,
                                 onClick: () => {
                                     // Confirm the deletion of the group
-                                    if (confirm("Are you sure you want to remove the user from this site collection?")) {
+                                    if (confirm("Are you sure you want to remove the user from this site?")) {
                                         // Disable this button
                                         btnDelete.disable();
 

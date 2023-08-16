@@ -50,11 +50,11 @@ class StorageMetrics {
 
                 // Calculate the total file stream size
                 let totalFileStreamSize = rootFolder.StorageMetrics.TotalFileStreamSize;
-                totalFileStreamSize = totalFileStreamSize > 0 ? (totalFileStreamSize / Math.pow(1024, 3)).toFixed(4) + " GB" as any : totalFileStreamSize;
+                totalFileStreamSize = totalFileStreamSize > 0 ? (totalFileStreamSize / Math.pow(1024, 3)).toFixed(2) + " GB" as any : totalFileStreamSize;
 
                 // Calculate the total size
                 let totalSize = rootFolder.StorageMetrics.TotalSize;
-                totalSize = totalSize > 0 ? (totalSize / Math.pow(1024, 3)).toFixed(4) + " GB" as any : totalSize;
+                totalSize = totalSize > 0 ? (totalSize / Math.pow(1024, 3)).toFixed(2) + " GB" as any : totalSize;
 
                 // Add a row for this entry
                 this._rows.push({
@@ -92,8 +92,8 @@ class StorageMetrics {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,
@@ -210,8 +210,8 @@ class StorageMetrics {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 2nd column by default; ascending
+                order: [[1, "asc"]]
             },
             columns: [
                 {
@@ -224,11 +224,39 @@ class StorageMetrics {
                 },
                 {
                     name: "WebDescription",
-                    title: "Description"
+                    title: "Description",
+                    onRenderCell: (el) => {
+                        // Add the data-filter attribute for searching notes properly
+                        el.setAttribute("data-filter", el.innerHTML);
+                        // Add the data-order attribute for sorting notes properly
+                        el.setAttribute("data-order", el.innerHTML);
+
+                        // Declare a span element
+                        let span = document.createElement("span");
+
+                        // Return the plain text if less than 50 chars
+                        if (el.innerHTML.length < 50) {
+                            span.innerHTML = el.innerHTML;
+                        } else {
+                            // Truncate to the last white space character in the text after 50 chars and add an ellipsis
+                            span.innerHTML = el.innerHTML.substring(0, 50).replace(/\s([^\s]*)$/, '') + '&#8230';
+
+                            // Add a tooltip containing the text
+                            Components.Tooltip({
+                                content: "<small>" + el.innerHTML + "</small>",
+                                target: span
+                            });
+                        }
+
+                        // Clear the element
+                        el.innerHTML = "";
+                        // Append the span
+                        el.appendChild(span);
+                    }
                 },
                 {
                     name: "LastModified",
-                    title: "Last Modified",
+                    title: "Modified",
                     onRenderCell: (el, col, item: IRowInfo) => {
                         el.innerHTML = item.LastModified ? moment(item.LastModified).format(Strings.TimeFormat) : "";
                     }
@@ -239,7 +267,7 @@ class StorageMetrics {
                 },
                 {
                     name: "TotalFileStreamSize",
-                    title: "Total File Stream Size"
+                    title: "Total Stream Size"
                 },
                 {
                     name: "TotalSize",

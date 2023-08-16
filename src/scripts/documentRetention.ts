@@ -128,7 +128,7 @@ class DocumentRetention {
         Modal.setHeader("Site Information");
 
         // Set the default date for retention
-        let defaultDate = moment(Date.now()).subtract(24, "months").toISOString();
+        let defaultDate = moment(Date.now()).subtract(18, "months").toISOString();
 
         // Render the form
         let form = Components.Form({
@@ -143,8 +143,8 @@ class DocumentRetention {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,

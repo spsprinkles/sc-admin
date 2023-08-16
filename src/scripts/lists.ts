@@ -82,13 +82,13 @@ class ListInfo {
             Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
                 // Exists
                 (web) => {
-                    // Ensure the user doesn't have permissions to manage lists
+                    // Ensure the user doesn't have permission to manage lists
                     if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
                         // Update the validation
                         let ctrl = form.getControl("WebUrl");
                         ctrl.updateValidation(ctrl.el, {
                             isValid: false,
-                            invalidMessage: "You do not have permissions to create lists on this web."
+                            invalidMessage: "You do not have permission to create lists on this web."
                         });
 
                         // Hide the loading dialog
@@ -106,7 +106,7 @@ class ListInfo {
                             let ctrl = form.getControl("WebUrl");
                             ctrl.updateValidation(ctrl.el, {
                                 isValid: false,
-                                invalidMessage: "Error loading the list information. Please check your permissions to the list."
+                                invalidMessage: "Error loading the list information. Please check your permission to this list."
                             });
 
                             // Hide the loading dialog
@@ -200,21 +200,21 @@ class ListInfo {
                                                         SchemaXml: fieldDef
                                                     }).execute(() => {
                                                         // Updated the lookup list
-                                                        console.log(`Updated the lookup field ${lookupField.InternalName} lookup list successfully.`);
+                                                        console.log(`Updated the lookup field '${lookupField.InternalName}' in lookup list successfully.`);
 
                                                         // Check the next field
                                                         resolve(null);
                                                     })
                                                 }, () => {
                                                     // Error getting the lookup list
-                                                    console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${web.ServerRelativeUrl}.`);
+                                                    console.error(`Error getting the lookup list '${lookupField.LookupList}' from web '${web.ServerRelativeUrl}'.`);
 
                                                     // Check the next field
                                                     resolve(null);
                                                 });
                                             }, () => {
                                                 // Error getting the lookup list
-                                                console.error(`Error getting the lookup list ${lookupField.LookupList} from web ${listInfo.WebUrl}.`);
+                                                console.error(`Error getting the lookup list '${lookupField.LookupList}' from web '${listInfo.WebUrl}'.`);
 
                                                 // Check the next field
                                                 resolve(null);
@@ -560,8 +560,8 @@ class ListInfo {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,
@@ -657,7 +657,7 @@ class ListInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 7,
+                        "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
@@ -680,8 +680,8 @@ class ListInfo {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 5th column by default; ascending
+                order: [[4, "asc"]]
             },
             columns: [
                 {
@@ -693,20 +693,20 @@ class ListInfo {
                     title: "Url"
                 },
                 {
-                    name: "ListType",
-                    title: "List Type"
-                },
-                {
                     name: "ListName",
                     title: "List Name"
                 },
                 {
+                    name: "ListType",
+                    title: "List Type"
+                },
+                {
                     name: "ListUrl",
-                    title: "List Url"
+                    title: "List Path"
                 },
                 {
                     name: "ListDescription",
-                    title: "List Description",
+                    title: "Description",
                     onRenderCell: (el) => {
                         // Add the data-filter attribute for searching notes properly
                         el.setAttribute("data-filter", el.innerHTML);
@@ -738,11 +738,11 @@ class ListInfo {
                 },
                 {
                     name: "ListItemCount",
-                    title: "List Item Count"
+                    title: "Item Count"
                 },
                 {
                     name: "ListViewCount",
-                    title: "List View Count"
+                    title: "View Count"
                 },
                 {
                     className: "text-end",
@@ -837,25 +837,28 @@ class ListInfo {
                 {
                     label: "Source List",
                     name: "SourceList",
-                    description: "The url of the source list.",
+                    //controlClassName: "mb-3",
+                    description: "The url of the source list",
                     type: Components.FormControlTypes.Readonly,
                     value: listInfo.ListUrl
                 },
                 {
                     label: "List Name",
                     name: "ListName",
+                    //controlClassName: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     value: listInfo.ListName,
-                    description: "The list name to create.",
-                    errorMessage: "A list name is required."
+                    description: "The list name to create",
+                    errorMessage: "A list name is required"
                 },
                 {
                     label: "Web Url",
                     name: "WebUrl",
+                    //controlClassName: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     required: true,
-                    description: "The destination url of the site to copy the list to.",
-                    errorMessage: "The destination url is required."
+                    description: "The destination url of the site to copy the list to",
+                    errorMessage: "The destination url is required"
                 }
             ]
         });
@@ -865,9 +868,10 @@ class ListInfo {
         let newListUrl: string = null;
         Components.TooltipGroup({
             el: CanvasForm.BodyElement,
+            className: "float-end mt-3",
             tooltips: [
                 {
-                    content: "Click to copy the list.",
+                    content: "Click to copy the list",
                     btnProps: {
                         text: "Copy",
                         type: Components.ButtonTypes.OutlinePrimary,
@@ -890,7 +894,7 @@ class ListInfo {
                     }
                 },
                 {
-                    content: "View the new list.",
+                    content: "View the new list",
                     btnProps: {
                         assignTo: btn => {
                             btnView = btn;

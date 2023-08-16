@@ -20,7 +20,7 @@ export class Dashboard {
                 // Render an alert
                 Components.Alert({
                     el: this._el,
-                    content: "You are not an owner/admin of the site.",
+                    content: "You are not an admin or owner of the site",
                     type: Components.AlertTypes.Danger
                 });
             }

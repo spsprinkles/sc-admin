@@ -348,7 +348,35 @@ class DocumentSearch {
                 },
                 {
                     name: "SearchResult",
-                    title: "Search Result"
+                    title: "Search Result",
+                    onRenderCell: (el) => {
+                        // Add the data-filter attribute for searching notes properly
+                        el.setAttribute("data-filter", el.innerHTML);
+                        // Add the data-order attribute for sorting notes properly
+                        el.setAttribute("data-order", el.innerHTML);
+
+                        // Declare a span element
+                        let span = document.createElement("span");
+
+                        // Return the plain text if less than 50 chars
+                        if (el.innerHTML.length < 50) {
+                            span.innerHTML = el.innerHTML;
+                        } else {
+                            // Truncate to the last white space character in the text after 50 chars and add an ellipsis
+                            span.innerHTML = el.innerHTML.substring(0, 50).replace(/\s([^\s]*)$/, '') + '&#8230';
+
+                            // Add a tooltip containing the text
+                            Components.Tooltip({
+                                content: "<small>" + el.innerHTML + "</small>",
+                                target: span
+                            });
+                        }
+
+                        // Clear the element
+                        el.innerHTML = "";
+                        // Append the span
+                        el.appendChild(span);
+                    }
                 },
                 {
                     className: "text-end",

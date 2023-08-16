@@ -415,8 +415,8 @@ class ExternalUsers {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 2nd column by default; ascending
-                order: [[1, "asc"]]
+                // Order by the 4th column by default; ascending
+                order: [[3, "asc"]]
             },
             columns: [
                 {
@@ -441,7 +441,36 @@ class ExternalUsers {
                 },
                 {
                     name: "GroupInfo",
-                    title: "Group Detail"
+                    title: "Group Detail",
+                    onRenderCell: (el) => {
+                        // Add the data-filter attribute for searching notes properly
+                        el.setAttribute("data-filter", el.innerHTML);
+                        // Add the data-order attribute for sorting notes properly
+                        el.setAttribute("data-order", el.innerHTML);
+
+                        // Declare a span element
+                        let span = document.createElement("span");
+                        span.className = "notes";
+
+                        // Return the plain text if less than 50 chars
+                        if (el.innerHTML.length < 50) {
+                            span.innerHTML = el.innerHTML;
+                        } else {
+                            // Truncate to the last white space character in the text after 50 chars and add an ellipsis
+                            span.innerHTML = el.innerHTML.substring(0, 50).replace(/\s([^\s]*)$/, '') + '&#8230';
+
+                            // Add a tooltip containing the text
+                            Components.Tooltip({
+                                content: "<small>" + el.innerHTML + "</small>",
+                                target: span
+                            });
+                        }
+
+                        // Clear the element
+                        el.innerHTML = "";
+                        // Append the span
+                        el.appendChild(span);
+                    }
                 },
                 {
                     name: "Role",

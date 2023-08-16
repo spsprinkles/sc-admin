@@ -180,8 +180,8 @@ class SecurityGroups {
                 {
                     label: "Site Url(s)",
                     name: "Urls",
-                    description: "Enter the relative site url(s). (Ex: /sites/dev)",
-                    errorMessage: "Please enter a site url.",
+                    description: "Enter the relative site url(s) [Ex: /sites/dev]",
+                    errorMessage: "Please enter a site url",
                     type: Components.FormControlTypes.TextArea,
                     required: true,
                     rows: 10,
@@ -302,8 +302,8 @@ class SecurityGroups {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 1st column by default; ascending
-                order: [[0, "asc"]]
+                // Order by the 2nd & 3rd column by default; ascending
+                order: [[1, "asc"],[2, "asc"]]
             },
             columns: [
                 {
@@ -320,7 +320,7 @@ class SecurityGroups {
                 },
                 {
                     name: "SiteGroupPermission",
-                    title: "Permissions"
+                    title: "Permission"
                 },
                 {
                     name: "SiteGroupUsers",
