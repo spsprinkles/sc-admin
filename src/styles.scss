@@ -2,81 +2,39 @@
     .card {
         --bs-card-color: #000;
         --bs-card-cap-color: #000;
-        max-width: 15rem;
-    }
-    .card-group.cg-1 {
-        margin-bottom: -1px;
-        >.card:first-child {
-            border-bottom-left-radius: 0;
-        }
-        >.card:last-child {
-            border-bottom-right-radius: 0;
-        }
-    }
-    .card-group.cg-2 {
-        >.card:first-child {
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
-        }
-        >.card:last-child {
-            border-top-right-radius: 0;
-        }
-    }
-    .card-group.cg-3 {
-        margin-top: -1px;
-        >.card:first-child {
-            border-top-left-radius: 0;
-        }
-        >.card:last-child {
-            border-top-right-radius: 0;
-        }
-    }
-    .card-group.cg-4 {
-        margin-top: -1px;
-        >.card:first-child {
-            border-top-left-radius: 0;
-        }
-        >.card:last-child {
-            border-top-right-radius: 0;
-        }
-    }
-    .card-group .card {
-        .card-body p {
-            margin: 0;
-        }
-        .card-header {
+        .card-header>.title {
             align-items: center;
             display: flex;
-            min-height: 4rem;
-            padding-bottom: .75rem;
+            min-height: 3rem;
+        }
+        .card-body {
+            .d-flex {
+                .dropdown {
+                    min-width: 18rem;
+                    button.dropdown-toggle {
+                        text-align: left;
+                    }
+                    button.dropdown-toggle::after {
+                        float: right;
+                        margin-top: .55rem;
+                    }
+                }
+                button.run {
+                    min-width: 4rem;
+                    margin-left: auto;
+                }
+                
+            }
+            p {
+                margin: 0;
+            }
         }
     }
-
     .modal {
         --bs-modal-color: #000;
     }
-
     .offcanvas {
         z-index: 1090;
-    }
-    
-    .sc-admin-menu.dropdown-menu {
-        border: none;
-        display: block;
-        position: relative;
-    }
-    
-    .sc-admin-dlg-results .modal-dialog {
-        max-width: 95vw;
-    }
-    
-    .sc-admin-dlg-results .modal-title {
-        margin-left: 0;
-    }
-    
-    .sc-admin-dlg-results .modal-body {
-        max-height: 75vh;
-        overflow: auto;
     }
 }
 
@@ -88,10 +46,6 @@ div.spPropertyPaneContainer div[aria-label='Site Admin Tool property pane'] div[
     }
 }
 
-#footer {
-    max-width: 60rem;
-}
-
-#sc-admin-link {
-    cursor: pointer;
+#footer, .bs .card {
+    max-width: 25rem;
 }
