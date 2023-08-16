@@ -23,6 +23,11 @@ const CSVExportFields = [
     "SiteHits", "SiteVisits"
 ];
 
+// Script Constants
+const ScriptDescription = "Scans site collection(s) for usage information.";
+const ScriptFileName = "site_usage.csv";
+const ScriptName = "Site Usage";
+
 /**
  * Site Collection Usage
  * Displays a dialog to get the site collection usage information.
@@ -79,8 +84,11 @@ class SiteUsage {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Usage");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -165,8 +173,11 @@ class SiteUsage {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+        
         // Show the modal dialog
-        Modal.setHeader("Site Usage");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -299,7 +310,7 @@ class SiteUsage {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("site_usage.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -321,6 +332,6 @@ class SiteUsage {
 // Script Information
 export const SiteUsageModal: IScript = {
     init: SiteUsage,
-    name: "Site Usage",
-    description: "Scans site collection(s) for usage information."
+    name: ScriptName,
+    description: ScriptDescription
 };

@@ -32,6 +32,11 @@ const CSVExportFields = [
     "Role", "RoleInfo"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan site(s) for external user information.";
+const ScriptFileName = "security_groups.csv";
+const ScriptName = "External User Information";
+
 /**
  * Security Group Information
  * Displays a dialog to get the site information.
@@ -287,8 +292,11 @@ class ExternalUsers {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -380,8 +388,11 @@ class ExternalUsers {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+        
         // Show the modal dialog
-        Modal.setHeader("External Users");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -585,7 +596,7 @@ class ExternalUsers {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -607,6 +618,6 @@ class ExternalUsers {
 // Script Information
 export const ExternalUsersModal: IScript = {
     init: ExternalUsers,
-    name: "External User Information",
-    description: "Scan site(s) for external user information."
+    name: ScriptName,
+    description: ScriptDescription
 };

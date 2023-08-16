@@ -24,6 +24,11 @@ const CSVExportFields = [
     "LastModifiedDate", "ListId", "WebId", "WebUrl", "SearchResult"
 ];
 
+// Script Constants
+const ScriptDescription = "Searches for documents by key word(s) within a site.";
+const ScriptFileName = "document_search.csv";
+const ScriptName = "Document Search";
+
 /**
  * Document Search
  * Displays a dialog to search documents by key words.
@@ -128,8 +133,11 @@ class DocumentSearch {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -137,12 +145,14 @@ class DocumentSearch {
                 {
                     label: "Search Terms",
                     name: "SearchTerms",
+                    className: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     required: true
                 },
                 {
                     label: "File Types",
                     name: "FileTypes",
+                    className: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     required: true,
                     value: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx"
@@ -260,8 +270,11 @@ class DocumentSearch {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+        
         // Show the modal dialog
-        Modal.setHeader("Document Search");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -438,7 +451,7 @@ class DocumentSearch {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("documet_search.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -460,6 +473,6 @@ class DocumentSearch {
 // Script Information
 export const DocumentSearchModal: IScript = {
     init: DocumentSearch,
-    name: "Document Search",
-    description: "Searches for documents by key word(s) within a site."
+    name: ScriptName,
+    description: ScriptDescription
 };

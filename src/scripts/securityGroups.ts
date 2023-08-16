@@ -22,6 +22,11 @@ const CSVExportFields = [
     "WebTitle", "WebUrl"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan site(s) for security group information.";
+const ScriptFileName = "security_groups.csv";
+const ScriptName = "Security Group Information";
+
 /**
  * Security Group Information
  * Displays a dialog to get the site information.
@@ -166,8 +171,11 @@ class SecurityGroups {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -175,6 +183,7 @@ class SecurityGroups {
                 {
                     label: "Search Sub-Sites?",
                     name: "RecurseWebs",
+                    className: "mb-2",
                     type: Components.FormControlTypes.Switch
                 },
                 {
@@ -187,13 +196,7 @@ class SecurityGroups {
                     rows: 10,
                     value: this._urls.join('\n')
                 } as Components.IFormControlPropsTextField
-            ],
-            onRendered: (ctrls) => {
-                ctrls[0].el.parentElement.classList.add("row");
-                ctrls[0].el.classList.add("col");
-                ctrls[0].el.querySelector(".form-check").parentElement.classList.remove("row");
-                ctrls[0].el.querySelector(".form-check").classList.remove("col-12");
-            }
+            ]
         });
 
         // Render the body
@@ -267,8 +270,11 @@ class SecurityGroups {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Show the modal dialog
-        Modal.setHeader("Security Groups");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -399,7 +405,7 @@ class SecurityGroups {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("security_groups.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -421,6 +427,6 @@ class SecurityGroups {
 // Script Information
 export const SecurityGroupsModal: IScript = {
     init: SecurityGroups,
-    name: "Security Group Information",
-    description: "Scan site(s) for security group information."
+    name: ScriptName,
+    description: ScriptDescription
 };

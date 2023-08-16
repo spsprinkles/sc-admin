@@ -22,6 +22,11 @@ const CSVExportFields = [
     "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan site(s) for list & library information. Ability to copy a list structure to another web.";
+const ScriptFileName = "list_information.csv";
+const ScriptName = "List Information";
+
 /**
  * List Information
  * Displays a dialog to get the site information.
@@ -551,8 +556,11 @@ class ListInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("List Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -645,8 +653,11 @@ class ListInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Show the modal dialog
-        Modal.setHeader("Sites");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -804,7 +815,7 @@ class ListInfo {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("list_information.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -827,6 +838,9 @@ class ListInfo {
         // Clear the canvas
         CanvasForm.clear();
 
+        // Prevent auto close
+        CanvasForm.setAutoClose(false);
+
         // Set the header
         CanvasForm.setHeader("Copy List");
 
@@ -837,7 +851,7 @@ class ListInfo {
                 {
                     label: "Source List",
                     name: "SourceList",
-                    //controlClassName: "mb-3",
+                    className: "mb-3",
                     description: "The url of the source list",
                     type: Components.FormControlTypes.Readonly,
                     value: listInfo.ListUrl
@@ -845,7 +859,7 @@ class ListInfo {
                 {
                     label: "List Name",
                     name: "ListName",
-                    //controlClassName: "mb-3",
+                    className: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     value: listInfo.ListName,
                     description: "The list name to create",
@@ -854,7 +868,6 @@ class ListInfo {
                 {
                     label: "Web Url",
                     name: "WebUrl",
-                    //controlClassName: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     required: true,
                     description: "The destination url of the site to copy the list to",
@@ -919,6 +932,6 @@ class ListInfo {
 // Script Information
 export const ListInfoModal: IScript = {
     init: ListInfo,
-    name: "List Information",
-    description: "Scan site(s) for list & library information. Ability to copy a list structure to another web."
+    name: ScriptName,
+    description: ScriptDescription
 };

@@ -28,6 +28,11 @@ const CSVExportFields = [
     "IsRootWeb", "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan for site details, admins, & owners.";
+const ScriptFileName = "site_information.csv";
+const ScriptName = "Site Information";
+
 /**
  * Sites
  * Displays a dialog to get the site information.
@@ -206,6 +211,10 @@ class SiteInfo {
     private manageSCAs(webInfo: IRowInfo) {
         // Set the header
         CanvasForm.clear();
+
+        // Prevent auto close
+        CanvasForm.setAutoClose(false);
+
         CanvasForm.setHeader("Site Admins");
 
         // Show a loading dialog
@@ -414,8 +423,11 @@ class SiteInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -504,8 +516,11 @@ class SiteInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+        
         // Show the modal dialog
-        Modal.setHeader("Sites");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -652,7 +667,7 @@ class SiteInfo {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("site_information.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -674,6 +689,6 @@ class SiteInfo {
 // Script Information
 export const SiteInfoModal: IScript = {
     init: SiteInfo,
-    name: "Site Information",
-    description: "Scan for site details, admins, & owners."
+    name: ScriptName,
+    description: ScriptDescription
 };

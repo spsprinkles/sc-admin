@@ -22,6 +22,11 @@ const CSVExportFields = [
     "TotalFileCount", "TotalFileStreamSize", "TotalSize"
 ];
 
+// Script Constants
+const ScriptDescription = "Scans site(s) for storage metrics.";
+const ScriptFileName = "storage_metrics.csv";
+const ScriptName = "Storage Metrics";
+
 /**
  * Site Storage Metrics
  * Displays a dialog to get the site collection storage metrics.
@@ -78,8 +83,11 @@ class StorageMetrics {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Usage");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -87,6 +95,7 @@ class StorageMetrics {
                 {
                     label: "Search Sub-Sites?",
                     name: "RecurseWebs",
+                    className: "mb-2",
                     type: Components.FormControlTypes.Switch
                 },
                 {
@@ -175,8 +184,11 @@ class StorageMetrics {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Show the modal dialog
-        Modal.setHeader("Storage Metrics");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -308,7 +320,7 @@ class StorageMetrics {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("storage_metrics.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -330,6 +342,6 @@ class StorageMetrics {
 // Script Information
 export const StorageMetricsModal: IScript = {
     init: StorageMetrics,
-    name: "Storage Metrics",
-    description: "Scans site(s) for storage metrics."
+    name: ScriptName,
+    description: ScriptDescription
 };

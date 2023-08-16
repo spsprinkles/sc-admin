@@ -27,6 +27,11 @@ const CSVExportFields = [
     "WebId", "WebTitle", "WebUrl", "WebDescription", "Owners", "SCAs"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan hub site(s) for details, admins, & owners.";
+const ScriptFileName = "hub_site_information.csv";
+const ScriptName = "Hub Site Information";
+
 /**
  * Hub Site Info
  * Displays a dialog to get the site information.
@@ -229,8 +234,11 @@ class HubSiteInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Hub Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -330,8 +338,11 @@ class HubSiteInfo {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+        
         // Show the modal dialog
-        Modal.setHeader("Sites");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -454,7 +465,7 @@ class HubSiteInfo {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("hub_site_information.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -476,6 +487,6 @@ class HubSiteInfo {
 // Script Information
 export const HubSiteInfoModal: IScript = {
     init: HubSiteInfo,
-    name: "Hub Site Information",
-    description: "Scan hub site(s) for details, admins, & owners."
+    name: ScriptName,
+    description: ScriptDescription
 };

@@ -23,6 +23,11 @@ const CSVExportFields = [
     "LastModifiedDate", "ListId", "WebId", "WebUrl"
 ];
 
+// Script Constants
+const ScriptDescription = "Scans for files older than a specified date.";
+const ScriptFileName = "document_retention.csv";
+const ScriptName = "Document Retention";
+
 /**
  * Document Retention
  * Displays a dialog to get the site information.
@@ -124,8 +129,11 @@ class DocumentRetention {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Set the default date for retention
         let defaultDate = moment(Date.now()).subtract(18, "months").toISOString();
@@ -136,6 +144,7 @@ class DocumentRetention {
                 {
                     label: "Document Date",
                     name: "DocumentDate",
+                    className: "mb-3",
                     type: Components.FormControlTypes.DateTime,
                     required: true,
                     value: defaultDate
@@ -245,8 +254,11 @@ class DocumentRetention {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Show the modal dialog
-        Modal.setHeader("Document Retention");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -391,7 +403,7 @@ class DocumentRetention {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("documet_retention.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -413,6 +425,6 @@ class DocumentRetention {
 // Script Information
 export const DocumentRetentionModal: IScript = {
     init: DocumentRetention,
-    name: "Document Retention",
-    description: "Scans for files older than a specified date."
+    name: ScriptName,
+    description: ScriptDescription
 };

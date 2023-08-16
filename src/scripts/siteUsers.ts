@@ -34,6 +34,11 @@ const CSVExportFields = [
     "Role", "RoleInfo"
 ];
 
+// Script Constants
+const ScriptDescription = "Scan site(s) for specified site users.";
+const ScriptFileName = "site_users_info.csv";
+const ScriptName = "Site Users Information";
+
 /**
  * Security Group Information
  * Displays a dialog to get the site user information.
@@ -229,8 +234,11 @@ class SiteUsers {
         // Set the type
         Modal.setType(Components.ModalTypes.Large);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Set the header
-        Modal.setHeader("Site Information");
+        Modal.setHeader(ScriptName);
 
         // Render the form
         let form = Components.Form({
@@ -238,6 +246,7 @@ class SiteUsers {
                 {
                     label: "User or Group Search by Text",
                     name: "UserName",
+                    className: "mb-3",
                     description: "Type a user or group display or login name for the search",
                     errorMessage: "Please enter the user or group information",
                     type: Components.FormControlTypes.TextField,
@@ -260,6 +269,7 @@ class SiteUsers {
                 {
                     label: "People Search by Lookup",
                     name: "PeoplePicker",
+                    className: "mb-3",
                     description: "Enter a minimum of 3 characters to search for a user",
                     errorMessage: "No user was selected...",
                     allowGroups: false,
@@ -369,8 +379,11 @@ class SiteUsers {
         // Set the type
         Modal.setType(Components.ModalTypes.Full);
 
+        // Prevent auto close
+        Modal.setAutoClose(false);
+
         // Show the modal dialog
-        Modal.setHeader("Site Users Information");
+        Modal.setHeader(ScriptName);
 
         // Render the table
         let elTable = document.createElement("div");
@@ -577,7 +590,7 @@ class SiteUsers {
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
                         // Export the CSV
-                        new ExportCSV("site_users_info.csv", CSVExportFields, this._rows);
+                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
                     }
                 },
                 {
@@ -599,6 +612,6 @@ class SiteUsers {
 // Script Information
 export const SiteUsersModal: IScript = {
     init: SiteUsers,
-    name: "Site Users Information",
-    description: "Scan site(s) for specified site users."
+    name: ScriptName,
+    description: ScriptDescription
 };
