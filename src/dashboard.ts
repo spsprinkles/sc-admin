@@ -126,7 +126,6 @@ export class Dashboard {
                     let ttp = Components.Tooltip({
                         el: elDiv,
                         content: "Run this report",
-                        placement: Components.TooltipPlacements.Bottom,
                         btnProps: {
                             className: "run",
                             text: "Run",
