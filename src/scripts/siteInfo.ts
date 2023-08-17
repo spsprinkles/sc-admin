@@ -847,12 +847,11 @@ class SiteInfo {
                                     }
                                 },
                                 {
-                                    text: "Site Admins",
+                                    text: row.IsRootWeb ? "Site Admins" : "Site Owners",
                                     type: Components.ButtonTypes.OutlinePrimary,
-                                    isDisabled: !row.IsRootWeb,
                                     onClick: () => {
                                         // Show the add form
-                                        this.manageSCAs(row);
+                                        row.IsRootWeb ? this.manageSCAs(row) : this.manageOwners(row);
                                     }
                                 }
                             ]
