@@ -12,6 +12,7 @@ interface IRowInfo {
     ListType: string;
     ListUrl: string;
     ListViewCount: number;
+    ListViewHiddenCount: number;
     WebTitle: string;
     WebUrl: string;
 }
@@ -19,7 +20,7 @@ interface IRowInfo {
 // CSV Export Fields
 const CSVExportFields = [
     "ListDescription", "ListId", "ListItemCount", "ListViewCount",
-    "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
+    "ListViewHiddenCount", "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
 ];
 
 // Script Constants
@@ -53,6 +54,13 @@ class ListInfo {
             Helper.Executor(webs, web => {
                 // Parse the lists
                 Helper.Executor(web.Lists.results, list => {
+                    // Parse the list views
+                    let hiddenCount = 0;
+                    let views = list.Views as any as Types.SP.IViewCollection;
+                    for (let i = 0; i < views.results.length; i++) {
+                        if (views.results[i].Hidden) { hiddenCount++; }
+                    }
+
                     // Add a row for this entry
                     this._rows.push({
                         ListDescription: list.Description,
@@ -61,7 +69,8 @@ class ListInfo {
                         ListName: list.Title,
                         ListType: this.getListType(list.BaseTemplate),
                         ListUrl: (list.RootFolder as any as Types.SP.Folder).ServerRelativeUrl,
-                        ListViewCount: (list.Views as any as Types.SP.IViewCollection).results.length,
+                        ListViewCount: views.results.length,
+                        ListViewHiddenCount: hiddenCount,
                         WebTitle: web.Title,
                         WebUrl: web.Url
                     });
@@ -668,7 +677,7 @@ class ListInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 8,
+                        "targets": 9,
                         "orderable": false,
                         "searchable": false
                     }
@@ -753,7 +762,11 @@ class ListInfo {
                 },
                 {
                     name: "ListViewCount",
-                    title: "View Count"
+                    title: "Total View Count"
+                },
+                {
+                    name: "ListViewHiddenCount",
+                    title: "Hidden View Count"
                 },
                 {
                     className: "text-end",
