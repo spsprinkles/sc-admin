@@ -136,7 +136,7 @@ class DocumentRetention {
         Modal.setHeader(ScriptName);
 
         // Set the default date for retention
-        let defaultDate = moment(Date.now()).subtract(18, "months").toISOString();
+        let defaultDate = moment(Date.now()).subtract(Strings.SearchMonths, "months").toISOString();
 
         // Render the form
         let form = Components.Form({

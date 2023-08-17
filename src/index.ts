@@ -9,7 +9,7 @@ const GlobalVariable = {
     Configuration,
     Dashboard: null,
     description: Strings.ProjectDescription,
-    render: (el, context?, timeFormat?: string, sourceUrl?: string) => {
+    render: (el, context?, fractionDigits?: number, searchFileTypes?: string, searchMonths?: number, searchTerms?: string, timeFormat?: string, sourceUrl?: string) => {
         // See if the page context exists
         if (context) {
             // Set the context
@@ -18,7 +18,11 @@ const GlobalVariable = {
             // Update the configuration
             Configuration.setWebUrl(sourceUrl || ContextInfo.webServerRelativeUrl);
 
-            // See if the timeFormat is set
+            // See if SPFx string values are set
+            fractionDigits ? Strings.FractionDigits = fractionDigits : null;
+            searchFileTypes ? Strings.SearchFileTypes = searchFileTypes : null;
+            searchMonths ? Strings.SearchMonths = searchMonths : null;
+            searchTerms ? Strings.SearchTerms = searchTerms : null;
             timeFormat ? Strings.TimeFormat = timeFormat : null;
         }
 

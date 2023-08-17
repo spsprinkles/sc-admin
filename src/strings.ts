@@ -15,9 +15,13 @@ export const setContext = (context, sourceUrl?: string) => {
  */
 const Strings = {
     AppElementId: "sc-admin",
+    FractionDigits: 2,
     GlobalVariable: "SCAdmin",
     ProjectName: "Site Admin Tool",
     ProjectDescription: "A tool to help manage SharePoint sites.",
+    SearchFileTypes: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx",
+    SearchMonths: 18,
+    SearchTerms: "PHI PII",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
     Version: "0.0.9"

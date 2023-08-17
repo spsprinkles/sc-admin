@@ -147,7 +147,8 @@ class DocumentSearch {
                     name: "SearchTerms",
                     className: "mb-3",
                     type: Components.FormControlTypes.TextField,
-                    required: true
+                    required: true,
+                    value: Strings.SearchTerms
                 },
                 {
                     label: "File Types",
@@ -155,7 +156,7 @@ class DocumentSearch {
                     className: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     required: true,
-                    value: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx"
+                    value: Strings.SearchFileTypes
                 },
                 {
                     label: "Site Url(s)",
