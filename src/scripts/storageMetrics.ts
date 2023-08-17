@@ -55,11 +55,11 @@ class StorageMetrics {
 
                 // Calculate the total file stream size
                 let totalFileStreamSize = rootFolder.StorageMetrics.TotalFileStreamSize;
-                totalFileStreamSize = totalFileStreamSize > 0 ? (totalFileStreamSize / Math.pow(1024, 3)).toFixed(2) + " GB" as any : totalFileStreamSize;
+                totalFileStreamSize = totalFileStreamSize > 0 ? (totalFileStreamSize / Math.pow(1024, 3)).toFixed(Strings.FractionDigits) + " GB" as any : totalFileStreamSize;
 
                 // Calculate the total size
                 let totalSize = rootFolder.StorageMetrics.TotalSize;
-                totalSize = totalSize > 0 ? (totalSize / Math.pow(1024, 3)).toFixed(2) + " GB" as any : totalSize;
+                totalSize = totalSize > 0 ? (totalSize / Math.pow(1024, 3)).toFixed(Strings.FractionDigits) + " GB" as any : totalSize;
 
                 // Add a row for this entry
                 this._rows.push({

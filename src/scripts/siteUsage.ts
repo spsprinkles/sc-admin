@@ -2,6 +2,7 @@ import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
 import * as jQuery from "jquery";
 import { ExportCSV, Sites, IScript } from "../common";
+import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
@@ -54,11 +55,11 @@ class SiteUsage {
             Helper.Executor(sites, site => {
                 // Calculate the site storage
                 let siteStorage = site.Usage.Storage;
-                siteStorage = siteStorage > 0 ? (siteStorage / Math.pow(1024, 3)).toFixed(2) + " GB" as any : siteStorage;
+                siteStorage = siteStorage > 0 ? (siteStorage / Math.pow(1024, 3)).toFixed(Strings.FractionDigits) + " GB" as any : siteStorage;
 
                 // Calculate the percent used
                 let percentUsed = site.Usage.StoragePercentageUsed;
-                percentUsed = percentUsed > 0 ? (percentUsed * 100).toFixed(2) + "%" as any : percentUsed;
+                percentUsed = percentUsed > 0 ? (percentUsed * 100).toFixed(Strings.FractionDigits) + "%" as any : percentUsed;
 
                 // Add a row for this entry
                 this._rows.push({
@@ -175,7 +176,7 @@ class SiteUsage {
 
         // Prevent auto close
         Modal.setAutoClose(false);
-        
+
         // Show the modal dialog
         Modal.setHeader(ScriptName);
 
