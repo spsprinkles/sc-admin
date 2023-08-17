@@ -65,6 +65,8 @@ export class Dashboard {
     // Renders the scripts as a card
     private render() {
         let items: Components.IDropdownItem[] = [];
+
+        // Define all the scripts
         let scripts = new Map<string, IScript>([
             [Scripts.DocumentRetentionModal.name, Scripts.DocumentRetentionModal],
             [Scripts.DocumentSearchModal.name, Scripts.DocumentSearchModal],
@@ -78,7 +80,7 @@ export class Dashboard {
             [Scripts.StorageMetricsModal.name, Scripts.StorageMetricsModal]
         ]);
 
-        // Parse the scripts
+        // Parse the scripts, add them to the dropdown items
         scripts.forEach(script => {
             items.push({
                 text: script.name,
@@ -86,10 +88,15 @@ export class Dashboard {
             });
         });
 
+        // Select the first item by default
+        items[0].isSelected = true;
+
+        // Render a card
         Components.Card({
             el: this._el,
             header: {
                 className: "h6",
+                // Create the header
                 onRender: (el) => {
                     let div = document.createElement("div");
                     div.classList.add("title");
@@ -98,6 +105,7 @@ export class Dashboard {
                 }
             },
             body: [{
+                // Render the card body
                 onRender: (el) => {
                     el.classList.add("d-flex");
                     el.classList.add("flex-column");
@@ -108,6 +116,7 @@ export class Dashboard {
                     elDiv.className = "d-flex";
                     el.appendChild(elDiv);
 
+                    // Render the dropdown using the first script name as the label
                     let ddl = Components.Dropdown({
                         el: elDiv,
                         btnClassName: "w-100",
@@ -116,8 +125,13 @@ export class Dashboard {
                         title: "Select a script to run",
                         type: Components.DropdownTypes.OutlinePrimary,
                         onChange: (item: Components.IDropdownItem) => {
+                            // Update the dropdown label
                             ddl.setLabel(item.text);
+
+                            // Set the description
                             elDescription.innerHTML = item.value;
+
+                            // Save the script name to the run tooltip
                             ttp.button.el.setAttribute("data-script", item.text);
                         }
                     });
@@ -131,6 +145,7 @@ export class Dashboard {
                             text: "Run",
                             type: Components.ButtonTypes.OutlinePrimary,
                             onClick: (b, e) => {
+                                // Get the name of the script from the run tooltip
                                 let scriptName = (e.target as HTMLButtonElement).dataset.script;
 
                                 // Initialize the script
@@ -138,7 +153,9 @@ export class Dashboard {
                             }
                         }
                     });
-                    ttp.button.el.setAttribute("data-script", scripts.get(scripts.keys().next().value).name);
+
+                    // Save the first script name as the default for the run tooltop
+                    ttp.button.el.setAttribute("data-script", scripts.keys().next().value);
 
                     // Render the description
                     let elDescription = document.createElement("p");
