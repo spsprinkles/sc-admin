@@ -4,30 +4,42 @@ import { Dashboard } from "./dashboard";
 import Strings, { setContext } from "./strings";
 import "./styles.scss";
 
+// Properties
+interface IProps {
+    el: HTMLElement;
+    context?: any;
+    fractionDigits?: number;
+    searchFileTypes?: string;
+    searchMonths?: number;
+    searchTerms?: string;
+    timeFormat?: string;
+    sourceUrl?: string;
+}
+
 // Create the global variable for this solution
 const GlobalVariable = {
     Configuration,
     Dashboard: null,
     description: Strings.ProjectDescription,
-    render: (el, context?, fractionDigits?: number, searchFileTypes?: string, searchMonths?: number, searchTerms?: string, timeFormat?: string, sourceUrl?: string) => {
+    render: (props: IProps) => {
         // See if the page context exists
-        if (context) {
+        if (props.context) {
             // Set the context
-            setContext(context, sourceUrl);
+            setContext(props.context, props.sourceUrl);
 
             // Update the configuration
-            Configuration.setWebUrl(sourceUrl || ContextInfo.webServerRelativeUrl);
+            Configuration.setWebUrl(props.sourceUrl || ContextInfo.webServerRelativeUrl);
 
             // See if SPFx string values are set
-            fractionDigits ? Strings.FractionDigits = fractionDigits : null;
-            searchFileTypes ? Strings.SearchFileTypes = searchFileTypes : null;
-            searchMonths ? Strings.SearchMonths = searchMonths : null;
-            searchTerms ? Strings.SearchTerms = searchTerms : null;
-            timeFormat ? Strings.TimeFormat = timeFormat : null;
+            props.fractionDigits ? Strings.FractionDigits = props.fractionDigits : null;
+            props.searchFileTypes ? Strings.SearchFileTypes = props.searchFileTypes : null;
+            props.searchMonths ? Strings.SearchMonths = props.searchMonths : null;
+            props.searchTerms ? Strings.SearchTerms = props.searchTerms : null;
+            props.timeFormat ? Strings.TimeFormat = props.timeFormat : null;
         }
 
         // Create the application
-        GlobalVariable.Dashboard = new Dashboard(el);
+        GlobalVariable.Dashboard = new Dashboard(props.el);
     },
     version: Strings.Version
 };
@@ -39,5 +51,5 @@ window[Strings.GlobalVariable] = GlobalVariable;
 let elApp = document.querySelector("#" + Strings.AppElementId) as HTMLElement;
 if (elApp) {
     // Render the application
-    GlobalVariable.render(elApp);
+    GlobalVariable.render({ el: elApp });
 }

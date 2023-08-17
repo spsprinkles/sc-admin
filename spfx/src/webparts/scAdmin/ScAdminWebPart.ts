@@ -15,7 +15,16 @@ export interface IScAdminWebPartProps {
 import "../../../../dist/sc-admin.min.js";
 declare const SCAdmin: {
   description: string;
-  render: new (el: HTMLElement, context: WebPartContext, fractionDigits: number, searchFileTypes: string, searchMonths: number, searchTerms: string, timeFormat: string) => void;
+  render: new (props: {
+    el: HTMLElement;
+    context?: WebPartContext;
+    fractionDigits?: number;
+    searchFileTypes?: string;
+    searchMonths?: number;
+    searchTerms?: string;
+    timeFormat?: string;
+    sourceUrl?: string;
+  }) => void;
   version: string;
 };
 
@@ -28,7 +37,7 @@ export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPar
       // Clear the element
       while (this.domElement.firstChild) { this.domElement.removeChild(this.domElement.firstChild); }
     }
-    
+
     // Set the default property values
     if (!this.properties.fractionDigits) { this.properties.fractionDigits = strings.FractionDigitsFieldValue; }
     if (!this.properties.searchFileTypes) { this.properties.searchFileTypes = strings.SearchFileTypesFieldValue; }
@@ -37,7 +46,15 @@ export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPar
     if (!this.properties.timeFormat) { this.properties.timeFormat = strings.TimeFormatFieldValue; }
 
     // Render the solution
-    new SCAdmin.render(this.domElement, this.context, this.properties.fractionDigits, this.properties.searchFileTypes, this.properties.searchMonths, this.properties.searchTerms, this.properties.timeFormat);
+    new SCAdmin.render({
+      el: this.domElement,
+      context: this.context,
+      fractionDigits: this.properties.fractionDigits,
+      searchFileTypes: this.properties.searchFileTypes,
+      searchMonths: this.properties.searchMonths,
+      searchTerms: this.properties.searchTerms,
+      timeFormat: this.properties.timeFormat
+    });
 
     // Set the flag
     this._hasRendered = true;
