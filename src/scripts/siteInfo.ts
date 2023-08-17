@@ -452,7 +452,7 @@ class SiteInfo {
             content: "Click to add the user as a Site Admin",
             placement: Components.TooltipPlacements.Left,
             btnProps: {
-                className: "float-end mb-3",
+                className: "float-end mb-3 mw-5",
                 text: "Add",
                 type: Components.ButtonTypes.OutlinePrimary,
                 onClick: () => {
@@ -558,7 +558,7 @@ class SiteInfo {
                 content: "Click to remove the selected Site Admin",
                 placement: Components.TooltipPlacements.Left,
                 btnProps: {
-                    className: "float-end",
+                    className: "float-end mw-5",
                     text: "Remove",
                     type: Components.ButtonTypes.OutlinePrimary,
                     onClick: () => {
