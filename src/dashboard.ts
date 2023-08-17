@@ -122,7 +122,7 @@ export class Dashboard {
                         btnClassName: "w-100",
                         items,
                         label: scripts.keys().next().value,
-                        title: "Select a script to run",
+                        title: "Select a report to run",
                         type: Components.DropdownTypes.OutlinePrimary,
                         onChange: (item: Components.IDropdownItem) => {
                             // Update the dropdown label
