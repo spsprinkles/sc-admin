@@ -2,9 +2,10 @@
 
 # Site Administration Tool
 ### A tool to help manage SharePoint sites.
-![SiteAdminTool](https://github.com/spsprinkles/sc-admin/assets/24440567/5f3c5204-28b7-49ce-8b8c-a08ec26421a2)
+![SiteAdminTool](https://github.com/spsprinkles/sc-admin/assets/24440567/416c322d-6042-4b1a-a93c-a96de29f44c8)
+![SiteAdminTool2](https://github.com/spsprinkles/sc-admin/assets/24440567/c89d4a05-8042-47da-8f35-94ecaf0ee052)
 
-### Download the latest [release](https://github.com/spsprinkles/sc-admin/releases/tag/v0.0.9) as an SPFx webpart and deploy it directly to SharePoint Online.
+### Download the latest [release](https://github.com/spsprinkles/sc-admin/releases/tag/v0.1.0) as an SPFx webpart and deploy it directly to SharePoint Online.
 
 ## Building the Solution (for on-premises SharePoint)
 

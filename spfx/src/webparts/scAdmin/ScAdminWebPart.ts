@@ -1,4 +1,4 @@
-import { Version } from '@microsoft/sp-core-library';
+import { Environment, Version } from '@microsoft/sp-core-library';
 import { IPropertyPaneConfiguration, PropertyPaneLabel, PropertyPaneSlider, PropertyPaneTextField } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart, WebPartContext } from '@microsoft/sp-webpart-base';
 import * as strings from 'ScAdminWebPartStrings';
@@ -18,6 +18,7 @@ declare const SCAdmin: {
   render: new (props: {
     el: HTMLElement;
     context?: WebPartContext;
+    envType?: number;
     fractionDigits?: number;
     searchFileTypes?: string;
     searchMonths?: number;
@@ -49,6 +50,7 @@ export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPar
     new SCAdmin.render({
       el: this.domElement,
       context: this.context,
+      envType: Environment.type,
       fractionDigits: this.properties.fractionDigits,
       searchFileTypes: this.properties.searchFileTypes,
       searchMonths: this.properties.searchMonths,

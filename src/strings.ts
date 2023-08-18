@@ -1,12 +1,13 @@
-import { ContextInfo } from "gd-sprest-bs";
+import { ContextInfo, SPTypes } from "gd-sprest-bs";
 
 // Sets the context information
 // This is for SPFx or Teams solutions
-export const setContext = (context, sourceUrl?: string) => {
+export const setContext = (context, envType?: number, sourceUrl?: string) => {
     // Set the context
     ContextInfo.setPageContext(context.pageContext);
 
-    // Update the source url
+    // Update the properties
+    Strings.IsClassic = envType == SPTypes.EnvironmentType.ClassicSharePoint;
     Strings.SourceUrl = sourceUrl || ContextInfo.webServerRelativeUrl;
 }
 
@@ -17,6 +18,7 @@ const Strings = {
     AppElementId: "sc-admin",
     FractionDigits: 2,
     GlobalVariable: "SCAdmin",
+    IsClassic: true,
     ProjectName: "Site Admin Tool",
     ProjectDescription: "A tool to help manage SharePoint sites.",
     SearchFileTypes: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx",
@@ -24,6 +26,6 @@ const Strings = {
     SearchTerms: "PHI PII",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
-    Version: "0.0.9"
+    Version: "0.1.0"
 };
 export default Strings;
