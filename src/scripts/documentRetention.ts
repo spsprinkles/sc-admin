@@ -197,6 +197,7 @@ class DocumentRetention {
                                             // Search the site
                                             Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
                                                 Querytext: `IsDocument: true LastModifiedTime<${moment(formValues["DocumentDate"]).format("YYYY-MM-DD")} path: ${context.GetContextWebInformation.WebFullUrl}`,
+                                                RowLimit: 5000,
                                                 SelectProperties: {
                                                     results: [
                                                         "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
