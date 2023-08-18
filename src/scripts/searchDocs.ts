@@ -185,8 +185,38 @@ class DocumentSearch {
                         if (form.isValid()) {
                             let formValues = form.getValues();
                             let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
-                            let queryText = formValues["SearchTerms"].split(' ').join(" OR ");
                             let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+
+                            // Determine the query text
+                            let searchTerms = formValues["SearchTerms"] || "";
+                            let queryPhrases = [];
+                            let idxStart = searchTerms.indexOf('"');
+                            if (idxStart < 0) {
+                                queryPhrases = searchTerms.split(' ');
+                            } else {
+                                let idx = 0;
+                                while (idxStart > 0) {
+                                    // Add the words before the phrase
+                                    let terms = searchTerms.substring(idx, idxStart).trim().split(' ');
+                                    queryPhrases = queryPhrases.concat(terms);
+
+                                    // Add the phrase
+                                    let idxEnd = searchTerms.indexOf('"', idxStart + 1);
+                                    queryPhrases.push(searchTerms.substring(idxStart, idxEnd + 1));
+
+                                    // Find the next phrase
+                                    idx = idxEnd + 1;
+                                    idxStart = searchTerms.indexOf('"', idxEnd + 1);
+                                }
+
+                                // See if there are more words after the last phrase
+                                if (idx < searchTerms.length) {
+                                    queryPhrases = queryPhrases.concat(searchTerms.substring(idx).trim().split(' '));
+                                }
+                            }
+
+                            // Remove the empty values and join them w/ an OR clause
+                            let queryText = queryPhrases.filter(String).join(" OR ");
 
                             // Clear the data
                             this._errors = [];
@@ -273,7 +303,7 @@ class DocumentSearch {
 
         // Prevent auto close
         Modal.setAutoClose(false);
-        
+
         // Show the modal dialog
         Modal.setHeader(ScriptName);
 
