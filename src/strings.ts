@@ -23,7 +23,7 @@ const Strings = {
     ProjectDescription: "A tool to help manage SharePoint sites.",
     SearchFileTypes: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx",
     SearchMonths: 18,
-    SearchTerms: "PHI PII",
+    SearchTerms: "phi pii ssn",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
     Version: "0.1.1"

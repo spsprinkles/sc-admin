@@ -9,7 +9,7 @@ define([], function() {
     "SearchMonthsFieldValue": 18,
     "SearchTermsFieldDescription": "The default document search terms",
     "SearchTermsFieldLabel": "Document Search Terms",
-    "SearchTermsFieldValue": "PHI PII",
+    "SearchTermsFieldValue": "phi pii ssn",
     "TimeFormatFieldDescription": "The DateTime format used when rendering a date.",
     "TimeFormatFieldLabel": "DateTime Format",
     "TimeFormatFieldValue": "YYYY-MMM-DD HH:mm:ss"

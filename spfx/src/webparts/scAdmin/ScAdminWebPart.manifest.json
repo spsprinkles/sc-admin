@@ -23,7 +23,7 @@
         "fractionDigits": 2,
         "searchFileTypes": "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx",
         "searchMonths": 18,
-        "searchTerms": "PHI PII",
+        "searchTerms": "phi pii ssn",
         "timeFormat": "YYYY-MMM-DD HH:mm:ss"
       }
     }
