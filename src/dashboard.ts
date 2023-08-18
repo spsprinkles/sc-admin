@@ -166,11 +166,11 @@ export class Dashboard {
             }]
         });
 
-        // Render the footer
+        // Render the footer if in classic mode
         let footer = document.createElement("div");
         footer.className = "d-flex justify-content-end pe-1";
         footer.id = "footer";
         footer.innerHTML = `<label class="text-dark">v${Strings.Version}</label>`;
-        this._el.appendChild(footer);
+        Strings.IsClassic ? this._el.appendChild(footer) : null;
     }
 }

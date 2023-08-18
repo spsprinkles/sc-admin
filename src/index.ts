@@ -8,6 +8,7 @@ import "./styles.scss";
 interface IProps {
     el: HTMLElement;
     context?: any;
+    envType?: number;
     fractionDigits?: number;
     searchFileTypes?: string;
     searchMonths?: number;
@@ -25,7 +26,7 @@ const GlobalVariable = {
         // See if the page context exists
         if (props.context) {
             // Set the context
-            setContext(props.context, props.sourceUrl);
+            setContext(props.context, props.envType, props.sourceUrl);
 
             // Update the configuration
             Configuration.setWebUrl(props.sourceUrl || ContextInfo.webServerRelativeUrl);
