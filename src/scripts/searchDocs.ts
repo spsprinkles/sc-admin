@@ -248,6 +248,7 @@ class DocumentSearch {
                                                 RefinementFilters: {
                                                     results: [`fileExtension:or("${fileExtensions}")`]
                                                 },
+                                                RowLimit: 5000,
                                                 SelectProperties: {
                                                     results: [
                                                         "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
