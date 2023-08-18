@@ -26,6 +26,6 @@ const Strings = {
     SearchTerms: "PHI PII",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
-    Version: "0.0.9"
+    Version: "0.1.0"
 };
 export default Strings;
