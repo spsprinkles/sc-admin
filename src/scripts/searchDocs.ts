@@ -146,6 +146,7 @@ class DocumentSearch {
                     label: "Search Terms",
                     name: "SearchTerms",
                     className: "mb-3",
+                    description: "Enter the search terms using quotes for phrases [Ex: movie \"social media\" show]",
                     type: Components.FormControlTypes.TextField,
                     required: true,
                     value: Strings.SearchTerms
@@ -187,13 +188,16 @@ class DocumentSearch {
                             let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
                             let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
-                            // Determine the query text
+                            // Determine the query text/phrases to search for
                             let searchTerms = formValues["SearchTerms"] || "";
                             let queryPhrases = [];
+
+                            // See if the search terms contains phrases
                             let idxStart = searchTerms.indexOf('"');
                             if (idxStart < 0) {
                                 queryPhrases = searchTerms.split(' ');
                             } else {
+                                // Find all of the phrases
                                 let idx = 0;
                                 while (idxStart > 0) {
                                     // Add the words before the phrase
