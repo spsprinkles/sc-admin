@@ -118,7 +118,8 @@ class HubSiteInfo {
                     return new Promise(resolve => {
                         // Get the associated sites
                         Search().postquery({
-                            Querytext: `DepartmentId=${site.ID} contentclass=sts_site -SiteId:${site.ID}`
+                            Querytext: `DepartmentId=${site.ID} contentclass=sts_site -SiteId:${site.ID}`,
+                            RowLimit: 5000
                         }).execute(results => {
                             // Parse the results
                             for (let i = 0; i < results.postquery.PrimaryQueryResult.RelevantResults.RowCount; i++) {
@@ -340,7 +341,7 @@ class HubSiteInfo {
 
         // Prevent auto close
         Modal.setAutoClose(false);
-        
+
         // Show the modal dialog
         Modal.setHeader(ScriptName);
 
