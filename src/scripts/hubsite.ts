@@ -54,6 +54,11 @@ class HubSiteInfo {
     private analyzeSites(webs: Types.SP.WebOData[]) {
         // Return a promise
         return new Promise(resolve => {
+            // Show a loading dialog
+            LoadingDialog.setHeader("Analyzing Hub Sites");
+            LoadingDialog.setBody("Getting the hub site information...");
+            LoadingDialog.show();
+
             // Parse the webs
             Helper.Executor(webs, web => {
                 // Return a promise
@@ -90,6 +95,9 @@ class HubSiteInfo {
                     });
                 });
             }).then(() => {
+                // Hide the loading dialog
+                LoadingDialog.hide();
+
                 // Check the next site collection
                 resolve(null);
             });
