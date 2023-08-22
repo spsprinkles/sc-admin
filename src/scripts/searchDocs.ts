@@ -14,6 +14,7 @@ interface IRowInfo {
     LastModifiedDate: string;
     ListId: string;
     SearchResult: string;
+    SiteUrl: string;
     WebId: string;
     WebUrl: string;
 }
@@ -81,7 +82,10 @@ class DocumentSearch {
                     case "Path":
                         rowInfo.DocumentUrl = cell.Value;
                         break;
-                    case "SiteName":
+                    case "SPSiteUrl":
+                        rowInfo.SiteUrl = cell.Value;
+                        break;
+                    case "SPWebUrl":
                         rowInfo.WebUrl = cell.Value;
                         break;
                     case "Title":
@@ -252,7 +256,7 @@ class DocumentSearch {
                                                 SelectProperties: {
                                                     results: [
                                                         "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                        "ListId", "Path", "SiteName", "Title", "WebId"
+                                                        "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
                                                     ]
                                                 }
                                             }).execute(results => {
@@ -321,7 +325,7 @@ class DocumentSearch {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 8,
+                        "targets": 9,
                         "orderable": false,
                         "searchable": false
                     }
@@ -344,10 +348,14 @@ class DocumentSearch {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 4th column by default; ascending
-                order: [[3, "asc"]]
+                // Order by the 5th column by default; ascending
+                order: [[4, "asc"]]
             },
             columns: [
+                {
+                    name: "SiteUrl",
+                    title: "Site Url"
+                },
                 {
                     name: "WebId",
                     title: "Web Id"

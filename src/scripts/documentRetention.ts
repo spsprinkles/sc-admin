@@ -13,6 +13,7 @@ interface IRowInfo {
     DocumentUrl: string;
     LastModifiedDate: string;
     ListId: string;
+    SiteUrl: string;
     WebId: string;
     WebUrl: string;
 }
@@ -20,7 +21,7 @@ interface IRowInfo {
 // CSV Export Fields
 const CSVExportFields = [
     "DocumentName", "DocumentExt", "DocumentUrl", "Author",
-    "LastModifiedDate", "ListId", "WebId", "WebUrl"
+    "LastModifiedDate", "ListId", "SiteUrl", "WebId", "WebUrl"
 ];
 
 // Script Constants
@@ -77,7 +78,10 @@ class DocumentRetention {
                     case "Path":
                         rowInfo.DocumentUrl = cell.Value;
                         break;
-                    case "SiteName":
+                    case "SPSiteUrl":
+                        rowInfo.SiteUrl = cell.Value;
+                        break;
+                    case "SPWebUrl":
                         rowInfo.WebUrl = cell.Value;
                         break;
                     case "Title":
@@ -201,7 +205,7 @@ class DocumentRetention {
                                                 SelectProperties: {
                                                     results: [
                                                         "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                        "ListId", "Path", "SiteName", "Title", "WebId"
+                                                        "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
                                                     ]
                                                 }
                                             }).execute(results => {
@@ -270,7 +274,7 @@ class DocumentRetention {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 7,
+                        "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
@@ -293,10 +297,14 @@ class DocumentRetention {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 4th column by default; ascending
-                order: [[3, "asc"]]
+                // Order by the 5th column by default; ascending
+                order: [[4, "asc"]]
             },
             columns: [
+                {
+                    name: "SiteUrl",
+                    title: "Site Url",
+                },
                 {
                     name: "WebId",
                     title: "Web Id"
