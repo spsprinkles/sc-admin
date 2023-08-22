@@ -325,7 +325,7 @@ class DocumentSearch {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 9,
+                        "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
@@ -348,14 +348,10 @@ class DocumentSearch {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 5th column by default; ascending
-                order: [[4, "asc"]]
+                // Order by the 4th column by default; ascending
+                order: [[3, "asc"]]
             },
             columns: [
-                {
-                    name: "SiteUrl",
-                    title: "Site Url"
-                },
                 {
                     name: "WebId",
                     title: "Web Id"

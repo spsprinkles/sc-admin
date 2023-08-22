@@ -274,7 +274,7 @@ class DocumentRetention {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 8,
+                        "targets": 7,
                         "orderable": false,
                         "searchable": false
                     }
@@ -297,14 +297,10 @@ class DocumentRetention {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 5th column by default; ascending
-                order: [[4, "asc"]]
+                // Order by the 4th column by default; ascending
+                order: [[3, "asc"]]
             },
             columns: [
-                {
-                    name: "SiteUrl",
-                    title: "Site Url",
-                },
                 {
                     name: "WebId",
                     title: "Web Id"
