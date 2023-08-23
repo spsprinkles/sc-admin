@@ -887,7 +887,7 @@ class SiteInfo {
                 },
                 {
                     text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
+                    type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {
                         // Close the modal
                         Modal.hide();
