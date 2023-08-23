@@ -1,5 +1,7 @@
 import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
+import { search } from "gd-sprest-bs/build/icons/svgs/search";
+import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
 import { ExportCSV, Sites, IScript } from "../common";
 import Strings from "../strings";
@@ -114,8 +116,12 @@ class SiteUsage {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
-                    text: "Analyze",
-                    type: Components.ButtonTypes.OutlineSuccess,
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: search,
+                    iconSize: 24,
+                    text: "Search",
+                    type: Components.ButtonTypes.OutlinePrimary,
                     onClick: () => {
                         // Ensure the form is valid
                         if (form.isValid()) {
@@ -155,8 +161,12 @@ class SiteUsage {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
+                    type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {
                         // Close the modal
                         Modal.hide();
