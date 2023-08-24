@@ -2,8 +2,10 @@ import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
 import * as jQuery from "jquery";
 import { ExportCSV, Sites, IScript } from "../common";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
 import Strings from "../strings";
 
 // Row Information
@@ -296,6 +298,10 @@ class SiteUsage {
                             el,
                             buttons: [
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: eye,
+                                    iconSize: 24,
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -317,6 +323,10 @@ class SiteUsage {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -325,6 +335,10 @@ class SiteUsage {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

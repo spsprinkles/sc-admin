@@ -2,6 +2,9 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -356,6 +359,10 @@ class SecurityGroups {
                                 el,
                                 buttons: [
                                     {
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: eye,
+                                        iconSize: 24,
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
@@ -365,6 +372,10 @@ class SecurityGroups {
                                     },
                                     {
                                         assignTo: btn => { btnDelete = btn; },
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: trash,
+                                        iconSize: 24,
                                         text: "Delete",
                                         type: Components.ButtonTypes.OutlineDanger,
                                         onClick: () => {
@@ -385,6 +396,10 @@ class SecurityGroups {
                             Components.Button({
                                 assignTo: btn => { btnDelete = btn; },
                                 el,
+                                className: "pe-2 py-1",
+                                iconClassName: "mx-1",
+                                iconType: trash,
+                                iconSize: 24,
                                 text: "Delete",
                                 type: Components.ButtonTypes.OutlineDanger,
                                 onClick: () => {
@@ -411,6 +426,10 @@ class SecurityGroups {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -419,6 +438,10 @@ class SecurityGroups {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

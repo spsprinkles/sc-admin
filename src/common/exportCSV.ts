@@ -8,7 +8,7 @@ export class ExportCSV {
 
     // Constructor
     constructor(filename: string, columns: string[], rows: any[]) {
-        // Save the properties
+        // fileEarmarkArrowDown the properties
         this._columns = columns;
         this._rows = rows;
         this._filename = filename;
@@ -42,9 +42,9 @@ export class ExportCSV {
         }
 
         // See if this is IE or Mozilla
-        if (Blob && navigator && navigator["msSaveBlob"]) {
+        if (Blob && navigator && navigator["msfileEarmarkArrowDownBlob"]) {
             // Download the file
-            navigator["msSaveBlob"](new Blob([csv], { type: "data:text/csv;charset=utf-8;" }), this._filename);
+            navigator["msfileEarmarkArrowDownBlob"](new Blob([csv], { type: "data:text/csv;charset=utf-8;" }), this._filename);
         } else {
             // Generate an anchor
             var anchor = document.createElement("a");

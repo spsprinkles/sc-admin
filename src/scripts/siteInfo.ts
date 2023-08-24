@@ -2,6 +2,10 @@ import { CanvasForm, DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { person } from "gd-sprest-bs/build/icons/svgs/person";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -834,6 +838,10 @@ class SiteInfo {
                             el,
                             buttons: [
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: eye,
+                                    iconSize: 24,
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -843,6 +851,10 @@ class SiteInfo {
                                 },
                                 {
                                     assignTo: btn => { btnDelete = btn; },
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: trash,
+                                    iconSize: 24,
                                     text: "Delete",
                                     type: Components.ButtonTypes.OutlineDanger,
                                     onClick: () => {
@@ -857,6 +869,10 @@ class SiteInfo {
                                     }
                                 },
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: person,
+                                    iconSize: 24,
                                     text: row.IsRootWeb ? "Site Admins" : "Site Owners",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -878,6 +894,10 @@ class SiteInfo {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -886,6 +906,10 @@ class SiteInfo {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

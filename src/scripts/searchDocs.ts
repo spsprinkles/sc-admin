@@ -2,6 +2,10 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
 import * as jQuery from "jquery";
 import * as moment from "moment";
 import { ExportCSV, isWopi, IScript } from "../common";
@@ -449,6 +453,10 @@ class DocumentSearch {
                             el,
                             buttons: [
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: eye,
+                                    iconSize: 24,
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -457,6 +465,10 @@ class DocumentSearch {
                                     }
                                 },
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: fileEarmarkArrowDown,
+                                    iconSize: 24,
                                     text: "Download",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -466,6 +478,10 @@ class DocumentSearch {
                                 },
                                 {
                                     assignTo: btn => { btnDelete = btn; },
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: trash,
+                                    iconSize: 24,
                                     text: "Delete",
                                     type: Components.ButtonTypes.OutlineDanger,
                                     onClick: () => {
@@ -493,6 +509,10 @@ class DocumentSearch {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -501,6 +521,10 @@ class DocumentSearch {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

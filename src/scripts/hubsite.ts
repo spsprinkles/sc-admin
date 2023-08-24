@@ -2,6 +2,11 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, Helper, HubSites, Search, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { upload } from "gd-sprest-bs/build/icons/svgs/upload";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -274,6 +279,10 @@ class HubSiteInfo {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: upload,
+                    iconSize: 24,
                     text: "Load Hub Sites",
                     type: Components.ButtonTypes.OutlinePrimary,
                     onClick: () => {
@@ -459,6 +468,10 @@ class HubSiteInfo {
                             el,
                             buttons: [
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: eye,
+                                    iconSize: 24,
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -480,6 +493,10 @@ class HubSiteInfo {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -488,6 +505,10 @@ class HubSiteInfo {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

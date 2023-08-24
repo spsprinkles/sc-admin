@@ -2,6 +2,11 @@ import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
+import { clipboard } from "gd-sprest-bs/build/icons/svgs/clipboard";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -790,6 +795,10 @@ class ListInfo {
                             el,
                             buttons: [
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: eye,
+                                    iconSize: 24,
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -799,6 +808,10 @@ class ListInfo {
                                 },
                                 {
                                     assignTo: btn => { btnDelete = btn; },
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: trash,
+                                    iconSize: 24,
                                     text: "Delete",
                                     type: Components.ButtonTypes.OutlineDanger,
                                     onClick: () => {
@@ -813,6 +826,10 @@ class ListInfo {
                                     }
                                 },
                                 {
+                                    className: "pe-2 py-1",
+                                    iconClassName: "mx-1",
+                                    iconType: clipboard,
+                                    iconSize: 24,
                                     text: "Copy",
                                     type: Components.ButtonTypes.OutlineSuccess,
                                     onClick: () => {
@@ -834,6 +851,10 @@ class ListInfo {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -842,6 +863,10 @@ class ListInfo {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {

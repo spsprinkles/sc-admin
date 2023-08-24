@@ -2,6 +2,9 @@ import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
+import { send } from "gd-sprest-bs/build/icons/svgs/send";
+import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import * as jQuery from "jquery";
 import { ExportCSV, Webs, IScript } from "../common";
 
@@ -539,6 +542,10 @@ class SiteUsers {
                                 el,
                                 buttons: [
                                     {
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: eye,
+                                        iconSize: 24,
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         isDisabled: !(row.GroupId > 0),
@@ -549,6 +556,9 @@ class SiteUsers {
                                     },
                                     {
                                         assignTo: btn => { btnDelete = btn; },
+                                        iconClassName: "mx-1",
+                                        iconType: trash,
+                                        iconSize: 24,
                                         text: "Remove User",
                                         type: Components.ButtonTypes.OutlineDanger,
                                         isDisabled: !(row.Id > 0),
@@ -596,6 +606,10 @@ class SiteUsers {
         Modal.setFooter(Components.ButtonGroup({
             buttons: [
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: send,
+                    iconSize: 24,
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
@@ -604,6 +618,10 @@ class SiteUsers {
                     }
                 },
                 {
+                    className: "pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: xSquare,
+                    iconSize: 24,
                     text: "Cancel",
                     type: Components.ButtonTypes.OutlineSecondary,
                     onClick: () => {
