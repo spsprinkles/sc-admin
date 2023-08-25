@@ -133,7 +133,7 @@ export class Dashboard {
                             // Set the description
                             elDescription.innerHTML = item.value;
 
-                            // fileEarmarkArrowDown the script name to the run tooltip
+                            // Save the script name to the run tooltip
                             ttp.button.el.setAttribute("data-script", item.text);
                         }
                     });
@@ -159,7 +159,7 @@ export class Dashboard {
                         }
                     });
 
-                    // fileEarmarkArrowDown the first script name as the default for the run tooltop
+                    // Save the first script name as the default for the run tooltop
                     ttp.button.el.setAttribute("data-script", scripts.keys().next().value);
 
                     // Render the description

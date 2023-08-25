@@ -20,7 +20,7 @@ export class Webs {
 
     // Constructor
     constructor(props: IProps) {
-        // fileEarmarkArrowDown the properties
+        // Save the properties
         this._props = props;
 
         // Display a loading dialog
