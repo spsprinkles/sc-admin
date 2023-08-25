@@ -1,6 +1,5 @@
 import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
-import { clipboard2 } from "gd-sprest-bs/build/icons/svgs/clipboard2";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
@@ -822,9 +821,7 @@ class ListInfo {
                                 },
                                 {
                                     className: "pe-2 py-1",
-                                    iconClassName: "mx-1",
-                                    iconType: clipboard2,
-                                    iconSize: 24,
+                                    iconType: GetIcon(24, 24, "CopyAdd", "mx-1"),
                                     text: "Copy",
                                     type: Components.ButtonTypes.OutlineSuccess,
                                     onClick: () => {
@@ -928,9 +925,7 @@ class ListInfo {
                     content: "Click to copy the list",
                     btnProps: {
                         className: "pe-2 py-1",
-                        iconClassName: "mx-1",
-                        iconType: clipboard2,
-                        iconSize: 24,
+                        iconType: GetIcon(24, 24, "CopyArrowRight", "mx-1"),
                         text: "Copy",
                         type: Components.ButtonTypes.OutlineSuccess,
                         onClick: () => {
