@@ -1,7 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, Helper, HubSites, Search, Types, Web } from "gd-sprest-bs";
+import { arrowClockwise } from "gd-sprest-bs/build/icons/svgs/arrowClockwise";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
-import { upload } from "gd-sprest-bs/build/icons/svgs/upload";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
@@ -277,7 +277,7 @@ class HubSiteInfo {
                 {
                     className: "pe-2 py-1",
                     iconClassName: "mx-1",
-                    iconType: upload,
+                    iconType: arrowClockwise,
                     iconSize: 24,
                     text: "Load Hub Sites",
                     type: Components.ButtonTypes.OutlinePrimary,
