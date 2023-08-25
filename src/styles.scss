@@ -1,4 +1,15 @@
 .bs {
+    button.btn-icon svg.icon-svg path {
+        fill: var(--bs-btn-color);
+    }
+    button.btn-icon:focus-visible, button.btn-icon:hover {
+        svg.icon-svg path  {
+            fill: var(--bs-btn-hover-color);
+        }
+    }
+    button.btn-icon:active svg.icon-svg path {
+        fill: var(--bs-btn-active-color);
+    }
     .card {
         --bs-card-color: #000;
         --bs-card-cap-color: #000;
@@ -39,16 +50,6 @@
     .offcanvas {
         z-index: 1090;
     }
-}
-
-button.btn-icon svg.icon-svg path {
-    fill: var(--bs-btn-color);
-}
-button.btn-icon:hover svg.icon-svg path {
-    fill: var(--bs-btn-hover-color);
-}
-button.btn-icon:active svg.icon-svg path {
-    fill: var(--bs-btn-active-color);
 }
 
 /* Apply changes to the Settings Panel */
