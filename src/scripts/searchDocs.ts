@@ -266,33 +266,21 @@ class DocumentSearch {
                                                     SelectProperties: {
                                                         results: [
                                                             "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                            "ListId", "Path", "SiteName", "Title", "WebId"
+                                                            "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
                                                         ]
                                                     }
                                                 }).execute(results => {
                                                     // Analyze the results
                                                     this.analyzeResult(results.postquery);
 
-                                    // Get the context information of the web
-                                    ContextInfo.getWeb(webUrl).execute(
-                                        // Success
-                                        (context) => {
-                                            // Search the site
-                                            Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
-                                                Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
-                                                RefinementFilters: {
-                                                    results: [`fileExtension:or("${fileExtensions}")`]
-                                                },
-                                                RowLimit: 5000,
-                                                SelectProperties: {
-                                                    results: [
-                                                        "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                        "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
-                                                    ]
-                                                }
-                                            }).execute(results => {
-                                                // Analyze the results
-                                                this.analyzeResult(results.postquery);
+                                                    // Check the next web
+                                                    resolve(null);
+                                                }, () => {
+                                                    // Error getting the search results
+                                                    this._errors.push(webUrl);
+                                                    resolve(null);
+                                                });
+                                            },
 
                                             // Error
                                             () => {
