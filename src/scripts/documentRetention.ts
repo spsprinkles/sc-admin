@@ -17,6 +17,7 @@ interface IRowInfo {
     DocumentUrl: string;
     LastModifiedDate: string;
     ListId: string;
+    SiteUrl: string;
     WebId: string;
     WebUrl: string;
 }
@@ -24,7 +25,7 @@ interface IRowInfo {
 // CSV Export Fields
 const CSVExportFields = [
     "DocumentName", "DocumentExt", "DocumentUrl", "Author",
-    "LastModifiedDate", "ListId", "WebId", "WebUrl"
+    "LastModifiedDate", "ListId", "SiteUrl", "WebId", "WebUrl"
 ];
 
 // Script Constants
@@ -81,7 +82,10 @@ class DocumentRetention {
                     case "Path":
                         rowInfo.DocumentUrl = cell.Value;
                         break;
-                    case "SiteName":
+                    case "SPSiteUrl":
+                        rowInfo.SiteUrl = cell.Value;
+                        break;
+                    case "SPWebUrl":
                         rowInfo.WebUrl = cell.Value;
                         break;
                     case "Title":
@@ -196,27 +200,27 @@ class DocumentRetention {
                                 LoadingDialog.setBody("This will close after the searches are completed...");
                                 LoadingDialog.show();
 
-                                // Parse the webs
-                                Helper.Executor(webUrls, webUrl => {
-                                    // Return a promise
-                                    return new Promise((resolve) => {
-                                        // Get the context information of the web
-                                        ContextInfo.getWeb(webUrl).execute(
-                                            // Success
-                                            (context) => {
-                                                // Search the site
-                                                Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
-                                                    Querytext: `IsDocument: true LastModifiedTime<${moment(formValues["DocumentDate"]).format("YYYY-MM-DD")} path: ${context.GetContextWebInformation.WebFullUrl}`,
-                                                    RowLimit: 5000,
-                                                    SelectProperties: {
-                                                        results: [
-                                                            "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                            "ListId", "Path", "SiteName", "Title", "WebId"
-                                                        ]
-                                                    }
-                                                }).execute(results => {
-                                                    // Analyze the results
-                                                    this.analyzeResult(results.postquery);
+                            // Parse the webs
+                            Helper.Executor(webUrls, webUrl => {
+                                // Return a promise
+                                return new Promise((resolve) => {
+                                    // Get the context information of the web
+                                    ContextInfo.getWeb(webUrl).execute(
+                                        // Success
+                                        (context) => {
+                                            // Search the site
+                                            Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
+                                                Querytext: `IsDocument: true LastModifiedTime<${moment(formValues["DocumentDate"]).format("YYYY-MM-DD")} path: ${context.GetContextWebInformation.WebFullUrl}`,
+                                                RowLimit: 5000,
+                                                SelectProperties: {
+                                                    results: [
+                                                        "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
+                                                        "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
+                                                    ]
+                                                }
+                                            }).execute(results => {
+                                                // Analyze the results
+                                                this.analyzeResult(results.postquery);
 
                                                     // Check the next web
                                                     resolve(null);

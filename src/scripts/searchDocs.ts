@@ -18,6 +18,7 @@ interface IRowInfo {
     LastModifiedDate: string;
     ListId: string;
     SearchResult: string;
+    SiteUrl: string;
     WebId: string;
     WebUrl: string;
 }
@@ -85,7 +86,10 @@ class DocumentSearch {
                     case "Path":
                         rowInfo.DocumentUrl = cell.Value;
                         break;
-                    case "SiteName":
+                    case "SPSiteUrl":
+                        rowInfo.SiteUrl = cell.Value;
+                        break;
+                    case "SPWebUrl":
                         rowInfo.WebUrl = cell.Value;
                         break;
                     case "Title":
@@ -262,7 +266,7 @@ class DocumentSearch {
                                                     SelectProperties: {
                                                         results: [
                                                             "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                            "ListId", "Path", "SiteName", "Title", "WebId"
+                                                            "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
                                                         ]
                                                     }
                                                 }).execute(results => {
