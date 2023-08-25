@@ -1,6 +1,8 @@
 import { CanvasForm, DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
-import { person } from "gd-sprest-bs/build/icons/svgs/person";
+import { people } from "gd-sprest-bs/build/icons/svgs/people";
+import { personAdd } from "gd-sprest-bs/build/icons/svgs/personAdd";
+import { personX } from "gd-sprest-bs/build/icons/svgs/personX";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
@@ -250,8 +252,11 @@ class SiteInfo {
             content: "Click to add the user as a Site Owner",
             placement: Components.TooltipPlacements.Left,
             btnProps: {
-                className: "float-end mb-3 mw-5",
-                text: "Add",
+                className: "float-end mb-3 mw-6 pe-2 py-1",
+                iconClassName: "mx-1",
+                iconType: personAdd,
+                iconSize: 24,
+                text: "Add User",
                 type: Components.ButtonTypes.OutlinePrimary,
                 onClick: () => {
                     // Ensure the form is valid
@@ -353,9 +358,12 @@ class SiteInfo {
                 content: "Click to remove the selected Site Owner",
                 placement: Components.TooltipPlacements.Left,
                 btnProps: {
-                    className: "float-end mw-5",
+                    className: "float-end mw-6 pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: personX,
+                    iconSize: 24,
                     text: "Remove",
-                    type: Components.ButtonTypes.OutlinePrimary,
+                    type: Components.ButtonTypes.OutlineDanger,
                     onClick: () => {
                         // Ensure the form is valid
                         if (formRemove.isValid()) {
@@ -456,8 +464,11 @@ class SiteInfo {
             content: "Click to add the user as a Site Admin",
             placement: Components.TooltipPlacements.Left,
             btnProps: {
-                className: "float-end mb-3 mw-5",
-                text: "Add",
+                className: "float-end mb-3 mw-6 pe-2 py-1",
+                iconClassName: "mx-1",
+                iconType: personAdd,
+                iconSize: 24,
+                text: "Add User",
                 type: Components.ButtonTypes.OutlinePrimary,
                 onClick: () => {
                     // Ensure the form is valid
@@ -562,9 +573,12 @@ class SiteInfo {
                 content: "Click to remove the selected Site Admin",
                 placement: Components.TooltipPlacements.Left,
                 btnProps: {
-                    className: "float-end mw-5",
+                    className: "float-end mw-6 pe-2 py-1",
+                    iconClassName: "mx-1",
+                    iconType: personX,
+                    iconSize: 24,
                     text: "Remove",
-                    type: Components.ButtonTypes.OutlinePrimary,
+                    type: Components.ButtonTypes.OutlineDanger,
                     onClick: () => {
                         // Ensure the form is valid
                         if (formRemove.isValid()) {
@@ -867,7 +881,7 @@ class SiteInfo {
                                 {
                                     className: "pe-2 py-1",
                                     iconClassName: "mx-1",
-                                    iconType: person,
+                                    iconType: people,
                                     iconSize: 24,
                                     text: row.IsRootWeb ? "Site Admins" : "Site Owners",
                                     type: Components.ButtonTypes.OutlinePrimary,
