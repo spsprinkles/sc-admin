@@ -927,8 +927,12 @@ class ListInfo {
                 {
                     content: "Click to copy the list",
                     btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: clipboard2,
+                        iconSize: 24,
                         text: "Copy",
-                        type: Components.ButtonTypes.OutlinePrimary,
+                        type: Components.ButtonTypes.OutlineSuccess,
                         onClick: () => {
                             // Disable the view button
                             btnView.disable();
@@ -953,8 +957,10 @@ class ListInfo {
                         assignTo: btn => {
                             btnView = btn;
                         },
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
                         text: "View",
-                        type: Components.ButtonTypes.OutlineSuccess,
+                        type: Components.ButtonTypes.OutlinePrimary,
                         isDisabled: true,
                         onClick: () => {
                             // Show the list in a new tab
