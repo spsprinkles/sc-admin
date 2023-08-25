@@ -1,8 +1,12 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
+import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
+import { search } from "gd-sprest-bs/build/icons/svgs/search";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
 import * as moment from "moment";
-import { ExportCSV, isWopi, IScript } from "../common";
+import { ExportCSV, GetIcon, isWopi, IScript } from "../common";
 import Strings from "../strings";
 
 // Row Information
@@ -176,122 +180,136 @@ class DocumentSearch {
         Modal.setBody(form.el);
 
         // Render the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    text: "Search",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Ensure the form is valid
-                        if (form.isValid()) {
-                            let formValues = form.getValues();
-                            let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
-                            let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                    content: "Search for Documents based on the Search Terms",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: search,
+                        iconSize: 24,
+                        text: "Search",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                let formValues = form.getValues();
+                                let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
+                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
-                            // Determine the query text/phrases to search for
-                            let searchTerms = formValues["SearchTerms"] || "";
-                            let queryPhrases = [];
+                                // Determine the query text/phrases to search for
+                                let searchTerms = formValues["SearchTerms"] || "";
+                                let queryPhrases = [];
 
-                            // See if the search terms contains phrases
-                            let idxStart = searchTerms.indexOf('"');
-                            if (idxStart < 0) {
-                                queryPhrases = searchTerms.split(' ');
-                            } else {
-                                // Find all of the phrases
-                                let idx = 0;
-                                while (idxStart > 0) {
-                                    // Add the words before the phrase
-                                    let terms = searchTerms.substring(idx, idxStart).trim().split(' ');
-                                    queryPhrases = queryPhrases.concat(terms);
+                                // See if the search terms contains phrases
+                                let idxStart = searchTerms.indexOf('"');
+                                if (idxStart < 0) {
+                                    queryPhrases = searchTerms.split(' ');
+                                } else {
+                                    // Find all of the phrases
+                                    let idx = 0;
+                                    while (idxStart > 0) {
+                                        // Add the words before the phrase
+                                        let terms = searchTerms.substring(idx, idxStart).trim().split(' ');
+                                        queryPhrases = queryPhrases.concat(terms);
 
-                                    // Add the phrase
-                                    let idxEnd = searchTerms.indexOf('"', idxStart + 1);
-                                    queryPhrases.push(searchTerms.substring(idxStart, idxEnd + 1));
+                                        // Add the phrase
+                                        let idxEnd = searchTerms.indexOf('"', idxStart + 1);
+                                        queryPhrases.push(searchTerms.substring(idxStart, idxEnd + 1));
 
-                                    // Find the next phrase
-                                    idx = idxEnd + 1;
-                                    idxStart = searchTerms.indexOf('"', idxEnd + 1);
+                                        // Find the next phrase
+                                        idx = idxEnd + 1;
+                                        idxStart = searchTerms.indexOf('"', idxEnd + 1);
+                                    }
+
+                                    // See if there are more words after the last phrase
+                                    if (idx < searchTerms.length) {
+                                        queryPhrases = queryPhrases.concat(searchTerms.substring(idx).trim().split(' '));
+                                    }
                                 }
 
-                                // See if there are more words after the last phrase
-                                if (idx < searchTerms.length) {
-                                    queryPhrases = queryPhrases.concat(searchTerms.substring(idx).trim().split(' '));
-                                }
-                            }
+                                // Remove the empty values and join them w/ an OR clause
+                                let queryText = queryPhrases.filter(String).join(" OR ");
 
-                            // Remove the empty values and join them w/ an OR clause
-                            let queryText = queryPhrases.filter(String).join(" OR ");
+                                // Clear the data
+                                this._errors = [];
+                                this._rows = [];
 
-                            // Clear the data
-                            this._errors = [];
-                            this._rows = [];
+                                // Display a loading dialog
+                                LoadingDialog.setHeader("Searching Webs");
+                                LoadingDialog.setBody("This will close after the searches are completed...");
+                                LoadingDialog.show();
 
-                            // Display a loading dialog
-                            LoadingDialog.setHeader("Searching Webs");
-                            LoadingDialog.setBody("This will close after the searches are completed...");
-                            LoadingDialog.show();
+                                // Parse the webs
+                                Helper.Executor(webUrls, webUrl => {
+                                    // Return a promise
+                                    return new Promise((resolve) => {
+                                        // Update the dialog
+                                        LoadingDialog.setBody("Searching " + webUrl);
 
-                            // Parse the webs
-                            Helper.Executor(webUrls, webUrl => {
-                                // Return a promise
-                                return new Promise((resolve) => {
-                                    // Update the dialog
-                                    LoadingDialog.setBody("Searching " + webUrl);
+                                        // Get the context information of the web
+                                        ContextInfo.getWeb(webUrl).execute(
+                                            // Success
+                                            (context) => {
+                                                // Search the site
+                                                Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
+                                                    Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
+                                                    RefinementFilters: {
+                                                        results: [`fileExtension:or("${fileExtensions}")`]
+                                                    },
+                                                    RowLimit: 5000,
+                                                    SelectProperties: {
+                                                        results: [
+                                                            "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
+                                                            "ListId", "Path", "SiteName", "Title", "WebId"
+                                                        ]
+                                                    }
+                                                }).execute(results => {
+                                                    // Analyze the results
+                                                    this.analyzeResult(results.postquery);
 
-                                    // Get the context information of the web
-                                    ContextInfo.getWeb(webUrl).execute(
-                                        // Success
-                                        (context) => {
-                                            // Search the site
-                                            Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
-                                                Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
-                                                RefinementFilters: {
-                                                    results: [`fileExtension:or("${fileExtensions}")`]
-                                                },
-                                                RowLimit: 5000,
-                                                SelectProperties: {
-                                                    results: [
-                                                        "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                        "ListId", "Path", "SiteName", "Title", "WebId"
-                                                    ]
-                                                }
-                                            }).execute(results => {
-                                                // Analyze the results
-                                                this.analyzeResult(results.postquery);
+                                                    // Check the next web
+                                                    resolve(null);
+                                                }, () => {
+                                                    // Error getting the search results
+                                                    this._errors.push(webUrl);
+                                                    resolve(null);
+                                                });
+                                            },
 
-                                                // Check the next web
-                                                resolve(null);
-                                            }, () => {
-                                                // Error getting the search results
+                                            // Error
+                                            () => {
+                                                // Append the error and check the next web
                                                 this._errors.push(webUrl);
                                                 resolve(null);
-                                            });
-                                        },
+                                            }
+                                        );
+                                    });
+                                }).then(() => {
+                                    // Render the summary
+                                    this.renderSummary();
 
-                                        // Error
-                                        () => {
-                                            // Append the error and check the next web
-                                            this._errors.push(webUrl);
-                                            resolve(null);
-                                        }
-                                    );
+                                    // Hide the dialog
+                                    LoadingDialog.hide();
                                 });
-                            }).then(() => {
-                                // Render the summary
-                                this.renderSummary();
-
-                                // Hide the dialog
-                                LoadingDialog.hide();
-                            });
+                            }
                         }
                     }
                 },
                 {
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
@@ -435,37 +453,56 @@ class DocumentSearch {
                         let btnDelete: Components.IButton = null;
 
                         // Render the buttons
-                        Components.ButtonGroup({
+                        Components.TooltipGroup({
                             el,
-                            buttons: [
+                            tooltips: [
                                 {
-                                    text: "View",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    onClick: () => {
-                                        // Show the security group
-                                        window.open(isWopi(`${row.DocumentName}.${row.DocumentExt}`) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
+                                    content: "View Document",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        text: "View",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Show the security group
+                                            window.open(isWopi(`${row.DocumentName}.${row.DocumentExt}`) ? row.WebUrl + "/_layouts/15/WopiFrame.aspx?sourcedoc=" + row.DocumentUrl + "&action=view" : row.DocumentUrl, "_blank");
+                                        }
                                     }
                                 },
                                 {
-                                    text: "Download",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    onClick: () => {
-                                        // Download the document
-                                        window.open(`${row.WebUrl}/_layouts/15/download.aspx?SourceUrl=${row.DocumentUrl}`, "_blank");
+                                    content: "Download Document",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: fileEarmarkArrowDown,
+                                        iconSize: 24,
+                                        text: "Download",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Download the document
+                                            window.open(`${row.WebUrl}/_layouts/15/download.aspx?SourceUrl=${row.DocumentUrl}`, "_blank");
+                                        }
                                     }
                                 },
                                 {
-                                    assignTo: btn => { btnDelete = btn; },
-                                    text: "Delete",
-                                    type: Components.ButtonTypes.OutlineDanger,
-                                    onClick: () => {
-                                        // Confirm the deletion of the group
-                                        if (confirm("Are you sure you want to delete this document?")) {
-                                            // Disable this button
-                                            btnDelete.disable();
+                                    content: "Delete Document",
+                                    btnProps: {
+                                        assignTo: btn => { btnDelete = btn; },
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: trash,
+                                        iconSize: 24,
+                                        text: "Delete",
+                                        type: Components.ButtonTypes.OutlineDanger,
+                                        onClick: () => {
+                                            // Confirm the deletion of the group
+                                            if (confirm("Are you sure you want to delete this document?")) {
+                                                // Disable this button
+                                                btnDelete.disable();
 
-                                            // Delete the document
-                                            this.deleteDocument(row.WebUrl, row.DocumentName, row.DocumentUrl);
+                                                // Delete the document
+                                                this.deleteDocument(row.WebUrl, row.DocumentName, row.DocumentUrl);
+                                            }
                                         }
                                     }
                                 }
@@ -480,22 +517,34 @@ class DocumentSearch {
         Modal.setBody(elTable)
 
         // Set the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    text: "Export",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Export the CSV
-                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                    content: "Export to a CSV file",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
+                        text: "Export",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Export the CSV
+                            new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                        }
                     }
                 },
                 {
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]

@@ -1,4 +1,18 @@
 .bs {
+    .btn-icon, .dropdown-toggle {
+        font-size: .875rem;
+    }
+    button.btn-icon svg.icon-svg path {
+        fill: var(--bs-btn-color);
+    }
+    button.btn-icon:focus-visible, button.btn-icon:hover {
+        svg.icon-svg path  {
+            fill: var(--bs-btn-hover-color);
+        }
+    }
+    button.btn-icon:active svg.icon-svg path {
+        fill: var(--bs-btn-active-color);
+    }
     .card {
         --bs-card-color: #000;
         --bs-card-cap-color: #000;
@@ -7,21 +21,35 @@
             display: flex;
             min-height: 3rem;
         }
+        .card-header svg.icon-svg path {
+            fill: var(--bs-card-cap-color);
+        }
         .card-body {
             .d-flex {
                 .dropdown {
-                    min-width: 18rem;
+                    min-width: 17.6rem;
                     button.dropdown-toggle {
                         text-align: left;
                     }
                     button.dropdown-toggle::after {
+                        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%230078d4' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
+                        background-repeat: no-repeat;
+                        background-size: 1rem;
+                        border: 0;
                         float: right;
-                        margin-top: .55rem;
+                        height: 1rem;
+                        margin-right: -.2rem;
+                        margin-top: .2rem;
+                        width: 1rem;
+                    }
+                    button.dropdown-toggle:hover::after, button.dropdown-toggle:active::after {
+                        background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
                     }
                 }
                 button.run {
                     min-width: 4rem;
                     margin-left: auto;
+                    padding: .35rem .75rem .25rem .25rem;
                 }
                 
             }
@@ -33,8 +61,8 @@
     .modal {
         --bs-modal-color: #000;
     }
-    .mw-5 {
-        min-width: 5rem;
+    .mw-6 {
+        min-width: 6rem;
     }
     .offcanvas {
         z-index: 1090;
