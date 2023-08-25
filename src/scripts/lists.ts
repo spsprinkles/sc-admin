@@ -1,14 +1,11 @@
 import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { clipboard2 } from "gd-sprest-bs/build/icons/svgs/clipboard2";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
-import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
-import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
-import { send } from "gd-sprest-bs/build/icons/svgs/send";
-import { clipboard } from "gd-sprest-bs/build/icons/svgs/clipboard";
+import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
-import { ExportCSV, Webs, IScript } from "../common";
+import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -796,9 +793,7 @@ class ListInfo {
                             buttons: [
                                 {
                                     className: "pe-2 py-1",
-                                    iconClassName: "mx-1",
-                                    iconType: eye,
-                                    iconSize: 24,
+                                    iconType: GetIcon(24, 24, "EntryView", "mx-1"),
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -828,7 +823,7 @@ class ListInfo {
                                 {
                                     className: "pe-2 py-1",
                                     iconClassName: "mx-1",
-                                    iconType: clipboard,
+                                    iconType: clipboard2,
                                     iconSize: 24,
                                     text: "Copy",
                                     type: Components.ButtonTypes.OutlineSuccess,
@@ -852,9 +847,7 @@ class ListInfo {
             buttons: [
                 {
                     className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: send,
-                    iconSize: 24,
+                    iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {

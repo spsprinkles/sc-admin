@@ -2,10 +2,8 @@ import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
 import * as jQuery from "jquery";
-import { ExportCSV, Sites, IScript } from "../common";
-import { send } from "gd-sprest-bs/build/icons/svgs/send";
+import { ExportCSV, GetIcon, IScript, Sites } from "../common";
 import Strings from "../strings";
 
 // Row Information
@@ -299,9 +297,7 @@ class SiteUsage {
                             buttons: [
                                 {
                                     className: "pe-2 py-1",
-                                    iconClassName: "mx-1",
-                                    iconType: eye,
-                                    iconSize: 24,
+                                    iconType: GetIcon(24, 24, "EntryView", "mx-1"),
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -324,9 +320,7 @@ class SiteUsage {
             buttons: [
                 {
                     className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: send,
-                    iconSize: 24,
+                    iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {

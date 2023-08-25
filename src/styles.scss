@@ -41,6 +41,14 @@
     }
 }
 
+button.btn-icon svg.icon-svg path {
+    fill: var(--bs-btn-color);
+}
+
+button.btn-icon:hover svg.icon-svg path {
+    fill: var(--bs-btn-hover-color);
+}
+
 /* Apply changes to the Settings Panel */
 div.spPropertyPaneContainer div[aria-label='Site Admin Tool property pane'] div[data-automation-id='propertyPaneGroupContent'] {
     /* Align version to the right */

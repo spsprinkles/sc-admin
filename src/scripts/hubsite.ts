@@ -1,14 +1,10 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, Helper, HubSites, Search, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
-import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import { upload } from "gd-sprest-bs/build/icons/svgs/upload";
-import { eye } from "gd-sprest-bs/build/icons/svgs/eye";
-import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
-import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
-import { send } from "gd-sprest-bs/build/icons/svgs/send";
+import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
-import { ExportCSV, Webs, IScript } from "../common";
+import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -469,9 +465,7 @@ class HubSiteInfo {
                             buttons: [
                                 {
                                     className: "pe-2 py-1",
-                                    iconClassName: "mx-1",
-                                    iconType: eye,
-                                    iconSize: 24,
+                                    iconType: GetIcon(24, 24, "EntryView", "mx-1"),
                                     text: "View",
                                     type: Components.ButtonTypes.OutlinePrimary,
                                     onClick: () => {
@@ -494,9 +488,7 @@ class HubSiteInfo {
             buttons: [
                 {
                     className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: send,
-                    iconSize: 24,
+                    iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
                     text: "Export",
                     type: Components.ButtonTypes.OutlineSuccess,
                     onClick: () => {
