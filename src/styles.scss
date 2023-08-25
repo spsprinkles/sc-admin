@@ -21,6 +21,9 @@
             display: flex;
             min-height: 3rem;
         }
+        .card-header svg.icon-svg path {
+            fill: var(--bs-card-cap-color);
+        }
         .card-body {
             .d-flex {
                 .dropdown {

@@ -2,7 +2,7 @@ import { Components, Types, Web } from "gd-sprest-bs";
 import { play } from "gd-sprest-bs/build/icons/svgs/play";
 import * as Scripts from "./scripts";
 import Strings from "./strings";
-import { IScript } from "./common";
+import { GetIcon, IScript } from "./common";
 
 export class Dashboard {
     private _el: HTMLElement = null;
@@ -96,9 +96,10 @@ export class Dashboard {
         Components.Card({
             el: this._el,
             header: {
-                className: "h6",
+                className: "align-items-center d-flex h6",
                 // Create the header
                 onRender: (el) => {
+                    el.appendChild(GetIcon(36, 36, "SiteAdminTool", "me-2"));
                     let div = document.createElement("div");
                     div.classList.add("title");
                     div.innerText = Strings.ProjectName;
