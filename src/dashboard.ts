@@ -1,4 +1,5 @@
 import { Components, Types, Web } from "gd-sprest-bs";
+import { play } from "gd-sprest-bs/build/icons/svgs/play";
 import * as Scripts from "./scripts";
 import Strings from "./strings";
 import { IScript } from "./common";
@@ -119,7 +120,7 @@ export class Dashboard {
                     // Render the dropdown using the first script name as the label
                     let ddl = Components.Dropdown({
                         el: elDiv,
-                        btnClassName: "w-100",
+                        btnClassName: "py-2 w-100",
                         items,
                         label: scripts.keys().next().value,
                         title: "Select a report to run",
@@ -142,6 +143,9 @@ export class Dashboard {
                         content: "Run this report",
                         btnProps: {
                             className: "run",
+                            iconClassName: "mb-1 me-1",
+                            iconType: play,
+                            iconSize: 24,
                             text: "Run",
                             type: Components.ButtonTypes.OutlinePrimary,
                             onClick: (b, e) => {

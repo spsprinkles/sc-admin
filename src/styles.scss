@@ -1,4 +1,7 @@
 .bs {
+    .btn-icon, .dropdown-toggle {
+        font-size: .875rem;
+    }
     button.btn-icon svg.icon-svg path {
         fill: var(--bs-btn-color);
     }
@@ -21,7 +24,7 @@
         .card-body {
             .d-flex {
                 .dropdown {
-                    min-width: 18rem;
+                    min-width: 17.6rem;
                     button.dropdown-toggle {
                         text-align: left;
                     }
@@ -33,6 +36,7 @@
                 button.run {
                     min-width: 4rem;
                     margin-left: auto;
+                    padding: .35rem .75rem .25rem .25rem;
                 }
                 
             }
@@ -44,8 +48,8 @@
     .modal {
         --bs-modal-color: #000;
     }
-    .mw-5 {
-        min-width: 5rem;
+    .mw-6 {
+        min-width: 6rem;
     }
     .offcanvas {
         z-index: 1090;
