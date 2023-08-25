@@ -1,6 +1,5 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
-import { personX } from "gd-sprest-bs/build/icons/svgs/personX";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
@@ -310,72 +309,78 @@ class SiteUsers {
         Modal.setBody(form.el);
 
         // Render the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: search,
-                    iconSize: 24,
-                    text: "Search",
-                    type: Components.ButtonTypes.OutlinePrimary,
-                    onClick: () => {
-                        // Ensure the form is valid
-                        if (form.isValid()) {
-                            let formValues = form.getValues();
-                            let userName: string = formValues["UserName"].trim();
-                            let user: Types.SP.User = formValues["PeoplePicker"][0];
-                            let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                    content: "Search for Users",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: search,
+                        iconSize: 24,
+                        text: "Search",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                let formValues = form.getValues();
+                                let userName: string = formValues["UserName"].trim();
+                                let user: Types.SP.User = formValues["PeoplePicker"][0];
+                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
-                            // Clear the data
-                            this._errors = [];
-                            this._rows = [];
+                                // Clear the data
+                                this._errors = [];
+                                this._rows = [];
 
-                            // Parse the webs
-                            Helper.Executor(webUrls, webUrl => {
-                                // Return a promise
-                                return new Promise((resolve) => {
-                                    // Get the webs
-                                    new Webs({
-                                        url: webUrl,
-                                        onQueryWeb: (odata) => {
-                                            // Include the site group information
-                                            odata.Expand.push("ParentWeb");
-                                            odata.Expand.push("RoleAssignments");
-                                            odata.Expand.push("RoleAssignments/Groups");
-                                            odata.Expand.push("RoleAssignments/Member");
-                                            odata.Expand.push("RoleAssignments/Member/Users");
-                                            odata.Expand.push("RoleAssignments/RoleDefinitionBindings");
-                                        },
-                                        recursiveFl: false,
-                                        onComplete: webs => {
-                                            // Analyze the site
-                                            this.analyzeSites(webs[0], webs, userName || user).then(resolve);
-                                        },
-                                        onError: () => {
-                                            // Add the url to the errors list
-                                            this._errors.push(webUrl);
-                                            resolve(null);
-                                        }
-                                    })
+                                // Parse the webs
+                                Helper.Executor(webUrls, webUrl => {
+                                    // Return a promise
+                                    return new Promise((resolve) => {
+                                        // Get the webs
+                                        new Webs({
+                                            url: webUrl,
+                                            onQueryWeb: (odata) => {
+                                                // Include the site group information
+                                                odata.Expand.push("ParentWeb");
+                                                odata.Expand.push("RoleAssignments");
+                                                odata.Expand.push("RoleAssignments/Groups");
+                                                odata.Expand.push("RoleAssignments/Member");
+                                                odata.Expand.push("RoleAssignments/Member/Users");
+                                                odata.Expand.push("RoleAssignments/RoleDefinitionBindings");
+                                            },
+                                            recursiveFl: false,
+                                            onComplete: webs => {
+                                                // Analyze the site
+                                                this.analyzeSites(webs[0], webs, userName || user).then(resolve);
+                                            },
+                                            onError: () => {
+                                                // Add the url to the errors list
+                                                this._errors.push(webUrl);
+                                                resolve(null);
+                                            }
+                                        })
+                                    });
+                                }).then(() => {
+                                    // Render the summary
+                                    this.renderSummary();
                                 });
-                            }).then(() => {
-                                // Render the summary
-                                this.renderSummary();
-                            });
+                            }
                         }
                     }
                 },
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: xSquare,
-                    iconSize: 24,
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineSecondary,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
@@ -536,36 +541,41 @@ class SiteUsers {
                         // Ensure this is a group
                         if (row.Group) {
                             // Render the buttons
-                            Components.ButtonGroup({
+                            Components.TooltipGroup({
                                 el,
-                                buttons: [
+                                tooltips: [
                                     {
-                                        className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
-                                        text: "View",
-                                        type: Components.ButtonTypes.OutlinePrimary,
-                                        isDisabled: !(row.GroupId > 0),
-                                        onClick: () => {
-                                            // View the group
-                                            window.open(`${row.WebUrl}/${ContextInfo.layoutsUrl}/people.aspx?MembershipGroupId=${row.GroupId}`);
+                                        content: "View Group",
+                                        btnProps: {
+                                            className: "pe-2 py-1",
+                                            iconType: GetIcon(24, 24, "PeopleTeam", "mx-1"),
+                                            text: "View",
+                                            type: Components.ButtonTypes.OutlinePrimary,
+                                            isDisabled: !(row.GroupId > 0),
+                                            onClick: () => {
+                                                // View the group
+                                                window.open(`${row.WebUrl}/${ContextInfo.layoutsUrl}/people.aspx?MembershipGroupId=${row.GroupId}`);
+                                            }
                                         }
                                     },
                                     {
-                                        assignTo: btn => { btnDelete = btn; },
-                                        iconClassName: "mx-1",
-                                        iconType: personX,
-                                        iconSize: 24,
-                                        text: "Remove User",
-                                        type: Components.ButtonTypes.OutlineDanger,
-                                        isDisabled: !(row.Id > 0),
-                                        onClick: () => {
-                                            // Confirm the removal of the user
-                                            if (confirm("Are you sure you want to remove the user from this site?")) {
-                                                // Disable this button
-                                                btnDelete.disable();
+                                        content: "Remove User",
+                                        btnProps: {
+                                            assignTo: btn => { btnDelete = btn; },
+                                            className: "pe-2 py-1",
+                                            iconType: GetIcon(24, 24, "PersonDelete", "mx-1"),
+                                            text: "Remove",
+                                            type: Components.ButtonTypes.OutlineDanger,
+                                            isDisabled: !(row.Id > 0),
+                                            onClick: () => {
+                                                // Confirm the removal of the user
+                                                if (confirm("Are you sure you want to remove the user from this site?")) {
+                                                    // Disable this button
+                                                    btnDelete.disable();
 
-                                                // Remove the user
-                                                this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
+                                                    // Remove the user
+                                                    this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
+                                                }
                                             }
                                         }
                                     }
@@ -573,19 +583,24 @@ class SiteUsers {
                             });
                         } else {
                             // Render the delete button
-                            Components.Button({
-                                assignTo: btn => { btnDelete = btn; },
+                            Components.Tooltip({
                                 el,
-                                text: "Delete",
-                                type: Components.ButtonTypes.OutlineDanger,
-                                onClick: () => {
-                                    // Confirm the deletion of the group
-                                    if (confirm("Are you sure you want to remove the user from this site?")) {
-                                        // Disable this button
-                                        btnDelete.disable();
+                                content: "Remove User",
+                                btnProps: {
+                                    assignTo: btn => { btnDelete = btn; },
+                                    className: "pe-2 py-1",
+                                    iconType: GetIcon(24, 24, "PersonDelete", "mx-1"),
+                                    text: "Remove",
+                                    type: Components.ButtonTypes.OutlineDanger,
+                                    onClick: () => {
+                                        // Confirm the deletion of the group
+                                        if (confirm("Are you sure you want to remove the user from this site?")) {
+                                            // Disable this button
+                                            btnDelete.disable();
 
-                                        // Remove the user
-                                        this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
+                                            // Remove the user
+                                            this.removeUser(row.WebUrl, row.Name, row.Id, row.Group);
+                                        }
                                     }
                                 }
                             });
@@ -599,28 +614,34 @@ class SiteUsers {
         Modal.setBody(elTable)
 
         // Set the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    className: "pe-2 py-1",
-                    iconType: GetIcon(24, 24, "ExcelDocument", "icon-svg mx-1"),
-                    text: "Export",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Export the CSV
-                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                    content: "Export to a CSV file",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "ExcelDocument", "icon-svg mx-1"),
+                        text: "Export",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Export the CSV
+                            new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                        }
                     }
                 },
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: xSquare,
-                    iconSize: 24,
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineSecondary,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]

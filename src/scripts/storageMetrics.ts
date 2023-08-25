@@ -117,69 +117,75 @@ class StorageMetrics {
         Modal.setBody(form.el);
 
         // Render the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: search,
-                    iconSize: 24,
-                    text: "Search",
-                    type: Components.ButtonTypes.OutlinePrimary,
-                    onClick: () => {
-                        // Ensure the form is valid
-                        if (form.isValid()) {
-                            let formValues = form.getValues();
-                            let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                    content: "Search for Storage Metrics",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: search,
+                        iconSize: 24,
+                        text: "Search",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                let formValues = form.getValues();
+                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
-                            // Clear the data
-                            this._errors = [];
-                            this._rows = [];
+                                // Clear the data
+                                this._errors = [];
+                                this._rows = [];
 
-                            // Parse the webs
-                            Helper.Executor(webUrls, webUrl => {
-                                // Return a promise
-                                return new Promise((resolve) => {
-                                    new Webs({
-                                        url: webUrl,
-                                        recursiveFl: formValues["RecurseWebs"],
-                                        onQueryWeb: (odata) => {
-                                            // Include the web information
-                                            odata.Select.push("Description");
-                                            odata.Select.push("Title");
-                                            odata.Select.push("ServerRelativeUrl");
+                                // Parse the webs
+                                Helper.Executor(webUrls, webUrl => {
+                                    // Return a promise
+                                    return new Promise((resolve) => {
+                                        new Webs({
+                                            url: webUrl,
+                                            recursiveFl: formValues["RecurseWebs"],
+                                            onQueryWeb: (odata) => {
+                                                // Include the web information
+                                                odata.Select.push("Description");
+                                                odata.Select.push("Title");
+                                                odata.Select.push("ServerRelativeUrl");
 
-                                            // Include the storage metrics
-                                            odata.Expand.push("RootFolder/StorageMetrics")
-                                        },
-                                        onComplete: webs => {
-                                            // Analyze the site
-                                            this.analyzeWebs(webs).then(resolve);
-                                        },
-                                        onError: () => {
-                                            // Add the url to the errors list
-                                            this._errors.push(webUrl);
-                                            resolve(null);
-                                        }
-                                    })
+                                                // Include the storage metrics
+                                                odata.Expand.push("RootFolder/StorageMetrics")
+                                            },
+                                            onComplete: webs => {
+                                                // Analyze the site
+                                                this.analyzeWebs(webs).then(resolve);
+                                            },
+                                            onError: () => {
+                                                // Add the url to the errors list
+                                                this._errors.push(webUrl);
+                                                resolve(null);
+                                            }
+                                        })
+                                    });
+                                }).then(() => {
+                                    // Render the summary
+                                    this.renderSummary();
                                 });
-                            }).then(() => {
-                                // Render the summary
-                                this.renderSummary();
-                            });
+                            }
                         }
                     }
                 },
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: xSquare,
-                    iconSize: 24,
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineSecondary,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
@@ -301,17 +307,20 @@ class StorageMetrics {
                     title: "",
                     onRenderCell: (el, col, row: IRowInfo) => {
                         // Render the buttons
-                        Components.ButtonGroup({
+                        Components.TooltipGroup({
                             el,
-                            buttons: [
+                            tooltips: [
                                 {
-                                    className: "pe-2 py-1",
-                                    iconType: GetIcon(24, 24, "EntryView", "mx-1"),
-                                    text: "View",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    onClick: () => {
-                                        // Show the security group
-                                        window.open(row.WebUrl, "_blank");
+                                    content: "View Site",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        text: "View",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Show the security group
+                                            window.open(row.WebUrl, "_blank");
+                                        }
                                     }
                                 }
                             ]
@@ -325,28 +334,34 @@ class StorageMetrics {
         Modal.setBody(elTable)
 
         // Set the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    className: "pe-2 py-1",
-                    iconType: GetIcon(24, 24, "ExcelDocument", "icon-svg mx-1"),
-                    text: "Export",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Export the CSV
-                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                    content: "Export to a CSV file",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "ExcelDocument", "icon-svg mx-1"),
+                        text: "Export",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Export the CSV
+                            new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                        }
                     }
                 },
                 {
-                    className: "pe-2 py-1",
-                    iconClassName: "mx-1",
-                    iconType: xSquare,
-                    iconSize: 24,
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineSecondary,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
