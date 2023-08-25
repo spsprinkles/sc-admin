@@ -1,7 +1,7 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
+import { personX } from "gd-sprest-bs/build/icons/svgs/personX";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
-import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
@@ -553,7 +553,7 @@ class SiteUsers {
                                     {
                                         assignTo: btn => { btnDelete = btn; },
                                         iconClassName: "mx-1",
-                                        iconType: trash,
+                                        iconType: personX,
                                         iconSize: 24,
                                         text: "Remove User",
                                         type: Components.ButtonTypes.OutlineDanger,
