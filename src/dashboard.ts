@@ -1,7 +1,8 @@
 import { Components, Types, Web } from "gd-sprest-bs";
+import { play } from "gd-sprest-bs/build/icons/svgs/play";
 import * as Scripts from "./scripts";
 import Strings from "./strings";
-import { IScript } from "./common";
+import { GetIcon, IScript } from "./common";
 
 export class Dashboard {
     private _el: HTMLElement = null;
@@ -95,9 +96,10 @@ export class Dashboard {
         Components.Card({
             el: this._el,
             header: {
-                className: "h6",
+                className: "align-items-center d-flex h6",
                 // Create the header
                 onRender: (el) => {
+                    el.appendChild(GetIcon(36, 36, "SiteAdminTool", "me-2"));
                     let div = document.createElement("div");
                     div.classList.add("title");
                     div.innerText = Strings.ProjectName;
@@ -119,7 +121,7 @@ export class Dashboard {
                     // Render the dropdown using the first script name as the label
                     let ddl = Components.Dropdown({
                         el: elDiv,
-                        btnClassName: "w-100",
+                        btnClassName: "py-2 w-100",
                         items,
                         label: scripts.keys().next().value,
                         title: "Select a report to run",
@@ -142,6 +144,9 @@ export class Dashboard {
                         content: "Run this report",
                         btnProps: {
                             className: "run",
+                            iconClassName: "mb-1 me-1",
+                            iconType: play,
+                            iconSize: 24,
                             text: "Run",
                             type: Components.ButtonTypes.OutlinePrimary,
                             onClick: (b, e) => {

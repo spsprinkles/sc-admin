@@ -1,7 +1,10 @@
 import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { search } from "gd-sprest-bs/build/icons/svgs/search";
+import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
+import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
-import { ExportCSV, Webs, IScript } from "../common";
+import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
 interface IRowInfo {
@@ -591,63 +594,77 @@ class ListInfo {
         Modal.setBody(form.el);
 
         // Render the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    text: "Analyze",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Ensure the form is valid
-                        if (form.isValid()) {
-                            let formValues = form.getValues();
-                            let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                    content: "Search for List Information",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: search,
+                        iconSize: 24,
+                        text: "Search",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                let formValues = form.getValues();
+                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
 
-                            // Clear the data
-                            this._errors = [];
-                            this._rows = [];
+                                // Clear the data
+                                this._errors = [];
+                                this._rows = [];
 
-                            // Parse the webs
-                            Helper.Executor(webUrls, webUrl => {
-                                // Return a promise
-                                return new Promise((resolve) => {
-                                    new Webs({
-                                        url: webUrl,
-                                        onQueryWeb: (odata) => {
-                                            // Include the list information
-                                            odata.Expand.push("Lists/RootFolder");
-                                            odata.Expand.push("Lists/Views");
-                                            odata.Select.push("Lists/BaseTemplate");
-                                            odata.Select.push("Lists/Description");
-                                            odata.Select.push("Lists/Id");
-                                            odata.Select.push("Lists/ItemCount");
-                                            odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
-                                            odata.Select.push("Lists/Title");
-                                        },
-                                        recursiveFl: true,
-                                        onComplete: webs => {
-                                            // Analyze the site
-                                            this.analyzeSites(webs).then(resolve);
-                                        },
-                                        onError: () => {
-                                            // Add the url to the errors list
-                                            this._errors.push(webUrl);
-                                            resolve(null);
-                                        }
-                                    })
+                                // Parse the webs
+                                Helper.Executor(webUrls, webUrl => {
+                                    // Return a promise
+                                    return new Promise((resolve) => {
+                                        new Webs({
+                                            url: webUrl,
+                                            onQueryWeb: (odata) => {
+                                                // Include the list information
+                                                odata.Expand.push("Lists/RootFolder");
+                                                odata.Expand.push("Lists/Views");
+                                                odata.Select.push("Lists/BaseTemplate");
+                                                odata.Select.push("Lists/Description");
+                                                odata.Select.push("Lists/Id");
+                                                odata.Select.push("Lists/ItemCount");
+                                                odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
+                                                odata.Select.push("Lists/Title");
+                                            },
+                                            recursiveFl: true,
+                                            onComplete: webs => {
+                                                // Analyze the site
+                                                this.analyzeSites(webs).then(resolve);
+                                            },
+                                            onError: () => {
+                                                // Add the url to the errors list
+                                                this._errors.push(webUrl);
+                                                resolve(null);
+                                            }
+                                        })
+                                    });
+                                }).then(() => {
+                                    // Render the summary
+                                    this.renderSummary();
                                 });
-                            }).then(() => {
-                                // Render the summary
-                                this.renderSummary();
-                            });
+                            }
                         }
                     }
                 },
                 {
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
@@ -776,38 +793,55 @@ class ListInfo {
                         let btnDelete: Components.IButton = null;
 
                         // Render the buttons
-                        Components.ButtonGroup({
+                        Components.TooltipGroup({
                             el,
-                            buttons: [
+                            tooltips: [
                                 {
-                                    text: "View",
-                                    type: Components.ButtonTypes.OutlinePrimary,
-                                    onClick: () => {
-                                        // Show the security group
-                                        window.open(row.ListUrl, "_blank");
-                                    }
-                                },
-                                {
-                                    assignTo: btn => { btnDelete = btn; },
-                                    text: "Delete",
-                                    type: Components.ButtonTypes.OutlineDanger,
-                                    onClick: () => {
-                                        // Confirm the deletion of the group
-                                        if (confirm("Are you sure you want to delete this list?")) {
-                                            // Disable this button
-                                            btnDelete.disable();
-
-                                            // Delete the site group
-                                            this.deleteList(row.WebUrl, row.ListName);
+                                    content: "View List",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        text: "View",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Show the security group
+                                            window.open(row.ListUrl, "_blank");
                                         }
                                     }
                                 },
                                 {
-                                    text: "Copy",
-                                    type: Components.ButtonTypes.OutlineSuccess,
-                                    onClick: () => {
-                                        // Display the copy form
-                                        this.showCopyListForm(row);
+                                    content: "Delete List",
+                                    btnProps: {
+                                        assignTo: btn => { btnDelete = btn; },
+                                        className: "pe-2 py-1",
+                                        iconClassName: "mx-1",
+                                        iconType: trash,
+                                        iconSize: 24,
+                                        text: "Delete",
+                                        type: Components.ButtonTypes.OutlineDanger,
+                                        onClick: () => {
+                                            // Confirm the deletion of the group
+                                            if (confirm("Are you sure you want to delete this list?")) {
+                                                // Disable this button
+                                                btnDelete.disable();
+
+                                                // Delete the site group
+                                                this.deleteList(row.WebUrl, row.ListName);
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    content: "Copy List",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "CopyAdd", "mx-1"),
+                                        text: "Copy",
+                                        type: Components.ButtonTypes.OutlineSuccess,
+                                        onClick: () => {
+                                            // Display the copy form
+                                            this.showCopyListForm(row);
+                                        }
                                     }
                                 }
                             ]
@@ -821,22 +855,34 @@ class ListInfo {
         Modal.setBody(elTable)
 
         // Set the footer
-        Modal.setFooter(Components.ButtonGroup({
-            buttons: [
+        Modal.setFooter(Components.TooltipGroup({
+            tooltips: [
                 {
-                    text: "Export",
-                    type: Components.ButtonTypes.OutlineSuccess,
-                    onClick: () => {
-                        // Export the CSV
-                        new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                    content: "Export to a CSV file",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
+                        text: "Export",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Export the CSV
+                            new ExportCSV(ScriptFileName, CSVExportFields, this._rows);
+                        }
                     }
                 },
                 {
-                    text: "Cancel",
-                    type: Components.ButtonTypes.OutlineDanger,
-                    onClick: () => {
-                        // Close the modal
-                        Modal.hide();
+                    content: "Close Window",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconClassName: "mx-1",
+                        iconType: xSquare,
+                        iconSize: 24,
+                        text: "Close",
+                        type: Components.ButtonTypes.OutlineSecondary,
+                        onClick: () => {
+                            // Close the modal
+                            Modal.hide();
+                        }
                     }
                 }
             ]
@@ -897,10 +943,12 @@ class ListInfo {
             className: "float-end mt-3",
             tooltips: [
                 {
-                    content: "Click to copy the list",
+                    content: "Start the list copy",
                     btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "CopyArrowRight", "mx-1"),
                         text: "Copy",
-                        type: Components.ButtonTypes.OutlinePrimary,
+                        type: Components.ButtonTypes.OutlineSuccess,
                         onClick: () => {
                             // Disable the view button
                             btnView.disable();
@@ -925,8 +973,10 @@ class ListInfo {
                         assignTo: btn => {
                             btnView = btn;
                         },
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
                         text: "View",
-                        type: Components.ButtonTypes.OutlineSuccess,
+                        type: Components.ButtonTypes.OutlinePrimary,
                         isDisabled: true,
                         onClick: () => {
                             // Show the list in a new tab
