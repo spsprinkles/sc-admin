@@ -31,6 +31,8 @@ export function GetIcon(height?, width?, iconName?, className?) {
         // Set the height/width
         height ? icon.setAttribute("height", (height).toString()) : null;
         width ? icon.setAttribute("width", (width).toString()) : null;
+        // Hide the icon as non-interactive content from the accessibility API
+        icon.setAttribute("aria-hidden", "true");
         // Update the styling
         icon.style.pointerEvents = "none";
         // Support for IE
