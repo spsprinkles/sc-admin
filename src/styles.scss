@@ -34,13 +34,13 @@
                     button.dropdown-toggle::after {
                         background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%230078d4' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
                         background-repeat: no-repeat;
-                        background-size: 1rem;
+                        background-size: .85rem;
                         border: 0;
                         float: right;
-                        height: 1rem;
-                        margin-right: -.2rem;
-                        margin-top: .2rem;
-                        width: 1rem;
+                        height: .85rem;
+                        margin-right: -.25rem;
+                        margin-top: .25rem;
+                        width: .85rem;
                     }
                     button.dropdown-toggle:hover::after, button.dropdown-toggle:active::after {
                         background-image: url("data:image/svg+xml,<svg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'><path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
