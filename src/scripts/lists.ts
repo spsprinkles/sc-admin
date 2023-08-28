@@ -935,6 +935,12 @@ class ListInfo {
             ]
         });
 
+        // Add the disclaimer about not copying the content
+        let disclaimer = document.createElement("p");
+        disclaimer.className = "fst-italic mb-0 mt-3 small";
+        disclaimer.innerHTML = "* The new list that is created will not contain any content. Only the structure of the list is preserved. Lookup list associations are preserved if the target lookup list exists.";
+        CanvasForm.BodyElement.appendChild(disclaimer);
+
         // Set the footer
         let btnView: Components.IButton = null;
         let newListUrl: string = null;
