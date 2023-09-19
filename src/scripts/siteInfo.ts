@@ -58,6 +58,8 @@ class SiteInfo {
     private analyzeSites(webs: Types.SP.WebOData[]) {
         // Return a promise
         return new Promise(resolve => {
+            let counter = 0;
+
             // Show a loading dialog
             LoadingDialog.setHeader("Analyzing the data");
             LoadingDialog.setBody("Getting additional user information...");
@@ -67,27 +69,68 @@ class SiteInfo {
             Helper.Executor(webs, web => {
                 // Return a promise
                 return new Promise(resolve => {
-                    // Get the owners
-                    this.getOwners(web.ServerRelativeUrl).then(owners => {
-                        let siteOwners = [];
-                        for (let i = 0; i < owners.length; i++) {
-                            // Add the owner email
-                            siteOwners.push(owners[i].EMail || owners[i].Name || owners[i].UserName || owners[i].Title);
-                        }
+                    // Update the loading dialog
+                    LoadingDialog.setBody(`Getting user information (${++counter} of ${webs.length})`);
 
-                        // Get the scas
-                        this.getSCAs(web.ServerRelativeUrl, web.ParentWeb).then(admins => {
-                            let siteAdmins = [];
-                            for (let i = 0; i < admins.length; i++) {
-                                // Add the admin email
-                                siteAdmins.push(admins[i].EMail || admins[i].Name || admins[i].UserName || admins[i].Title);
+                    // Get the owners
+                    this.getOwners(web.ServerRelativeUrl).then(
+                        // Success
+                        owners => {
+                            let siteOwners = [];
+                            for (let i = 0; i < owners.length; i++) {
+                                // Add the owner email
+                                siteOwners.push(owners[i].EMail || owners[i].Name || owners[i].UserName || owners[i].Title);
                             }
 
+                            // Get the scas
+                            this.getSCAs(web.ServerRelativeUrl, web.ParentWeb).then(
+                                // Success
+                                admins => {
+                                    let siteAdmins = [];
+                                    for (let i = 0; i < admins.length; i++) {
+                                        // Add the admin email
+                                        siteAdmins.push(admins[i].EMail || admins[i].Name || admins[i].UserName || admins[i].Title);
+                                    }
+
+                                    // Add a row for this entry
+                                    this._rows.push({
+                                        IsRootWeb: web.ParentWeb && web.ParentWeb.Id ? false : true,
+                                        Owners: siteOwners.join(', '),
+                                        SCAs: siteAdmins.join(', '),
+                                        WebDescription: web.Description,
+                                        WebId: web.Id,
+                                        WebTitle: web.Title,
+                                        WebUrl: web.Url
+                                    });
+
+                                    // Check the next web
+                                    resolve(null);
+                                },
+                                // Error getting the admin information
+                                () => {
+                                    // Add a row for this entry
+                                    this._rows.push({
+                                        IsRootWeb: web.ParentWeb && web.ParentWeb.Id ? false : true,
+                                        Owners: siteOwners.join(', '),
+                                        SCAs: "Unable to get admin information",
+                                        WebDescription: web.Description,
+                                        WebId: web.Id,
+                                        WebTitle: web.Title,
+                                        WebUrl: web.Url
+                                    });
+
+                                    // Check the next web
+                                    resolve(null);
+                                }
+                            );
+                        },
+                        // Error getting the owner information
+                        () => {
                             // Add a row for this entry
                             this._rows.push({
                                 IsRootWeb: web.ParentWeb && web.ParentWeb.Id ? false : true,
-                                Owners: siteOwners.join(', '),
-                                SCAs: siteAdmins.join(', '),
+                                Owners: "Unable to get owner information",
+                                SCAs: "Unable to get admin information",
                                 WebDescription: web.Description,
                                 WebId: web.Id,
                                 WebTitle: web.Title,
@@ -96,8 +139,8 @@ class SiteInfo {
 
                             // Check the next web
                             resolve(null);
-                        });
-                    });
+                        }
+                    );
                 });
             }).then(() => {
                 // Hide the loading dialog
