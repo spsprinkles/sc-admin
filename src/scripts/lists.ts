@@ -95,8 +95,9 @@ class ListInfo {
 
             // Get the target web
             let formValues = form.getValues();
-            let url = formValues["WebUrl"];
-            Web(url).query({ Expand: ["EffectiveBasePermissions"] }).execute(
+            let dstListName = formValues["ListName"];
+            let dstWebUrl = formValues["WebUrl"];
+            Web(dstWebUrl).query({ Expand: ["EffectiveBasePermissions"] }).execute(
                 // Exists
                 (web) => {
                     // Ensure the user doesn't have permission to manage lists
@@ -139,7 +140,7 @@ class ListInfo {
                                 ListCfg: [{
                                     ListInformation: {
                                         BaseTemplate: list.ListInfo.BaseTemplate,
-                                        Title: list.ListInfo.Title,
+                                        Title: dstListName,
                                         AllowContentTypes: list.ListInfo.AllowContentTypes,
                                         Hidden: list.ListInfo.Hidden,
                                         NoCrawl: list.ListInfo.NoCrawl
@@ -246,7 +247,7 @@ class ListInfo {
                                         });
 
                                         // Get the new list's url
-                                        Web(listInfo.WebUrl).Lists(listInfo.ListName).RootFolder().execute(folder => {
+                                        Web(dstWebUrl).Lists(dstListName).RootFolder().execute(folder => {
                                             // Hide the loading dialog
                                             LoadingDialog.hide();
 
@@ -921,6 +922,7 @@ class ListInfo {
                     className: "mb-3",
                     type: Components.FormControlTypes.TextField,
                     value: listInfo.ListName,
+                    required: true,
                     description: "The list name to create",
                     errorMessage: "A list name is required"
                 },
