@@ -59,7 +59,7 @@ class UserSearch {
             // Parse the users
             Helper.Executor(sites, site => {
                 // Update the loading dialog
-                LoadingDialog.setBody(`Analyzing User ${++counter} of ${sites.length}`);
+                LoadingDialog.setBody(`Analyzing Site ${++counter} of ${sites.length}`);
 
                 // Get the user information
                 return this.getUserInfo(site, userInfo);
