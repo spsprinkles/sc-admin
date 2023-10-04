@@ -451,7 +451,6 @@ class UserSearch {
                             btnProps: {
                                 assignTo: btn => { btnDelete = btn; },
                                 className: "pe-2 py-1",
-                                isDisabled: true,
                                 iconType: GetIcon(24, 24, "PersonDelete", "mx-1"),
                                 text: "Remove",
                                 type: Components.ButtonTypes.OutlineDanger,
