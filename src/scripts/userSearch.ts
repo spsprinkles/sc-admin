@@ -88,6 +88,7 @@ class UserSearch {
             Search().postquery({
                 Querytext: `contentclass=sts_site`,
                 RowLimit: 5000,
+                TrimDuplicates: true,
                 SelectProperties: {
                     results: [
                         "Title", "SPSiteUrl", "WebId"
