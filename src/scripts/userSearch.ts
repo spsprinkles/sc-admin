@@ -181,7 +181,7 @@ class UserSearch {
             } else {
                 // Get the users
                 Web(site.WebUrl).Lists("User Information List").Items().query({
-                    Filter: `EMail eq '${user.Email} Name eq '${user.LoginName}' or UserName eq '${user.UserPrincipalName}'`,
+                    Filter: `EMail eq '${user.Email}' or UserName eq '${user.UserPrincipalName}'`,
                     GetAllItems: true,
                     Select: ["Id", "Name", "EMail", "IsSiteAdmin", "Title"],
                     Top: 1
