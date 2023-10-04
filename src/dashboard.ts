@@ -78,7 +78,8 @@ export class Dashboard {
             [Scripts.SiteInfoModal.name, Scripts.SiteInfoModal],
             [Scripts.SiteUsageModal.name, Scripts.SiteUsageModal],
             [Scripts.SiteUsersModal.name, Scripts.SiteUsersModal],
-            [Scripts.StorageMetricsModal.name, Scripts.StorageMetricsModal]
+            [Scripts.StorageMetricsModal.name, Scripts.StorageMetricsModal],
+            [Scripts.UserSearchModal.name, Scripts.UserSearchModal]
         ]);
 
         // Parse the scripts, add them to the dropdown items

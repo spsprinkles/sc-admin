@@ -9,3 +9,4 @@ export * from "./siteInfo";
 export * from "./siteUsage";
 export * from "./siteUsers";
 export * from "./storageMetrics";
+export * from "./userSearch";
