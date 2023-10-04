@@ -26,6 +26,6 @@ const Strings = {
     SearchTerms: "phi pii ssn",
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
-    Version: "0.1.3"
+    Version: "0.1.4"
 };
 export default Strings;
