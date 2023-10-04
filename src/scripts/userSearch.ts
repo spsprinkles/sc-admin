@@ -7,10 +7,11 @@ import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
 interface IRowInfo extends ISiteInfo {
+    Account: string;
     EMail: string;
     Id: number;
-    Name: string;
-    UserName: string;
+    IsSiteAdmin: boolean;
+    Title: string;
 }
 
 // Site Information
@@ -23,7 +24,7 @@ interface ISiteInfo {
 // CSV Export Fields
 const CSVExportFields = [
     "WebTitle", "WebUrl", "WebId",
-    "Name", "UserName", "Email"
+    "Account", "EMail", "Id", "IsSiteAdmin", "Title"
 ];
 
 // Script Constants
@@ -37,13 +38,9 @@ const ScriptName = "User Search";
  */
 class UserSearch {
     private _rows: IRowInfo[] = null;
-    private _urls: string[] = null;
 
     // Constructor
-    constructor(urls: string[] = []) {
-        // Set the urls
-        this._urls = urls;
-
+    constructor() {
         // Render the modal dialog
         this.render();
     }
@@ -151,7 +148,7 @@ class UserSearch {
                 // Get the user information list
                 Web(site.WebUrl).Lists("User Information List").Items().query({
                     Filter: `substringof('${user}', Name) or substringof('${user}', Title) or substringof('${user}', UserName)`,
-                    Select: ["Id", "Name", "EMail", "Title", "UserName"],
+                    Select: ["Id", "Name", "EMail", "IsSiteAdmin", "Title"],
                     GetAllItems: true,
                     Top: 5000
                 }).execute(
@@ -162,10 +159,11 @@ class UserSearch {
 
                             // Add the row
                             this._rows.push({
+                                Account: item["Name"],
                                 EMail: item["EMail"],
                                 Id: item.Id,
-                                Name: item["Name"],
-                                UserName: item["UserName"],
+                                IsSiteAdmin: item["IsSiteAdmin"],
+                                Title: item["Title"],
                                 WebId: site.WebId,
                                 WebTitle: site.WebTitle,
                                 WebUrl: site.WebUrl
@@ -185,7 +183,7 @@ class UserSearch {
                 Web(site.WebUrl).Lists("User Information List").Items().query({
                     Filter: `EMail eq '${user.Email} Name eq '${user.LoginName}' or UserName eq '${user.UserPrincipalName}'`,
                     GetAllItems: true,
-                    Select: ["Id", "Name", "EMail", "Title", "UserName"],
+                    Select: ["Id", "Name", "EMail", "IsSiteAdmin", "Title"],
                     Top: 1
                 }).execute(
                     items => {
@@ -194,10 +192,11 @@ class UserSearch {
                         if (item) {
                             // Add the row
                             this._rows.push({
+                                Account: item["Name"],
                                 EMail: item["EMail"],
                                 Id: item.Id,
-                                Name: item["Name"],
-                                UserName: item["UserName"],
+                                IsSiteAdmin: item["IsSiteAdmin"],
+                                Title: item["Title"],
                                 WebId: site.WebId,
                                 WebTitle: site.WebTitle,
                                 WebUrl: site.WebUrl
@@ -220,7 +219,7 @@ class UserSearch {
     private removeUser(row: IRowInfo) {
         // Display a loading dialog
         LoadingDialog.setHeader("Removing Site User");
-        LoadingDialog.setBody(`Removing the site user '${row.Name}' from all groups. This will close after the request completes.`);
+        LoadingDialog.setBody(`Removing the site user '${row.Title}' from all groups. This will close after the request completes.`);
         LoadingDialog.show();
 
         // Get the web context
@@ -387,7 +386,7 @@ class UserSearch {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 9,
+                        "targets": 6,
                         "orderable": false,
                         "searchable": false
                     }
@@ -416,22 +415,26 @@ class UserSearch {
             columns: [
                 {
                     name: "WebTitle",
-                    title: "Title"
+                    title: "Web Title"
                 },
                 {
                     name: "WebUrl",
-                    title: "Url"
+                    title: "Web Url"
                 },
                 {
-                    name: "Name",
+                    name: "Account",
                     title: "Name"
                 },
                 {
-                    name: "User Name",
-                    title: "User Name"
+                    name: "Title",
+                    title: "Title"
                 },
                 {
-                    name: "Email",
+                    name: "IsSiteAdmin",
+                    title: "Is Site Admin"
+                },
+                {
+                    name: "EMail",
                     title: "User Email"
                 },
                 {
