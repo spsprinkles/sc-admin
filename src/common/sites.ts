@@ -112,15 +112,44 @@ export class Sites {
     }
 
     // Static method for executing the search api request
-    private static searchForSites(sites: ISiteInfo[], startRowIdx: number = 0): PromiseLike<Array<ISiteInfo>> {
+    private static searchForSites(sites: ISiteInfo[]): PromiseLike<Array<ISiteInfo>> {
+        // Parses the results of the search
+        let parseResults = (results: Types.Microsoft.Office.Server.Search.REST.SearchResult) => {
+            // Parse the results
+            for (let i = 0; i < results.PrimaryQueryResult.RelevantResults.RowCount; i++) {
+                let row = results.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
+                let siteInfo: ISiteInfo = {} as any;
+
+                // Parse the cells
+                for (let j = 0; j < row.Cells.results.length; j++) {
+                    let cell = row.Cells.results[j];
+
+                    // Set the values
+                    switch (cell.Key) {
+                        case "SPSiteUrl":
+                            siteInfo.WebUrl = cell.Value;
+                            break;
+                        case "Title":
+                            siteInfo.WebTitle = cell.Value;
+                            break;
+                        case "WebId":
+                            siteInfo.WebId = cell.Value;
+                            break;
+                    }
+                }
+
+                // Add the site information
+                sites.push(siteInfo);
+            }
+        }
+
         // Return a promise
         return new Promise(resolve => {
             // Get the associated sites
             Search().postquery({
                 Querytext: `contentclass=sts_site`,
-                RowLimit: 5000,
+                RowLimit: 500,
                 TrimDuplicates: true,
-                StartRow: startRowIdx,
                 SelectProperties: {
                     results: [
                         "Title", "SPSiteUrl", "WebId"
@@ -129,36 +158,35 @@ export class Sites {
             }).execute(
                 results => {
                     // Parse the results
-                    for (let i = 0; i < results.postquery.PrimaryQueryResult.RelevantResults.RowCount; i++) {
-                        let row = results.postquery.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
-                        let siteInfo: ISiteInfo = {} as any;
-
-                        // Parse the cells
-                        for (let j = 0; j < row.Cells.results.length; j++) {
-                            let cell = row.Cells.results[j];
-
-                            // Set the values
-                            switch (cell.Key) {
-                                case "SPSiteUrl":
-                                    siteInfo.WebUrl = cell.Value;
-                                    break;
-                                case "Title":
-                                    siteInfo.WebTitle = cell.Value;
-                                    break;
-                                case "WebId":
-                                    siteInfo.WebId = cell.Value;
-                                    break;
-                            }
-                        }
-
-                        // Add the site information
-                        sites.push(siteInfo);
-                    }
+                    parseResults(results.postquery);
 
                     // See if more items exist
                     if (results.postquery.PrimaryQueryResult.RelevantResults.TotalRows > sites.length) {
-                        // Search for the sites
-                        this.searchForSites(sites, sites.length + 1).then(resolve);
+                        let search = Search();
+                        let totalPages = Math.ceil(results.postquery.PrimaryQueryResult.RelevantResults.TotalRows / 500);
+                        for (let i = 0; i < totalPages; i++) {
+                            // Get the associated sites
+                            search.postquery({
+                                Querytext: `contentclass=sts_site`,
+                                RowLimit: 500,
+                                StartRow: i * 500,
+                                TrimDuplicates: true,
+                                SelectProperties: {
+                                    results: [
+                                        "Title", "SPSiteUrl", "WebId"
+                                    ]
+                                }
+                            }).batch(results => {
+                                // Parse the results
+                                parseResults(results.postquery);
+                            }, i % 100 == 0);
+                        }
+
+                        // Wait for the batch request to complete
+                        search.execute(() => {
+                            // Resolve the request
+                            resolve(sites);
+                        });
                     } else {
                         // Resolve the request
                         resolve(sites);
