@@ -1,9 +1,9 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import * as jQuery from "jquery";
-import { ExportCSV, GetIcon, IScript, Webs } from "../common";
+import { ExportCSV, GetIcon, IScript, ISiteInfo, Sites } from "../common";
 
 // Row Information
 interface IRowInfo extends ISiteInfo {
@@ -12,13 +12,6 @@ interface IRowInfo extends ISiteInfo {
     Id: number;
     IsSiteAdmin: boolean;
     Title: string;
-}
-
-// Site Information
-interface ISiteInfo {
-    WebId?: string;
-    WebTitle: string;
-    WebUrl: string;
 }
 
 // CSV Export Fields
@@ -70,73 +63,6 @@ class UserSearch {
                 // Resolve the request
                 resolve(null);
             });
-        });
-    }
-
-    // Gets the sites the user has access to
-    private getSites(): PromiseLike<Array<ISiteInfo>> {
-        // Return a promise
-        return new Promise((resolve) => {
-            let sites: ISiteInfo[] = [];
-
-            // Show a loading dialog
-            LoadingDialog.setHeader("Searching Site Collections");
-            LoadingDialog.setBody('Getting the sites you have access to...');
-            LoadingDialog.show();
-
-            // Get the associated sites
-            Search().postquery({
-                Querytext: `contentclass=sts_site`,
-                RowLimit: 5000,
-                TrimDuplicates: true,
-                SelectProperties: {
-                    results: [
-                        "Title", "SPSiteUrl", "WebId"
-                    ]
-                }
-            }).execute(
-                results => {
-                    // Parse the results
-                    for (let i = 0; i < results.postquery.PrimaryQueryResult.RelevantResults.RowCount; i++) {
-                        let row = results.postquery.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
-                        let siteInfo: ISiteInfo = {} as any;
-
-                        // Parse the cells
-                        for (let j = 0; j < row.Cells.results.length; j++) {
-                            let cell = row.Cells.results[j];
-
-                            // Set the values
-                            switch (cell.Key) {
-                                case "SPSiteUrl":
-                                    siteInfo.WebUrl = cell.Value;
-                                    break;
-                                case "Title":
-                                    siteInfo.WebTitle = cell.Value;
-                                    break;
-                                case "WebId":
-                                    siteInfo.WebId = cell.Value;
-                                    break;
-                            }
-                        }
-
-                        // Add the site information
-                        sites.push(siteInfo);
-                    }
-
-                    // Hide the dialog
-                    LoadingDialog.hide();
-
-                    // Resolve the request
-                    resolve(sites);
-                },
-                () => {
-                    // Hide the dialog
-                    LoadingDialog.hide();
-
-                    // Error executing the search
-                    resolve(sites);
-                }
-            );
         });
     }
 
@@ -330,7 +256,7 @@ class UserSearch {
                             // Ensure the form is valid
                             if (form.isValid()) {
                                 // Search for the sites
-                                this.getSites().then(sites => {
+                                Sites.getSites().then(sites => {
                                     let formValues = form.getValues();
                                     let userName: string = formValues["UserName"].trim();
                                     let user: Types.SP.User = formValues["PeoplePicker"][0];

@@ -1,5 +1,5 @@
 import { LoadingDialog } from "dattatable";
-import { Types, Site } from "gd-sprest-bs";
+import { Types, Search, Site } from "gd-sprest-bs";
 
 // Properties
 interface IProps {
@@ -7,6 +7,13 @@ interface IProps {
     onError?: (url: string) => void;
     onQuerySite?: (odata: Types.IODataQuery) => void;
     url: string;
+}
+
+// Site Information
+export interface ISiteInfo {
+    WebId?: string;
+    WebTitle: string;
+    WebUrl: string;
 }
 
 /**
@@ -77,6 +84,83 @@ export class Sites {
 
                     // Resolve the request
                     resolve();
+                }
+            );
+        });
+    }
+
+    // Static method to get all site collections the user has access to
+    static getSites(): PromiseLike<Array<ISiteInfo>> {
+        // Return a promise
+        return new Promise((resolve) => {
+            let sites: ISiteInfo[] = [];
+
+            // Show a loading dialog
+            LoadingDialog.setHeader("Searching Site Collections");
+            LoadingDialog.setBody('Getting the sites you have access to...');
+            LoadingDialog.show();
+
+            // Search for the sites
+            this.searchForSites(sites).then(sites => {
+                // Hide the dialog
+                LoadingDialog.hide();
+
+                // Resolve the request
+                resolve(sites);
+            });
+        });
+    }
+
+    // Static method for executing the search api request
+    private static searchForSites(sites: ISiteInfo[]): PromiseLike<Array<ISiteInfo>> {
+        // Return a promise
+        return new Promise(resolve => {
+            // Get the associated sites
+            Search.postQuery({
+                query: {
+                    Querytext: `contentclass=sts_site`,
+                    TrimDuplicates: true,
+                    SelectProperties: {
+                        results: [
+                            "Title", "SPSiteUrl", "WebId"
+                        ]
+                    }
+                }
+            }).then(
+                results => {
+                    // Parse the results
+                    for (let i = 0; i < results.PrimaryQueryResult.RelevantResults.RowCount; i++) {
+                        let row = results.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
+                        let siteInfo: ISiteInfo = {} as any;
+
+                        // Parse the cells
+                        for (let j = 0; j < row.Cells.results.length; j++) {
+                            let cell = row.Cells.results[j];
+
+                            // Set the values
+                            switch (cell.Key) {
+                                case "SPSiteUrl":
+                                    siteInfo.WebUrl = cell.Value;
+                                    break;
+                                case "Title":
+                                    siteInfo.WebTitle = cell.Value;
+                                    break;
+                                case "WebId":
+                                    siteInfo.WebId = cell.Value;
+                                    break;
+                            }
+                        }
+
+                        // Add the site information
+                        sites.push(siteInfo);
+                    }
+
+                    // Resolve the request
+                    resolve(sites);
+                },
+                () => {
+                    // Error executing the search
+                    resolve(sites);
                 }
             );
         });
