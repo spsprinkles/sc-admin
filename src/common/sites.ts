@@ -120,6 +120,7 @@ export class Sites {
                 query: {
                     Querytext: `contentclass=sts_site`,
                     TrimDuplicates: true,
+                    RowLimit: 500,
                     SelectProperties: {
                         results: [
                             "Title", "SPSiteUrl", "WebId"
