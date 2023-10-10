@@ -126,9 +126,8 @@ export class Sites {
                             "Title", "SPSiteUrl", "WebId"
                         ]
                     }
-                }
-            }).then(
-                results => {
+                },
+                onQueryCompleted: (results) => {
                     // Parse the results
                     for (let i = 0; i < results.PrimaryQueryResult.RelevantResults.RowCount; i++) {
                         let row = results.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
@@ -155,7 +154,9 @@ export class Sites {
                         // Add the site information
                         sites.push(siteInfo);
                     }
-
+                }
+            }).then(
+                results => {
                     // Resolve the request
                     resolve(sites);
                 },
