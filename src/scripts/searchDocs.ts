@@ -257,27 +257,28 @@ class DocumentSearch {
                                             // Success
                                             (context) => {
                                                 // Search the site
-                                                Search(webUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue }).postquery({
-                                                    Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
-                                                    RefinementFilters: {
-                                                        results: [`fileExtension:or("${fileExtensions}")`]
+                                                Search.postQuery({
+                                                    url: webUrl,
+                                                    targetInfo: { requestDigest: context.GetContextWebInformation.FormDigestValue },
+                                                    query: {
+                                                        Querytext: `${queryText} IsDocument: true path: ${context.GetContextWebInformation.WebFullUrl}`,
+                                                        RefinementFilters: {
+                                                            results: [`fileExtension:or("${fileExtensions}")`]
+                                                        },
+                                                        RowLimit: 500,
+                                                        SelectProperties: {
+                                                            results: [
+                                                                "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
+                                                                "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
+                                                            ]
+                                                        }
                                                     },
-                                                    RowLimit: 5000,
-                                                    SelectProperties: {
-                                                        results: [
-                                                            "Author", "FileExtension", "HitHighlightedSummary", "LastModifiedTime",
-                                                            "ListId", "Path", "SPSiteUrl", "SPWebUrl", "Title", "WebId"
-                                                        ]
+                                                    onQueryCompleted: results => {
+                                                        // Analyze the results
+                                                        this.analyzeResult(results);
                                                     }
-                                                }).execute(results => {
-                                                    // Analyze the results
-                                                    this.analyzeResult(results.postquery);
-
+                                                }).then(() => {
                                                     // Check the next web
-                                                    resolve(null);
-                                                }, () => {
-                                                    // Error getting the search results
-                                                    this._errors.push(webUrl);
                                                     resolve(null);
                                                 });
                                             },
