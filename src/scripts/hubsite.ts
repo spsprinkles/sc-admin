@@ -128,27 +128,30 @@ class HubSiteInfo {
                     // Return a promise
                     return new Promise(resolve => {
                         // Get the associated sites
-                        Search().postquery({
-                            Querytext: `DepartmentId=${site.ID} contentclass=sts_site -SiteId:${site.ID}`,
-                            RowLimit: 5000
-                        }).execute(results => {
-                            // Parse the results
-                            for (let i = 0; i < results.postquery.PrimaryQueryResult.RelevantResults.RowCount; i++) {
-                                let row = results.postquery.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
+                        Search.postQuery({
+                            query: {
+                                Querytext: `DepartmentId=${site.ID} contentclass=sts_site -SiteId:${site.ID}`,
+                                RowLimit: 500
+                            },
+                            onQueryCompleted: (results) => {
+                                // Parse the results
+                                for (let i = 0; i < results.PrimaryQueryResult.RelevantResults.RowCount; i++) {
+                                    let row = results.PrimaryQueryResult.RelevantResults.Table.Rows.results[i];
 
-                                // Parse the cells
-                                for (let j = 0; j < row.Cells.results.length; j++) {
-                                    let cell = row.Cells.results[j];
+                                    // Parse the cells
+                                    for (let j = 0; j < row.Cells.results.length; j++) {
+                                        let cell = row.Cells.results[j];
 
-                                    // See if this is the url
-                                    if (cell.Key == "SiteName") {
-                                        // Add the url and break from the loop
-                                        urls.push(cell.Value);
-                                        break;
+                                        // See if this is the url
+                                        if (cell.Key == "SiteName") {
+                                            // Add the url and break from the loop
+                                            urls.push(cell.Value);
+                                            break;
+                                        }
                                     }
                                 }
                             }
-
+                        }).then(() => {
                             // Check the next site
                             resolve(null);
                         });
