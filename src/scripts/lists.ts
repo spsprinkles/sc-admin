@@ -9,6 +9,7 @@ import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 // Row Information
 interface IRowInfo {
     ListDescription: string;
+    ListExperience: string;
     ListId: string;
     ListItemCount: string;
     ListName: string;
@@ -22,8 +23,8 @@ interface IRowInfo {
 
 // CSV Export Fields
 const CSVExportFields = [
-    "ListDescription", "ListId", "ListItemCount", "ListViewCount",
-    "ListViewHiddenCount", "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
+    "ListDescription", "ListId", "ListItemCount", "ListViewCount", "ListViewHiddenCount",
+    "ListName", "ListType", "ListExperience", "ListUrl", "WebTitle", "WebUrl"
 ];
 
 // Script Constants
@@ -64,9 +65,24 @@ class ListInfo {
                         if (views.results[i].Hidden) { hiddenCount++; }
                     }
 
+                    // Set the list experience
+                    let listExperience = "";
+                    switch (list.ListExperienceOptions) {
+                        case SPTypes.ListExperienceOptions.Auto:
+                            listExperience = "Default for site"
+                            break;
+                        case SPTypes.ListExperienceOptions.ClassicExperience:
+                            listExperience = "Classic"
+                            break;
+                        case SPTypes.ListExperienceOptions.NewExperience:
+                            listExperience = "Modern"
+                            break;
+                    }
+
                     // Add a row for this entry
                     this._rows.push({
                         ListDescription: list.Description,
+                        ListExperience: listExperience,
                         ListId: list.Id,
                         ListItemCount: list.ItemCount + "",
                         ListName: list.Title,
@@ -630,6 +646,7 @@ class ListInfo {
                                                 odata.Select.push("Lists/Description");
                                                 odata.Select.push("Lists/Id");
                                                 odata.Select.push("Lists/ItemCount");
+                                                odata.Select.push("Lists/ListExperienceOptions");
                                                 odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
                                                 odata.Select.push("Lists/Title");
                                             },
@@ -695,7 +712,7 @@ class ListInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 9,
+                        "targets": 10,
                         "orderable": false,
                         "searchable": false
                     }
@@ -718,8 +735,8 @@ class ListInfo {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 5th column by default; ascending
-                order: [[4, "asc"]]
+                // Order by the 6th column by default; ascending
+                order: [[5, "asc"]]
             },
             columns: [
                 {
@@ -737,6 +754,10 @@ class ListInfo {
                 {
                     name: "ListType",
                     title: "List Type"
+                },
+                {
+                    name: "ListExperience",
+                    title: "List Experience"
                 },
                 {
                     name: "ListUrl",
