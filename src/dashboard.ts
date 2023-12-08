@@ -15,7 +15,10 @@ export class Dashboard {
         // Ensure the user is an Owner or Admin
         this.isOwnerOrAdmin().then(
             // Render the solution if the user is an owner/admin
-            this.render,
+            () => {
+                // Render the dashboard
+                this.render();
+            },
 
             // Not Owner/Admin
             () => {
@@ -26,10 +29,7 @@ export class Dashboard {
                     type: Components.AlertTypes.Danger
                 });
             }
-        )
-
-        // Render the dashboard
-        this.render();
+        );
     }
 
     // Sees if the user is an owner or admin

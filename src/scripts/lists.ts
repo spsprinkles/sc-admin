@@ -865,6 +865,19 @@ class ListInfo {
                                             this.showCopyListForm(row);
                                         }
                                     }
+                                },
+                                {
+                                    content: "Update Experience",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
+                                        text: "Experience",
+                                        type: Components.ButtonTypes.OutlineSecondary,
+                                        onClick: () => {
+                                            // Display the list experience form
+                                            this.showListExperienceForm(row);
+                                        }
+                                    }
                                 }
                             ]
                         });
@@ -912,6 +925,84 @@ class ListInfo {
 
         // Show the modal
         Modal.show();
+    }
+
+    // Sets the list experience
+    private setListExperience(listInfo: IRowInfo, form: Components.IForm) {
+        let ctrl = form.getControl("ListExperience");
+
+        // Show a loading Dialog
+        LoadingDialog.setHeader("Reading Target List");
+        LoadingDialog.setBody("Validating the permissions...");
+        LoadingDialog.show();
+
+        // Get the target list permissions
+        Web(listInfo.WebUrl).Lists(listInfo.ListName).query({ Expand: ["EffectiveBasePermissions"] }).execute(
+            // Exists
+            (list) => {
+                // Ensure the user doesn't have permission to manage lists
+                if (!Helper.hasPermissions(list.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
+                    // Update the validation
+                    ctrl.updateValidation(ctrl.el, {
+                        isValid: false,
+                        invalidMessage: "You do not have permission to manage lists on this web."
+                    });
+
+                    // Hide the loading dialog
+                    LoadingDialog.hide();
+                    return;
+                }
+
+                // Get the digest value for the destination web
+                ContextInfo.getWeb(listInfo.WebUrl).execute(context => {
+                    // Update the loading dialog
+                    LoadingDialog.setHeader("Updating the List");
+                    LoadingDialog.setBody("Updating the list experience...");
+
+                    // Update the list experience value
+                    let formValues = form.getValues();
+                    let listExperience = formValues["ListExperience"] as Components.ICheckboxGroupItem;
+                    Web(listInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue })
+                        .Lists(listInfo.ListName).update({ ListExperienceOptions: listExperience.data }).execute(
+                            // Success
+                            () => {
+                                // Update the validation
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: true,
+                                    validMessage: `The list was successfully updated to ${listExperience.label}.`
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            },
+
+                            // Error
+                            () => {
+                                // Update the validation
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "Error updating the list."
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            }
+                        )
+                });
+            },
+
+            // Doesn't exist
+            () => {
+                // Update the validation
+                ctrl.updateValidation(ctrl.el, {
+                    isValid: false,
+                    invalidMessage: "The target web doesn't exist, or you do not have access to it."
+                });
+
+                // Hide the loading dialog
+                LoadingDialog.hide();
+            }
+        );
     }
 
     // Shows the copy list form
@@ -1010,6 +1101,78 @@ class ListInfo {
                         onClick: () => {
                             // Show the list in a new tab
                             newListUrl ? window.open(newListUrl, "_blank") : null;
+                        }
+                    }
+                }
+            ]
+        });
+
+        // Show the canvas form
+        CanvasForm.show();
+    }
+
+    // Shows the list experience form
+    private showListExperienceForm(listInfo: IRowInfo) {
+        // Clear the canvas
+        CanvasForm.clear();
+
+        // Prevent auto close
+        CanvasForm.setAutoClose(false);
+
+        // Set the header
+        CanvasForm.setHeader("List Experience");
+
+        // Set the body
+        let form = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [
+                {
+                    label: "List Experience",
+                    name: "ListExperience",
+                    className: "mb-3",
+                    errorMessage: "A selection a required.",
+                    required: true,
+                    type: Components.FormControlTypes.Switch,
+                    value: listInfo.ListExperience,
+                    items: [
+                        {
+                            data: SPTypes.ListExperienceOptions.Auto,
+                            name: "Auto",
+                            label: "Default for site"
+                        },
+                        {
+                            data: SPTypes.ListExperienceOptions.ClassicExperience,
+                            name: "ClassicExperience",
+                            label: "Classic"
+                        },
+                        {
+                            data: SPTypes.ListExperienceOptions.NewExperience,
+                            name: "NewExperience",
+                            label: "Modern"
+                        }
+                    ]
+                } as Components.IFormControlPropsSwitch
+            ]
+        });
+
+        // Set the footer
+        Components.TooltipGroup({
+            el: CanvasForm.BodyElement,
+            className: "float-end mt-3",
+            tooltips: [
+                {
+                    content: "Updates the list experience",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
+                        text: "Update",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                // Update the list
+                                this.setListExperience(listInfo, form);
+                            }
                         }
                     }
                 }
