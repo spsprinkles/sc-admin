@@ -1,5 +1,6 @@
 import { DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, Search, Types, Web } from "gd-sprest-bs";
+import { fileEarmark } from "gd-sprest-bs/build/icons/svgs/fileEarmark";
 import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkArrowDown";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
@@ -382,7 +383,9 @@ class DocumentRetention {
                                     content: "View Document",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        iconClassName: "mx-1",
+                                        iconType: fileEarmark,
+                                        iconSize: 24,
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {

@@ -1,5 +1,5 @@
 import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, SPTypes, ThemeManager, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
@@ -9,6 +9,7 @@ import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 // Row Information
 interface IRowInfo {
     ListDescription: string;
+    ListExperience: string;
     ListId: string;
     ListItemCount: string;
     ListName: string;
@@ -22,8 +23,8 @@ interface IRowInfo {
 
 // CSV Export Fields
 const CSVExportFields = [
-    "ListDescription", "ListId", "ListItemCount", "ListViewCount",
-    "ListViewHiddenCount", "ListName", "ListType", "ListUrl", "WebTitle", "WebUrl"
+    "ListDescription", "ListId", "ListItemCount", "ListViewCount", "ListViewHiddenCount",
+    "ListName", "ListType", "ListExperience", "ListUrl", "WebTitle", "WebUrl"
 ];
 
 // Script Constants
@@ -64,9 +65,24 @@ class ListInfo {
                         if (views.results[i].Hidden) { hiddenCount++; }
                     }
 
+                    // Set the list experience
+                    let listExperience = "";
+                    switch (list.ListExperienceOptions) {
+                        case SPTypes.ListExperienceOptions.Auto:
+                            listExperience = "Default experience for the site"
+                            break;
+                        case SPTypes.ListExperienceOptions.ClassicExperience:
+                            listExperience = "Classic experience"
+                            break;
+                        case SPTypes.ListExperienceOptions.NewExperience:
+                            listExperience = "New experience"
+                            break;
+                    }
+
                     // Add a row for this entry
                     this._rows.push({
                         ListDescription: list.Description,
+                        ListExperience: listExperience,
                         ListId: list.Id,
                         ListItemCount: list.ItemCount + "",
                         ListName: list.Title,
@@ -630,6 +646,7 @@ class ListInfo {
                                                 odata.Select.push("Lists/Description");
                                                 odata.Select.push("Lists/Id");
                                                 odata.Select.push("Lists/ItemCount");
+                                                odata.Select.push("Lists/ListExperienceOptions");
                                                 odata.Select.push("Lists/RootFolder/ServerRelativeUrl");
                                                 odata.Select.push("Lists/Title");
                                             },
@@ -695,7 +712,7 @@ class ListInfo {
                 dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
                 columnDefs: [
                     {
-                        "targets": 9,
+                        "targets": 10,
                         "orderable": false,
                         "searchable": false
                     }
@@ -718,8 +735,8 @@ class ListInfo {
                 headerCallback: function (thead, data, start, end, display) {
                     jQuery('th', thead).addClass('align-middle');
                 },
-                // Order by the 5th column by default; ascending
-                order: [[4, "asc"]]
+                // Order by the 6th column by default; ascending
+                order: [[5, "asc"]]
             },
             columns: [
                 {
@@ -737,6 +754,10 @@ class ListInfo {
                 {
                     name: "ListType",
                     title: "List Type"
+                },
+                {
+                    name: "ListExperience",
+                    title: "List Experience"
                 },
                 {
                     name: "ListUrl",
@@ -801,7 +822,7 @@ class ListInfo {
                                     content: "View List",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
@@ -842,6 +863,18 @@ class ListInfo {
                                         onClick: () => {
                                             // Display the copy form
                                             this.showCopyListForm(row);
+                                        }
+                                    }
+                                },
+                                {
+                                    content: "List Experience",
+                                    btnProps: {
+                                        iconType: GetIcon(24, 24, "TextBulletListSquare", "mx-1"),
+                                        text: "Experience",
+                                        type: Components.ButtonTypes.OutlineSecondary,
+                                        onClick: () => {
+                                            // Display the list experience form
+                                            this.showListExperienceForm(row);
                                         }
                                     }
                                 }
@@ -891,6 +924,84 @@ class ListInfo {
 
         // Show the modal
         Modal.show();
+    }
+
+    // Sets the list experience
+    private setListExperience(listInfo: IRowInfo, form: Components.IForm) {
+        let ctrl = form.getControl("ListExperience");
+
+        // Show a loading Dialog
+        LoadingDialog.setHeader("Reading Target List");
+        LoadingDialog.setBody("Validating the permissions...");
+        LoadingDialog.show();
+
+        // Get the target list permissions
+        Web(listInfo.WebUrl).Lists(listInfo.ListName).query({ Expand: ["EffectiveBasePermissions"] }).execute(
+            // Exists
+            (list) => {
+                // Ensure the user doesn't have permission to manage lists
+                if (!Helper.hasPermissions(list.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
+                    // Update the validation
+                    ctrl.updateValidation(ctrl.el, {
+                        isValid: false,
+                        invalidMessage: "You do not have permission to manage lists on this web."
+                    });
+
+                    // Hide the loading dialog
+                    LoadingDialog.hide();
+                    return;
+                }
+
+                // Get the digest value for the destination web
+                ContextInfo.getWeb(listInfo.WebUrl).execute(context => {
+                    // Update the loading dialog
+                    LoadingDialog.setHeader("Updating the List");
+                    LoadingDialog.setBody("Updating the list experience...");
+
+                    // Update the list experience value
+                    let formValues = form.getValues();
+                    let listExperience = formValues["ListExperience"] as Components.ICheckboxGroupItem;
+                    Web(listInfo.WebUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue })
+                        .Lists(listInfo.ListName).update({ ListExperienceOptions: listExperience.data }).execute(
+                            // Success
+                            () => {
+                                // Update the validation
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: true,
+                                    validMessage: `The list was successfully updated to ${listExperience.label}.`
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            },
+
+                            // Error
+                            () => {
+                                // Update the validation
+                                ctrl.updateValidation(ctrl.el, {
+                                    isValid: false,
+                                    invalidMessage: "Error updating the list"
+                                });
+
+                                // Hide the loading dialog
+                                LoadingDialog.hide();
+                            }
+                        )
+                });
+            },
+
+            // Doesn't exist
+            () => {
+                // Update the validation
+                ctrl.updateValidation(ctrl.el, {
+                    isValid: false,
+                    invalidMessage: "The target web doesn't exist, or you do not have access to it."
+                });
+
+                // Hide the loading dialog
+                LoadingDialog.hide();
+            }
+        );
     }
 
     // Shows the copy list form
@@ -982,13 +1093,93 @@ class ListInfo {
                             btnView = btn;
                         },
                         className: "pe-2 py-1",
-                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                         text: "View",
                         type: Components.ButtonTypes.OutlinePrimary,
                         isDisabled: true,
                         onClick: () => {
                             // Show the list in a new tab
                             newListUrl ? window.open(newListUrl, "_blank") : null;
+                        }
+                    }
+                }
+            ]
+        });
+
+        // Show the canvas form
+        CanvasForm.show();
+    }
+
+    // Shows the list experience form
+    private showListExperienceForm(listInfo: IRowInfo) {
+        // Clear the canvas
+        CanvasForm.clear();
+
+        // Prevent auto close
+        CanvasForm.setAutoClose(false);
+
+        // Set the header
+        CanvasForm.setHeader("List Experience: " + listInfo.ListName);
+
+        // Set the body
+        let form = Components.Form({
+            el: CanvasForm.BodyElement,
+            controls: [
+                {
+                    label: "Display this list using the new or classic experience?",
+                    name: "ListExperience",
+                    className: "mb-3",
+                    errorMessage: "A selection a required",
+                    required: true,
+                    type: Components.FormControlTypes.Switch,
+                    value: listInfo.ListExperience,
+                    items: [
+                        {
+                            data: SPTypes.ListExperienceOptions.Auto,
+                            name: "Auto",
+                            label: "Default experience for the site"
+                        },
+                        {
+                            data: SPTypes.ListExperienceOptions.NewExperience,
+                            name: "NewExperience",
+                            label: "New experience"
+                        },
+                        {
+                            data: SPTypes.ListExperienceOptions.ClassicExperience,
+                            name: "ClassicExperience",
+                            label: "Classic experience"
+                        }
+                    ],
+                    onControlRendered: (ctrl) => {
+                        // Add the dark class if theme is inverted
+                        if (ThemeManager.IsInverted) {
+                            ctrl.el.querySelectorAll("div.form-check.form-switch input[type=checkbox].form-check-input").forEach((el: HTMLElement) => {
+                                el.classList.add("dark");
+                            });
+                        }
+                    }
+                } as Components.IFormControlPropsSwitch
+            ]
+        });
+
+        // Set the footer
+        Components.TooltipGroup({
+            el: CanvasForm.BodyElement,
+            className: "float-end mt-3",
+            tooltips: [
+                {
+                    content: "Update the list experience",
+                    btnProps: {
+                        className: "pe-2 py-1",
+                        iconType: GetIcon(24, 24, "TextBulletListSquareEdit", "mx-1"),
+                        text: "Update",
+                        type: Components.ButtonTypes.OutlineSuccess,
+                        onClick: () => {
+                            // Ensure the form is valid
+                            if (form.isValid()) {
+                                // Update the list
+                                this.setListExperience(listInfo, form);
+                            }
                         }
                     }
                 }

@@ -305,7 +305,7 @@ class SiteUsage {
                                     content: "View Site",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        iconType: GetIcon(24, 24, "LiveSite", "mx-1"),
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {

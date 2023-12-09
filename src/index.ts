@@ -1,4 +1,5 @@
-import { ContextInfo } from "gd-sprest-bs";
+import { LoadingDialog, waitForTheme } from "dattatable";
+import { ContextInfo, ThemeManager } from "gd-sprest-bs";
 import { Configuration } from "./cfg";
 import { Dashboard } from "./dashboard";
 import Strings, { setContext } from "./strings";
@@ -23,6 +24,11 @@ const GlobalVariable = {
     Dashboard: null,
     description: Strings.ProjectDescription,
     render: (props: IProps) => {
+        // Show a loading dialog
+        LoadingDialog.setHeader("Loading Theme");
+        LoadingDialog.setBody("Please wait...");
+        LoadingDialog.show();
+        
         // See if the page context exists
         if (props.context) {
             // Set the context
@@ -39,8 +45,18 @@ const GlobalVariable = {
             props.timeFormat ? Strings.TimeFormat = props.timeFormat : null;
         }
 
-        // Create the application
-        GlobalVariable.Dashboard = new Dashboard(props.el);
+        // Wait for the theme to be loaded
+        waitForTheme().then(() => {
+            // Create the application
+            GlobalVariable.Dashboard = new Dashboard(props.el);
+            
+            // Hide the loading dialog
+            LoadingDialog.hide();
+        });
+    },
+    updateTheme: (themeInfo) => {
+        // Set the theme
+        ThemeManager.setCurrentTheme(themeInfo);
     },
     version: Strings.Version
 };
