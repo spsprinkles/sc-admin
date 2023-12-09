@@ -5,7 +5,7 @@
 ![SiteAdminTool](https://github.com/spsprinkles/sc-admin/assets/24440567/e4d021c8-5202-4e88-900f-dde4b6ed3b8c)
 ![SiteAdminTool2](https://github.com/spsprinkles/sc-admin/assets/24440567/e227d65b-ba93-48e7-a1a5-cad9ea4d5f2f)
 
-### Download the latest [release](https://github.com/spsprinkles/sc-admin/releases/tag/v0.1.2) as an SPFx webpart and deploy it directly to SharePoint Online.
+### Download the latest [release](https://github.com/spsprinkles/sc-admin/releases/tag/v0.1.6) as an SPFx webpart and deploy it directly to SharePoint Online.
 
 ## Building the Solution (for on-premises SharePoint)
 
