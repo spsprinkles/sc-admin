@@ -1,5 +1,5 @@
 import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { Components, ContextInfo, Helper, SPTypes, ThemeManager, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
@@ -1150,7 +1150,15 @@ class ListInfo {
                             name: "NewExperience",
                             label: "Modern"
                         }
-                    ]
+                    ],
+                    onControlRendered: (ctrl) => {
+                        // Add the dark class if theme is inverted
+                        if (ThemeManager.IsInverted) {
+                            ctrl.el.querySelectorAll("div.form-check.form-switch input[type=checkbox].form-check-input").forEach((el: HTMLElement) => {
+                                el.classList.add("dark");
+                            });
+                        }
+                    }
                 } as Components.IFormControlPropsSwitch
             ]
         });
