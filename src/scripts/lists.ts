@@ -69,13 +69,13 @@ class ListInfo {
                     let listExperience = "";
                     switch (list.ListExperienceOptions) {
                         case SPTypes.ListExperienceOptions.Auto:
-                            listExperience = "Default for site"
+                            listExperience = "Default experience for the site"
                             break;
                         case SPTypes.ListExperienceOptions.ClassicExperience:
-                            listExperience = "Classic"
+                            listExperience = "Classic experience"
                             break;
                         case SPTypes.ListExperienceOptions.NewExperience:
-                            listExperience = "Modern"
+                            listExperience = "New experience"
                             break;
                     }
 
@@ -867,7 +867,7 @@ class ListInfo {
                                     }
                                 },
                                 {
-                                    content: "Update Experience",
+                                    content: "List Experience",
                                     btnProps: {
                                         className: "pe-2 py-1",
                                         iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
@@ -981,7 +981,7 @@ class ListInfo {
                                 // Update the validation
                                 ctrl.updateValidation(ctrl.el, {
                                     isValid: false,
-                                    invalidMessage: "Error updating the list."
+                                    invalidMessage: "Error updating the list"
                                 });
 
                                 // Hide the loading dialog
@@ -1120,17 +1120,17 @@ class ListInfo {
         CanvasForm.setAutoClose(false);
 
         // Set the header
-        CanvasForm.setHeader("List Experience");
+        CanvasForm.setHeader("List Experience: " + listInfo.ListName);
 
         // Set the body
         let form = Components.Form({
             el: CanvasForm.BodyElement,
             controls: [
                 {
-                    label: "List Experience",
+                    label: "Display this list using the new or classic experience?",
                     name: "ListExperience",
                     className: "mb-3",
-                    errorMessage: "A selection a required.",
+                    errorMessage: "A selection a required",
                     required: true,
                     type: Components.FormControlTypes.Switch,
                     value: listInfo.ListExperience,
@@ -1138,17 +1138,17 @@ class ListInfo {
                         {
                             data: SPTypes.ListExperienceOptions.Auto,
                             name: "Auto",
-                            label: "Default for site"
-                        },
-                        {
-                            data: SPTypes.ListExperienceOptions.ClassicExperience,
-                            name: "ClassicExperience",
-                            label: "Classic"
+                            label: "Default experience for the site"
                         },
                         {
                             data: SPTypes.ListExperienceOptions.NewExperience,
                             name: "NewExperience",
-                            label: "Modern"
+                            label: "New experience"
+                        },
+                        {
+                            data: SPTypes.ListExperienceOptions.ClassicExperience,
+                            name: "ClassicExperience",
+                            label: "Classic experience"
                         }
                     ],
                     onControlRendered: (ctrl) => {
@@ -1169,7 +1169,7 @@ class ListInfo {
             className: "float-end mt-3",
             tooltips: [
                 {
-                    content: "Updates the list experience",
+                    content: "Update the list experience",
                     btnProps: {
                         className: "pe-2 py-1",
                         iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
