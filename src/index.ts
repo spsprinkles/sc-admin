@@ -1,5 +1,5 @@
 import { LoadingDialog, waitForTheme } from "dattatable";
-import { ContextInfo } from "gd-sprest-bs";
+import { ContextInfo, ThemeManager } from "gd-sprest-bs";
 import { Configuration } from "./cfg";
 import { Dashboard } from "./dashboard";
 import Strings, { setContext } from "./strings";
@@ -53,6 +53,10 @@ const GlobalVariable = {
             // Hide the loading dialog
             LoadingDialog.hide();
         });
+    },
+    updateTheme: (themeInfo) => {
+        // Set the theme
+        ThemeManager.setCurrentTheme(themeInfo);
     },
     version: Strings.Version
 };

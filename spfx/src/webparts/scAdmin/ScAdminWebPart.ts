@@ -1,6 +1,7 @@
 import { Environment, Version } from '@microsoft/sp-core-library';
 import { IPropertyPaneConfiguration, PropertyPaneLabel, PropertyPaneSlider, PropertyPaneTextField } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart, WebPartContext } from '@microsoft/sp-webpart-base';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'ScAdminWebPartStrings';
 
 export interface IScAdminWebPartProps {
@@ -26,6 +27,7 @@ declare const SCAdmin: {
     timeFormat?: string;
     sourceUrl?: string;
   }) => void;
+  updateTheme: (currentTheme: Partial<IReadonlyTheme>) => void;
   version: string;
 };
 
@@ -60,6 +62,15 @@ export default class ScAdminWebPart extends BaseClientSideWebPart<IScAdminWebPar
 
     // Set the flag
     this._hasRendered = true;
+  }
+
+  protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
+    if (!currentTheme) {
+      return;
+    }
+
+    // Update the theme
+    SCAdmin.updateTheme(currentTheme);
   }
 
   protected get dataVersion(): Version {
