@@ -822,7 +822,7 @@ class ListInfo {
                                     content: "View List",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
@@ -869,8 +869,7 @@ class ListInfo {
                                 {
                                     content: "List Experience",
                                     btnProps: {
-                                        className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
+                                        iconType: GetIcon(24, 24, "TextBulletListSquare", "mx-1"),
                                         text: "Experience",
                                         type: Components.ButtonTypes.OutlineSecondary,
                                         onClick: () => {
@@ -1094,7 +1093,7 @@ class ListInfo {
                             btnView = btn;
                         },
                         className: "pe-2 py-1",
-                        iconType: GetIcon(24, 24, "EntryView", "mx-1"),
+                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                         text: "View",
                         type: Components.ButtonTypes.OutlinePrimary,
                         isDisabled: true,
@@ -1172,7 +1171,7 @@ class ListInfo {
                     content: "Update the list experience",
                     btnProps: {
                         className: "pe-2 py-1",
-                        iconType: GetIcon(24, 24, "ListExperience", "mx-1"),
+                        iconType: GetIcon(24, 24, "TextBulletListSquareEdit", "mx-1"),
                         text: "Update",
                         type: Components.ButtonTypes.OutlineSuccess,
                         onClick: () => {
