@@ -1,4 +1,4 @@
-import { Components, Types, Web } from "gd-sprest-bs";
+import { Components, ThemeManager, Types, Web } from "gd-sprest-bs";
 import { play } from "gd-sprest-bs/build/icons/svgs/play";
 import * as Scripts from "./scripts";
 import Strings from "./strings";
@@ -123,6 +123,7 @@ export class Dashboard {
                     let ddl = Components.Dropdown({
                         el: elDiv,
                         btnClassName: "py-2 w-100",
+                        isDark: ThemeManager.IsInverted,
                         items,
                         label: scripts.keys().next().value,
                         title: "Select a report to run",
@@ -138,6 +139,9 @@ export class Dashboard {
                             ttp.button.el.setAttribute("data-script", item.text);
                         }
                     });
+
+                    // Update the dropdown's tippy theme
+                    ddl.popover.tippy.setProps({ theme: 'light-border' });
 
                     // Render a tooltip
                     let ttp = Components.Tooltip({
@@ -176,7 +180,17 @@ export class Dashboard {
         let footer = document.createElement("div");
         footer.className = "d-flex justify-content-end pe-1";
         footer.id = "footer";
-        footer.innerHTML = `<label class="text-dark">v${Strings.Version}</label>`;
+        footer.innerHTML = `<label class="text-body">v${Strings.Version}</label>`;
         Strings.IsClassic ? this._el.appendChild(footer) : null;
+
+        // Update the dropdown theming style
+        let cssVar = "--bs-dropdown-toggle-img";
+        let ddlBtn = this._el.querySelector(".card .card-body .dropdown button.dropdown-toggle") as HTMLButtonElement;
+        let ddlImg = getComputedStyle(ddlBtn).getPropertyValue(cssVar);
+        let root = document.querySelector(':root') as HTMLElement;
+        let priColor = "%23" + root.style.getPropertyValue("--sp-theme-primary").slice(1);
+        let hovColor = "%23" + root.style.getPropertyValue("--sp-white").slice(1);
+
+        ddlImg ? ddlBtn.setAttribute("style", cssVar + ": " + ddlImg.replace("%230078d4", priColor) + "; " + cssVar + "-hover: " + ddlImg.replace("%230078d4", hovColor)) : null;
     }
 }
