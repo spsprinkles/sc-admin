@@ -94,7 +94,7 @@ class ListPermissions {
 
                     // Get the lists w/ broken inheritance
                     Web(web.ServerRelativeUrl).Lists().query({
-                        Filter: "HasUniqueRoleAssignments eq true",
+                        Filter: "Hidden eq false and HasUniqueRoleAssignments eq true",
                         Expand: ["RootFolder"],
                         Select: ["Id", "Title", "HasUniqueRoleAssignments", "RootFolder/ServerRelativeUrl"]
                     }).execute(lists => {
