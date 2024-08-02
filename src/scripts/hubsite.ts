@@ -3,7 +3,6 @@ import { Components, Helper, HubSites, Search, Types, Web } from "gd-sprest-bs";
 import { arrowClockwise } from "gd-sprest-bs/build/icons/svgs/arrowClockwise";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information

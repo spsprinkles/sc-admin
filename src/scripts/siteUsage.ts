@@ -2,7 +2,6 @@ import { DataTable, Modal } from "dattatable";
 import { Components, Helper, Types } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Sites } from "../common";
 import Strings from "../strings";
 

@@ -5,7 +5,6 @@ import { fileEarmarkArrowDown } from "gd-sprest-bs/build/icons/svgs/fileEarmarkA
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import * as jQuery from "jquery";
 import * as moment from "moment";
 import { ExportCSV, GetIcon, isWopi, IScript } from "../common";
 import Strings from "../strings";
