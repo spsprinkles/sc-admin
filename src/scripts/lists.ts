@@ -841,6 +841,12 @@ class ListInfo {
             ]
         });
 
+        // Create the results element
+        let elResults = document.createElement("div");
+        elResults.id = "results";
+        elResults.classList.add("mt-3");
+        CanvasForm.BodyElement.appendChild(elResults);
+
         // Add the disclaimer about not copying the content
         let disclaimer = document.createElement("p");
         disclaimer.className = "fst-italic mb-0 mt-3 small";
@@ -906,12 +912,6 @@ class ListInfo {
         elLog.classList.add("mt-3");
         elLog.classList.add("d-none");
         CanvasForm.BodyElement.appendChild(elLog);
-
-        // Create the results element
-        let elResults = document.createElement("div");
-        elResults.id = "results";
-        elResults.classList.add("mt-3");
-        CanvasForm.BodyElement.appendChild(elResults);
 
         // Show the canvas form
         CanvasForm.show();

@@ -36,9 +36,9 @@ export class CopyList {
                         // Validate the lookup fields
                         this.validateLookups(srcList.WebUrl, web.ServerRelativeUrl, srcList, listCfg.lookupFields).then(() => {
                             // Test the configuration
-                            this.installConfiguration(listCfg.cfg, web.ServerRelativeUrl, elLog).then(lists => {
+                            this.installConfiguration(listCfg.cfg, web.ServerRelativeUrl, elLog).then(list => {
                                 // Show the results
-                                this.renderResults(elResults, listCfg.cfg, web.ServerRelativeUrl, lists, true);
+                                this.renderResults(elResults, listCfg.cfg, web.ServerRelativeUrl, list);
 
                                 // Resolve the request
                                 resolve(strConfig);
@@ -60,8 +60,8 @@ export class CopyList {
         });
     }
 
-    // Method to create the lists
-    private static createLists(cfgProps: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List[]> {
+    // Method to create the list
+    private static createList(cfgProps: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List> {
         // Return a promise
         return new Promise((resolve, reject) => {
             // Set the log event
@@ -90,30 +90,16 @@ export class CopyList {
 
             // Install the solution
             cfg.install().then(() => {
-                let lists: List[] = [];
-
                 // Update the loading dialog
                 LoadingDialog.setBody("Validating the list(s)...");
 
-                // Parse the lists
-                Helper.Executor(cfgProps.ListCfg, listCfg => {
-                    // Return a promise
-                    return new Promise(resolve => {
-                        // Test the list
-                        this.testList(listCfg, webUrl).then(list => {
-                            // Append the list
-                            lists.push(list);
-
-                            // Check the next list
-                            resolve(null);
-                        });
-                    });
-                }).then(() => {
+                // Test the list
+                this.testList(cfgProps.ListCfg[0], webUrl).then(list => {
                     // Hide the log
                     elLog.classList.add("d-none");
 
                     // Resolve the request
-                    resolve(lists);
+                    resolve(list);
                 });
             }, reject);
         });
@@ -363,7 +349,7 @@ export class CopyList {
     }
 
     // Installs the configuration
-    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List[]> {
+    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List> {
         // Show a loading dialog
         LoadingDialog.setHeader("Creating the List");
         LoadingDialog.setBody("Initializing the request...");
@@ -372,35 +358,32 @@ export class CopyList {
         // Return a promise
         return new Promise((resolve, reject) => {
             // Create the list(s)
-            this.createLists(cfg, webUrl, elLog).then(lists => {
+            this.createList(cfg, webUrl, elLog).then(list => {
                 // Hide the dialog
                 LoadingDialog.hide();
 
                 // Resolve the request
-                resolve(lists);
+                resolve(list);
             }, reject);
         });
     }
 
     // Renders the results
-    static renderResults(el: HTMLElement, cfgProps: Helper.ISPConfigProps, webUrl: string, lists: List[], showDeleteFl: boolean = false) {
+    static renderResults(el: HTMLElement, cfgProps: Helper.ISPConfigProps, webUrl: string, list: List) {
         // Clear the element
         while (el.firstChild) { el.removeChild(el.firstChild); }
 
         // Set the body
         el.innerHTML = "<p>Click on the link(s) below to access the list settings for validation.</p>";
 
-        // Parse the lists
-        let items: Components.IListGroupItem[] = [];
-        for (let i = 0; i < lists.length; i++) {
-            let list = lists[i];
-
-            // Add the list links
-            items.push({
-                data: list,
-                onRender: (el, item) => {
-                    // Render the list view button
-                    Components.Button({
+        // Render the list group
+        Components.ListGroup({
+            el: CanvasForm.BodyElement,
+            isHorizontal: true,
+            items: [
+                {
+                    data: list,
+                    content: Components.Button({
                         el,
                         isSmall: true,
                         text: "View List",
@@ -409,61 +392,47 @@ export class CopyList {
                             // Go to the list
                             window.open(list.ListUrl, "_blank");
                         }
-                    });
-
-                    // Render the list settings button
-                    Components.Button({
+                    }).el
+                },
+                {
+                    data: list,
+                    content: Components.Button({
                         el,
                         className: "ms-2",
                         isSmall: true,
-                        text: "List Settings",
+                        text: "Settings",
                         type: Components.ButtonTypes.OutlinePrimary,
                         onClick: () => {
                             // Go to the list
                             window.open(list.ListSettingsUrl, "_blank");
                         }
-                    });
-                }
-            });
-        }
+                    }).el
+                },
+                {
+                    data: list,
+                    content: Components.Button({
+                        el,
+                        className: "ms-2",
+                        isSmall: true,
+                        text: "Delete List",
+                        type: Components.ButtonTypes.OutlineDanger,
+                        onClick: () => {
+                            // Show a loading dialog
+                            LoadingDialog.setHeader("Deleting List");
+                            LoadingDialog.setBody("This will close after the lists are removed...");
+                            LoadingDialog.show();
 
-        Components.ListGroup({
-            el: CanvasForm.BodyElement,
-            items
+                            // Uninstall the configuration
+                            Helper.SPConfig(cfgProps, webUrl).uninstall().then(() => {
+                                // Hide the dialogs
+                                LoadingDialog.hide();
+                                CanvasForm.hide();
+                            });
+                        }
+                    }).el
+                }
+            ]
         });
-
-        // See if we are deleting the list
-        if (showDeleteFl) {
-            // Add the footer
-            let footer = document.createElement("div");
-            footer.classList.add("d-flex");
-            footer.classList.add("justify-content-end");
-            footer.classList.add("mt-2");
-            CanvasForm.BodyElement.appendChild(footer);
-
-            // Render a delete button
-            Components.Tooltip({
-                el: footer,
-                content: "Click to delete the test lists.",
-                btnProps: {
-                    text: "Delete List",
-                    type: Components.ButtonTypes.OutlineDanger,
-                    onClick: () => {
-                        // Show a loading dialog
-                        LoadingDialog.setHeader("Deleting List");
-                        LoadingDialog.setBody("This will close after the lists are removed...");
-                        LoadingDialog.show();
-
-                        // Uninstall the configuration
-                        Helper.SPConfig(cfgProps, webUrl).uninstall().then(() => {
-                            // Hide the dialogs
-                            LoadingDialog.hide();
-                            CanvasForm.hide();
-                        });
-                    }
-                }
-            });
-        }
 
         // Show the modal
         CanvasForm.show();
