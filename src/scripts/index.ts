@@ -2,6 +2,7 @@ export * from "../common/exportCSV";
 export * from "./documentRetention";
 export * from "./externalUsers";
 export * from "./hubsite";
+export * from "./listPermissions";
 export * from "./lists";
 export * from "./searchDocs";
 export * from "./securityGroups";

@@ -74,6 +74,7 @@ export class Dashboard {
             [Scripts.ExternalUsersModal.name, Scripts.ExternalUsersModal],
             [Scripts.HubSiteInfoModal.name, Scripts.HubSiteInfoModal],
             [Scripts.ListInfoModal.name, Scripts.ListInfoModal],
+            [Scripts.ListPermissionsModal.name, Scripts.ListPermissionsModal],
             [Scripts.SecurityGroupsModal.name, Scripts.SecurityGroupsModal],
             [Scripts.SiteInfoModal.name, Scripts.SiteInfoModal],
             [Scripts.SiteUsageModal.name, Scripts.SiteUsageModal],
