@@ -7,7 +7,7 @@ import { IListInfo } from "./lists";
  */
 export class CopyList {
     // Method to create the list configuration
-    static createListConfiguration(el: HTMLElement, srcList: IListInfo, dstWebUrl: string, dstListName?: string): PromiseLike<string> {
+    static createListConfiguration(elResults: HTMLElement, elLog: HTMLElement, srcList: IListInfo, dstWebUrl: string, dstListName: string): PromiseLike<string> {
         // Show a loading dialog
         LoadingDialog.setHeader("Copying the List");
         LoadingDialog.setBody("Initializing the request...");
@@ -36,9 +36,9 @@ export class CopyList {
                         // Validate the lookup fields
                         this.validateLookups(srcList.WebUrl, web.ServerRelativeUrl, srcList, listCfg.lookupFields).then(() => {
                             // Test the configuration
-                            this.installConfiguration(listCfg.cfg, web.ServerRelativeUrl).then(lists => {
+                            this.installConfiguration(listCfg.cfg, web.ServerRelativeUrl, elLog).then(lists => {
                                 // Show the results
-                                this.renderResults(el, listCfg.cfg, web.ServerRelativeUrl, lists, true);
+                                this.renderResults(elResults, listCfg.cfg, web.ServerRelativeUrl, lists, true);
 
                                 // Resolve the request
                                 resolve(strConfig);
@@ -61,23 +61,26 @@ export class CopyList {
     }
 
     // Method to create the lists
-    private static createLists(cfgProps: Helper.ISPConfigProps, webUrl: string): PromiseLike<List[]> {
+    private static createLists(cfgProps: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
-            // Initialize the logging form
-            this.initLoggingForm();
-
             // Set the log event
             cfgProps.onLogMessage = msg => {
                 // Append the message
                 let elMessage = document.createElement("p");
                 elMessage.innerHTML = msg;
-                CanvasForm.BodyElement.appendChild(elMessage);
+                elLog.appendChild(elMessage);
 
                 // Focus on the message
                 elMessage.focus();
                 elMessage.scrollIntoView();
             };
+
+            // Clear the log
+            while (elLog.firstChild) { elLog.removeChild(elLog.firstChild); }
+
+            // Show the log
+            elLog.classList.remove("d-none");
 
             // Create the configuration
             let cfg = Helper.SPConfig(cfgProps, webUrl);
@@ -106,6 +109,9 @@ export class CopyList {
                         });
                     });
                 }).then(() => {
+                    // Hide the log
+                    elLog.classList.add("d-none");
+
                     // Resolve the request
                     resolve(lists);
                 });
@@ -356,23 +362,8 @@ export class CopyList {
         });
     }
 
-    // Initializes the logging form
-    private static initLoggingForm() {
-        // Clear the canvas form
-        CanvasForm.clear();
-
-        // Set the size
-        CanvasForm.setSize(Components.OffcanvasSize.Medium2);
-
-        // Set the header
-        CanvasForm.setHeader("Create List Logging");
-
-        // Show the logging
-        CanvasForm.show();
-    }
-
     // Installs the configuration
-    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string): PromiseLike<List[]> {
+    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List[]> {
         // Show a loading dialog
         LoadingDialog.setHeader("Creating the List");
         LoadingDialog.setBody("Initializing the request...");
@@ -381,7 +372,7 @@ export class CopyList {
         // Return a promise
         return new Promise((resolve, reject) => {
             // Create the list(s)
-            this.createLists(cfg, webUrl).then(lists => {
+            this.createLists(cfg, webUrl, elLog).then(lists => {
                 // Hide the dialog
                 LoadingDialog.hide();
 
@@ -412,7 +403,7 @@ export class CopyList {
                     Components.Button({
                         el,
                         isSmall: true,
-                        text: list.ListName,
+                        text: "View List",
                         type: Components.ButtonTypes.OutlinePrimary,
                         onClick: () => {
                             // Go to the list
@@ -423,6 +414,7 @@ export class CopyList {
                     // Render the list settings button
                     Components.Button({
                         el,
+                        className: "ms-2",
                         isSmall: true,
                         text: "List Settings",
                         type: Components.ButtonTypes.OutlinePrimary,
@@ -454,11 +446,11 @@ export class CopyList {
                 el: footer,
                 content: "Click to delete the test lists.",
                 btnProps: {
-                    text: "Delete Lists",
+                    text: "Delete List",
                     type: Components.ButtonTypes.OutlineDanger,
                     onClick: () => {
                         // Show a loading dialog
-                        LoadingDialog.setHeader("Deleteing List(s)");
+                        LoadingDialog.setHeader("Deleting List");
                         LoadingDialog.setBody("This will close after the lists are removed...");
                         LoadingDialog.show();
 

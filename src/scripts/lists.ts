@@ -867,13 +867,45 @@ class ListInfo {
                                 let dstWebUrl = formValues["WebUrl"];
 
                                 // Copy the list
-                                CopyList.createListConfiguration(elResults, listInfo, dstWebUrl, dstListName);
+                                CopyList.createListConfiguration(elResults, elLog, listInfo, dstWebUrl, dstListName).then(
+                                    // The list configuration as a JSON string
+                                    // We should allow the user to download it
+                                    cfg => {
+                                        // Ensure the control is valid
+                                        let ctrl = form.getControl("WebUrl");
+                                        ctrl.updateValidation(ctrl.el, {
+                                            isValid: true,
+                                            validMessage: "The list was copied successfully."
+                                        });
+                                    },
+                                    // Error
+                                    err => {
+                                        if (typeof (err) === "string") {
+                                            // Show the error message
+                                            let ctrl = form.getControl("WebUrl");
+                                            ctrl.updateValidation(ctrl.el, {
+                                                isValid: false,
+                                                invalidMessage: err
+                                            });
+
+                                            // Hide the loading dialog
+                                            LoadingDialog.hide();
+                                        }
+                                    }
+                                );
                             }
                         }
                     }
                 }
             ]
         });
+
+        // Create the log element
+        let elLog = document.createElement("div");
+        elLog.id = "log";
+        elLog.classList.add("mt-3");
+        elLog.classList.add("d-none");
+        CanvasForm.BodyElement.appendChild(elLog);
 
         // Create the results element
         let elResults = document.createElement("div");
