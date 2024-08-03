@@ -13,7 +13,7 @@ export interface IScAdminWebPartProps {
 }
 
 // Reference the solution
-import "../../../../dist/sc-admin.min.js";
+import "main-lib";
 declare const SCAdmin: {
   description: string;
   render: new (props: {

@@ -11,7 +11,12 @@
       ]
     }
   },
-  "externals": {},
+  "externals": {
+    "main-lib": {
+      "globalName": "main-lib",
+      "path": "../dist/sc-admin.min.js"
+    }
+  },
   "localizedResources": {
     "ScAdminWebPartStrings": "lib/webparts/scAdmin/loc/{locale}.js"
   }
