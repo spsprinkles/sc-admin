@@ -341,35 +341,20 @@ class DocumentSearch {
         new DataTable({
             el: elTable,
             rows: this._rows,
-            dtProps: {
-                dom: 'rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
-                columnDefs: [
+            onRendering: dtProps => {
+                dtProps.columnDefs = [
                     {
                         "targets": 8,
                         "orderable": false,
                         "searchable": false
                     }
-                ],
-                // Add some classes to the dataTable elements
-                createdRow: function (row, data, index) {
-                    jQuery('td', row).addClass('align-middle');
-                },
-                drawCallback: function (settings) {
-                    let api = new jQuery.fn.dataTable.Api(settings) as any;
-                    let div = api.table().container() as HTMLDivElement;
-                    let table = api.table().node() as HTMLTableElement;
-                    div.querySelector(".dataTables_info").classList.add("text-center");
-                    div.querySelector(".dataTables_length").classList.add("pt-2");
-                    div.querySelector(".dataTables_paginate").classList.add("pt-03");
-                    table.classList.remove("no-footer");
-                    table.classList.add("tbl-footer");
-                    table.classList.add("table-striped");
-                },
-                headerCallback: function (thead, data, start, end, display) {
-                    jQuery('th', thead).addClass('align-middle');
-                },
+                ];
+
                 // Order by the 4th column by default; ascending
-                order: [[3, "asc"]]
+                dtProps.order = [[3, "asc"]];
+
+                // Return the properties
+                return dtProps;
             },
             columns: [
                 {
