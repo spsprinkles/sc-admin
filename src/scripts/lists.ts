@@ -1,20 +1,13 @@
-import { CanvasForm, DataTable, List, LoadingDialog, Modal } from "dattatable";
+import { CanvasForm, DataTable, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, ThemeManager, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
+import { CopyList } from "./copyList";
 
-// List Settings
-interface IListSettings {
-    Description: string;
-    ListExperienceOptions: string;
-    Title: string;
-}
-
-// Row Information
-interface IRowInfo {
+// List Information
+export interface IListInfo {
     ListDescription: string;
     ListExperience: string;
     ListId: string;
@@ -26,6 +19,13 @@ interface IRowInfo {
     ListViewHiddenCount: number;
     WebTitle: string;
     WebUrl: string;
+}
+
+// List Settings
+interface IListSettings {
+    Description: string;
+    ListExperienceOptions: string;
+    Title: string;
 }
 
 // CSV Export Fields
@@ -45,7 +45,7 @@ const ScriptName = "List Information";
  */
 class ListInfo {
     private _errors: string[] = null;
-    private _rows: IRowInfo[] = null;
+    private _rows: IListInfo[] = null;
     private _urls: string[] = null;
 
     // Constructor
@@ -105,198 +105,6 @@ class ListInfo {
                 // Check the next site collection
                 resolve(null);
             });
-        });
-    }
-
-    // Copies a list
-    private copyList(listInfo: IRowInfo, form: Components.IForm): PromiseLike<string> {
-        return new Promise(resolve => {
-            // Show a loading Dialog
-            LoadingDialog.setHeader("Reading Target Web");
-            LoadingDialog.setBody("Getting the destination web information...");
-            LoadingDialog.show();
-
-            // Get the target web
-            let formValues = form.getValues();
-            let dstListName = formValues["ListName"];
-            let dstWebUrl = formValues["WebUrl"];
-            Web(dstWebUrl).query({ Expand: ["EffectiveBasePermissions"] }).execute(
-                // Exists
-                (web) => {
-                    // Ensure the user doesn't have permission to manage lists
-                    if (!Helper.hasPermissions(web.EffectiveBasePermissions, [SPTypes.BasePermissionTypes.ManageLists])) {
-                        // Update the validation
-                        let ctrl = form.getControl("WebUrl");
-                        ctrl.updateValidation(ctrl.el, {
-                            isValid: false,
-                            invalidMessage: "You do not have permission to create lists on this web."
-                        });
-
-                        // Hide the loading dialog
-                        LoadingDialog.hide();
-                        return;
-                    }
-
-                    // Get the list information
-                    var list = new List({
-                        listName: formValues["ListName"],
-                        webUrl: listInfo.WebUrl,
-                        itemQuery: { Filter: "Id eq 0" },
-                        onInitError: () => {
-                            // Update the validation
-                            let ctrl = form.getControl("WebUrl");
-                            ctrl.updateValidation(ctrl.el, {
-                                isValid: false,
-                                invalidMessage: "Error loading the list information. Please check your permission to this list."
-                            });
-
-                            // Hide the loading dialog
-                            LoadingDialog.hide();
-                        },
-                        onInitialized: () => {
-                            // Update the loading dialog
-                            LoadingDialog.setHeader("Analyzing the List");
-                            LoadingDialog.setBody("Getting the list information...");
-
-                            // Create the configuration
-                            let cfgProps: Helper.ISPConfigProps = {
-                                ListCfg: [{
-                                    ListInformation: {
-                                        BaseTemplate: list.ListInfo.BaseTemplate,
-                                        Title: dstListName,
-                                        AllowContentTypes: list.ListInfo.AllowContentTypes,
-                                        Hidden: list.ListInfo.Hidden,
-                                        NoCrawl: list.ListInfo.NoCrawl
-                                    },
-                                    CustomFields: [],
-                                    ViewInformation: []
-                                }]
-                            };
-
-                            // Parse the content type fields
-                            let lookupFields: Types.SP.FieldLookup[] = [];
-                            for (let i = 0; i < list.ListContentTypes[0].Fields.results.length; i++) {
-                                let fldInfo = list.ListContentTypes[0].Fields.results[i];
-
-                                // Skip internal fields
-                                if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
-
-                                // See if this is a lookup field
-                                if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
-                                    // Add the field
-                                    lookupFields.push(fldInfo);
-                                }
-
-                                // Add the field information
-                                cfgProps.ListCfg[0].CustomFields.push({
-                                    name: fldInfo.InternalName,
-                                    schemaXml: fldInfo.SchemaXml
-                                });
-                            }
-
-                            // Parse the views
-                            for (let i = 0; i < list.ListViews.length; i++) {
-                                let viewInfo = list.ListViews[i];
-
-                                // Add the view
-                                cfgProps.ListCfg[0].ViewInformation.push({
-                                    Default: true,
-                                    ViewName: viewInfo.Title,
-                                    ViewFields: viewInfo.ViewFields.Items.results,
-                                    ViewQuery: viewInfo.ViewQuery
-                                });
-                            }
-
-                            // Update the loading dialog
-                            LoadingDialog.setHeader("Creating the List");
-                            LoadingDialog.setBody("Creating the destination list...");
-
-                            // Create the list
-                            let cfg = Helper.SPConfig(cfgProps);
-                            cfg.setWebUrl(web.ServerRelativeUrl);
-                            cfg.install().then(() => {
-                                // Update the loading dialog
-                                LoadingDialog.setHeader("Reading Destination Web");
-                                LoadingDialog.setBody("Getting the context information of the destination web...");
-
-                                // Get the digest value for the destination web
-                                ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
-                                    // Update the loading dialog
-                                    LoadingDialog.setHeader("Updating the List");
-                                    LoadingDialog.setBody("Updating the lookup field(s)...");
-
-                                    // Parse the lookup fields
-                                    Helper.Executor(lookupFields, lookupField => {
-                                        // Return a promise
-                                        return new Promise(resolve => {
-                                            // Get the lookup field source list
-                                            Web(listInfo.WebUrl).Lists().getById(lookupField.LookupList).execute(srcList => {
-                                                // Get the lookup list in the destination site
-                                                Web(web.ServerRelativeUrl).Lists(srcList.Title).execute(dstList => {
-                                                    // Update the field schema xml
-                                                    let fieldDef = lookupField.SchemaXml.replace(`List="${lookupField.LookupList}"`, `List="{${dstList.Id}}"`);
-                                                    Web(web.ServerRelativeUrl, {
-                                                        requestDigest: context.GetContextWebInformation.FormDigestValue
-                                                    }).Lists(list.ListInfo.Title).Fields(lookupField.InternalName).update({
-                                                        SchemaXml: fieldDef
-                                                    }).execute(() => {
-                                                        // Updated the lookup list
-                                                        console.log(`Updated the lookup field '${lookupField.InternalName}' in lookup list successfully.`);
-
-                                                        // Check the next field
-                                                        resolve(null);
-                                                    })
-                                                }, () => {
-                                                    // Error getting the lookup list
-                                                    console.error(`Error getting the lookup list '${lookupField.LookupList}' from web '${web.ServerRelativeUrl}'.`);
-
-                                                    // Check the next field
-                                                    resolve(null);
-                                                });
-                                            }, () => {
-                                                // Error getting the lookup list
-                                                console.error(`Error getting the lookup list '${lookupField.LookupList}' from web '${listInfo.WebUrl}'.`);
-
-                                                // Check the next field
-                                                resolve(null);
-                                            });
-                                        });
-                                    }).then(() => {
-                                        // Update the validation
-                                        let ctrl = form.getControl("WebUrl");
-                                        ctrl.updateValidation(ctrl.el, {
-                                            isValid: true,
-                                            validMessage: "The list was copied successfully to the destination url."
-                                        });
-
-                                        // Get the new list's url
-                                        Web(dstWebUrl).Lists(dstListName).RootFolder().execute(folder => {
-                                            // Hide the loading dialog
-                                            LoadingDialog.hide();
-
-                                            // Resolve the request
-                                            resolve(folder.ServerRelativeUrl)
-                                        });
-                                    });
-                                });
-                            });
-                        }
-                    });
-                },
-
-                // Doesn't exist
-                () => {
-                    // Update the validation
-                    let ctrl = form.getControl("WebUrl");
-                    ctrl.updateValidation(ctrl.el, {
-                        isValid: false,
-                        invalidMessage: "The target web doesn't exist, or you do not have access to it."
-                    });
-
-                    // Hide the loading dialog
-                    LoadingDialog.hide();
-                }
-            );
         });
     }
 
@@ -803,7 +611,7 @@ class ListInfo {
                     className: "text-end",
                     name: "",
                     title: "",
-                    onRenderCell: (el, col, row: IRowInfo) => {
+                    onRenderCell: (el, col, row: IListInfo) => {
                         let btnDelete: Components.IButton = null;
 
                         // Render the buttons
@@ -919,7 +727,7 @@ class ListInfo {
     }
 
     // Shows the copy list form
-    private showCopyListForm(listInfo: IRowInfo) {
+    private showCopyListForm(listInfo: IListInfo) {
         // Clear the canvas
         CanvasForm.clear();
 
@@ -962,6 +770,12 @@ class ListInfo {
             ]
         });
 
+        // Create the results element
+        let elResults = document.createElement("div");
+        elResults.id = "results";
+        elResults.classList.add("mt-3");
+        CanvasForm.BodyElement.appendChild(elResults);
+
         // Add the disclaimer about not copying the content
         let disclaimer = document.createElement("p");
         disclaimer.className = "fst-italic mb-0 mt-3 small";
@@ -969,8 +783,6 @@ class ListInfo {
         CanvasForm.BodyElement.appendChild(disclaimer);
 
         // Set the footer
-        let btnView: Components.IButton = null;
-        let newListUrl: string = null;
         Components.TooltipGroup({
             el: CanvasForm.BodyElement,
             className: "float-end mt-3",
@@ -983,49 +795,59 @@ class ListInfo {
                         text: "Copy",
                         type: Components.ButtonTypes.OutlineSuccess,
                         onClick: () => {
-                            // Disable the view button
-                            btnView.disable();
-
                             // Ensure the form is valid
                             if (form.isValid()) {
-                                // Copy the list
-                                this.copyList(listInfo, form).then(url => {
-                                    // Set the url
-                                    newListUrl = url;
+                                let formValues = form.getValues();
+                                let dstListName = formValues["ListName"];
+                                let dstWebUrl = formValues["WebUrl"];
 
-                                    // Enable the button
-                                    btnView.enable();
-                                });
+                                // Copy the list
+                                CopyList.createListConfiguration(elResults, elLog, listInfo, dstWebUrl, dstListName).then(
+                                    // The list configuration as a JSON string
+                                    // We should allow the user to download it
+                                    cfg => {
+                                        // Ensure the control is valid
+                                        let ctrl = form.getControl("WebUrl");
+                                        ctrl.updateValidation(ctrl.el, {
+                                            isValid: true,
+                                            validMessage: "The list was copied successfully."
+                                        });
+                                    },
+                                    // Error
+                                    err => {
+                                        if (typeof (err) === "string") {
+                                            // Show the error message
+                                            let ctrl = form.getControl("WebUrl");
+                                            ctrl.updateValidation(ctrl.el, {
+                                                isValid: false,
+                                                invalidMessage: err
+                                            });
+
+                                            // Hide the loading dialog
+                                            LoadingDialog.hide();
+                                        }
+                                    }
+                                );
                             }
-                        }
-                    }
-                },
-                {
-                    content: "View the new list",
-                    btnProps: {
-                        assignTo: btn => {
-                            btnView = btn;
-                        },
-                        className: "pe-2 py-1",
-                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
-                        text: "View",
-                        type: Components.ButtonTypes.OutlinePrimary,
-                        isDisabled: true,
-                        onClick: () => {
-                            // Show the list in a new tab
-                            newListUrl ? window.open(newListUrl, "_blank") : null;
                         }
                     }
                 }
             ]
         });
 
+        // Create the log element
+        let elLog = document.createElement("div");
+        elLog.id = "log";
+        elLog.classList.add("mt-3");
+        elLog.classList.add("d-none");
+        CanvasForm.BodyElement.appendChild(elLog);
+
         // Show the canvas form
         CanvasForm.show();
     }
 
     // Shows the list settings form
-    private showListSettingsForm(listInfo: IRowInfo) {
+    private showListSettingsForm(listInfo: IListInfo) {
         // Clear the canvas
         CanvasForm.clear();
 
@@ -1154,7 +976,7 @@ class ListInfo {
     }
 
     // Updates the list settings
-    private updateListSettings(listInfo: IRowInfo, values: IListSettings): PromiseLike<void> {
+    private updateListSettings(listInfo: IListInfo, values: IListSettings): PromiseLike<void> {
         // Return a promise
         return new Promise((resolve, reject) => {
             // Show a loading Dialog

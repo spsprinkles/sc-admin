@@ -3,7 +3,6 @@ import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
-import * as jQuery from "jquery";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
