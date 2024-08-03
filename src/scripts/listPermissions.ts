@@ -1,5 +1,6 @@
 import { DataTable, Documents, LoadingDialog, Modal } from "dattatable";
 import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
+import { cardList } from "gd-sprest-bs/build/icons/svgs/cardList";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
@@ -380,7 +381,9 @@ class ListPermissions {
                                     content: "Click to view the item properties.",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
+                                        iconClassName: "mx-1",
+                                        iconSize: 24,
+                                        iconType: cardList,
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
@@ -394,7 +397,7 @@ class ListPermissions {
                                     className: row.FileName ? "" : "d-none",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
+                                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                                         text: "File",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
