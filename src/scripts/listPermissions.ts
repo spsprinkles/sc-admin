@@ -1,24 +1,32 @@
-import { CanvasForm, DataTable, LoadingDialog, Modal } from "dattatable";
-import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
+import { DataTable, Documents, LoadingDialog, Modal } from "dattatable";
+import { Components, ContextInfo, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
-import { trash } from "gd-sprest-bs/build/icons/svgs/trash";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
 
 // Row Information
 interface IRowInfo {
-    Permissions: string;
+    FileName?: string;
+    FileUrl?: string;
     ItemId: number;
     ListName: string;
     ListType: number;
     ListUrl: string;
+    ListViewUrl: string;
+    RoleAssignmentId?: number;
+    SiteGroupId: number;
+    SiteGroupName: string;
+    SiteGroupPermission: string;
+    SiteGroupUrl?: string;
+    SiteGroupUsers?: string;
     WebTitle: string;
     WebUrl: string;
 }
 
 // CSV Export Fields
 const CSVExportFields = [
-    "WebTitle", "WebUrl", "ListType", "ListName", "ListUrl", "ItemId", "Permissions"
+    "WebTitle", "WebUrl", "ListType", "ListName", "ListUrl", "ItemId", "FileName", "FileUrl", "Permissions", "RoleAssignmentId",
+    "SiteGroupId", "SiteGroupName", "SiteGroupPermission", "SiteGroupUrl", "SiteGroupUsers"
 ];
 
 // Script Constants
@@ -45,31 +53,106 @@ class ListPermissions {
     }
 
     // Analyzes the list
-    private analyzeList(web: Types.SP.WebOData, list: Types.SP.ListOData) {
+    private analyzeList(context: Types.SP.ContextWebInformation, web: Types.SP.WebOData, list: Types.SP.ListOData): PromiseLike<void> {
         // Return a promise
         return new Promise(resolve => {
+            let Select = ["Id", "HasUniqueRoleAssignments"];
+
+            // See if this is a document library
+            if (list.BaseTemplate == SPTypes.ListTemplateType.DocumentLibrary || list.BaseTemplate == SPTypes.ListTemplateType.PageLibrary) {
+                // Get the file information
+                Select.push("FileLeafRef");
+                Select.push("FileRef");
+            }
+
             // Get the items where it has broken inheritance
             Web(web.ServerRelativeUrl).Lists(list.Title).Items().query({
                 GetAllItems: true,
-                Top: 5000,
-                Select: ["Id", "HasUniqueRoleAssignments"]
+                Select,
+                Top: 5000
             }).execute(items => {
+                // Create a batch job
+                let batch = Web(web.ServerRelativeUrl, { requestDigest: context.FormDigestValue }).Lists(list.Title);
+
                 // Parse the items
                 Helper.Executor(items.results, item => {
                     // See if this item doesn't have unique permissions
                     if (!item.HasUniqueRoleAssignments) { return; }
 
-                    // Log the result
-                    this._rows.push({
-                        ItemId: item.Id,
-                        ListName: list.Title,
-                        ListType: list.BaseTemplate,
-                        ListUrl: list.RootFolder.ServerRelativeUrl,
-                        Permissions: "",
-                        WebTitle: web.Title,
-                        WebUrl: web.ServerRelativeUrl
+                    // Get the permissions
+                    batch.Items(item.Id).RoleAssignments().query({
+                        Expand: [
+                            "Member/Users", "RoleDefinitionBindings"
+                        ]
+                    }).batch(roles => {
+                        // Parse the role assignments
+                        Helper.Executor(roles.results, roleAssignment => {
+                            // Parse the role definitions and create a list of permissions
+                            let roleDefinitions = [];
+                            for (let i = 0; i < roleAssignment.RoleDefinitionBindings.results.length; i++) {
+                                // Add the permission name
+                                roleDefinitions.push(roleAssignment.RoleDefinitionBindings.results[i].Name);
+                            }
+
+                            // See if this is a group
+                            if (roleAssignment.Member["Users"] != null) {
+                                let group: Types.SP.GroupOData = roleAssignment.Member as any;
+
+                                // Parse the users and create a list of members
+                                let members = [];
+                                for (let i = 0; i < group.Users.results.length; i++) {
+                                    let user = group.Users.results[i];
+
+                                    // Add the user information
+                                    members.push(user.Email || user.UserPrincipalName || user.Title);
+                                }
+
+                                // Add a row for this entry
+                                this._rows.push({
+                                    FileName: item["FileLeafRef"],
+                                    FileUrl: item["FileRef"],
+                                    ItemId: item.Id,
+                                    ListName: list.Title,
+                                    ListType: list.BaseTemplate,
+                                    ListUrl: list.RootFolder.ServerRelativeUrl,
+                                    ListViewUrl: list.DefaultDisplayFormUrl,
+                                    SiteGroupId: group.Id,
+                                    SiteGroupName: group.LoginName,
+                                    SiteGroupPermission: roleDefinitions.join(', '),
+                                    SiteGroupUrl: web.Url + "/_layouts/15/people.aspx?MembershipGroupId=" + group.Id,
+                                    SiteGroupUsers: members.join(', '),
+                                    WebTitle: web.Title,
+                                    WebUrl: web.Url
+                                });
+                            } else {
+                                let user: Types.SP.User = roleAssignment.Member as any;
+
+                                // Add a row for this entry
+                                this._rows.push({
+                                    FileName: item["FileLeafRef"],
+                                    FileUrl: item["FileRef"],
+                                    ItemId: item.Id,
+                                    ListName: list.Title,
+                                    ListType: list.BaseTemplate,
+                                    ListUrl: list.RootFolder.ServerRelativeUrl,
+                                    ListViewUrl: list.DefaultDisplayFormUrl,
+                                    RoleAssignmentId: roleAssignment.PrincipalId,
+                                    SiteGroupId: user.Id,
+                                    SiteGroupName: user.Email || user.UserPrincipalName || user.Title,
+                                    SiteGroupPermission: roleDefinitions.join(', '),
+                                    WebTitle: web.Title,
+                                    WebUrl: web.Url
+                                });
+                            }
+                        });
                     });
-                }).then(resolve);
+                }).then(() => {
+                    // Execute the batch job
+                    batch.execute(() => {
+                        // Resolve the request
+                        resolve();
+                    });
+                });
             });
         });
     }
@@ -92,17 +175,20 @@ class ListPermissions {
                     // Update the loading dialog
                     LoadingDialog.setBody(`Getting list information (${++counter} of ${webs.length})`);
 
-                    // Get the lists w/ broken inheritance
-                    Web(web.ServerRelativeUrl).Lists().query({
-                        Filter: "Hidden eq false and HasUniqueRoleAssignments eq true",
-                        Expand: ["RootFolder"],
-                        Select: ["Id", "Title", "HasUniqueRoleAssignments", "RootFolder/ServerRelativeUrl"]
-                    }).execute(lists => {
-                        // Parse the lists
-                        Helper.Executor(lists.results, list => {
-                            // Analyze the list
-                            return this.analyzeList(web, list);
-                        }).then(resolve);
+                    // Get the context for this web
+                    ContextInfo.getWeb(web.ServerRelativeUrl).execute(context => {
+                        // Get the lists w/ broken inheritance
+                        Web(web.ServerRelativeUrl).Lists().query({
+                            Filter: "Hidden eq false and HasUniqueRoleAssignments eq true",
+                            Expand: ["DefaultDisplayFormUrl", "DefaultViewFormUrl", "RootFolder"],
+                            Select: ["BaseTemplate", "Id", "Title", "HasUniqueRoleAssignments", "RootFolder/ServerRelativeUrl"]
+                        }).execute(lists => {
+                            // Parse the lists
+                            Helper.Executor(lists.results, list => {
+                                // Analyze the list
+                                return this.analyzeList(context.GetContextWebInformation, web, list);
+                            }).then(resolve);
+                        });
                     });
                 });
             }).then(() => {
@@ -260,16 +346,24 @@ class ListPermissions {
                     title: "List Name"
                 },
                 {
-                    name: "ListUrl",
-                    title: "List Url"
-                },
-                {
                     name: "ItemId",
                     title: "Item Id"
                 },
                 {
-                    name: "Permissions",
-                    title: "Permissions"
+                    name: "FileName",
+                    title: "File Name"
+                },
+                {
+                    name: "SiteGroupName",
+                    title: "Site Group"
+                },
+                {
+                    name: "SiteGroupPermission",
+                    title: "Permission"
+                },
+                {
+                    name: "SiteGroupUsers",
+                    title: "User(s)"
                 },
                 {
                     className: "text-end",
@@ -283,33 +377,45 @@ class ListPermissions {
                             el,
                             tooltips: [
                                 {
-                                    content: "View Site",
+                                    content: "Click to view the item properties.",
                                     btnProps: {
                                         className: "pe-2 py-1",
-                                        iconType: GetIcon(24, 24, "LiveSite", "mx-1"),
+                                        iconType: GetIcon(24, 24, "CustomList", "mx-1"),
                                         text: "View",
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
                                             // Show the security group
-                                            window.open(row.WebUrl, "_blank");
+                                            window.open(row.ListViewUrl + "?Id=" + row.ItemId, "_blank");
                                         }
                                     }
                                 },
                                 {
-                                    content: "Delete Site",
+                                    content: "Click to view the file.",
+                                    className: row.FileName ? "" : "d-none",
+                                    btnProps: {
+                                        className: "pe-2 py-1",
+                                        iconType: GetIcon(24, 24, "ExcelDocument", "mx-1"),
+                                        text: "File",
+                                        type: Components.ButtonTypes.OutlinePrimary,
+                                        onClick: () => {
+                                            // Open the document in view mode
+                                            Documents.open(row.FileUrl, false, row.WebUrl);
+                                        }
+                                    }
+                                },
+                                {
+                                    content: "Click to restore permissions to inherit.",
                                     btnProps: {
                                         assignTo: btn => { btnDelete = btn; },
                                         className: "pe-2 py-1",
-                                        iconClassName: "mx-1",
-                                        iconType: trash,
-                                        iconSize: 24,
-                                        text: "Delete",
-                                        type: Components.ButtonTypes.OutlineDanger,
+                                        iconType: GetIcon(24, 24, "PeopleTeamDelete", "mx-1"),
+                                        text: "Restore",
+                                        type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
                                             // Confirm the deletion of the group
-                                            if (confirm("Are you sure you want to delete this web?")) {
-                                                // Disable this button
-                                                btnDelete.disable();
+                                            if (confirm("Are you sure you restore the permissions to inherit?")) {
+                                                // Revert the permissions
+                                                this.revertPermissions(row);
                                             }
                                         }
                                     }
@@ -360,6 +466,24 @@ class ListPermissions {
 
         // Show the modal
         Modal.show();
+    }
+
+    // Reverts the item permissions
+    private revertPermissions(row: IRowInfo) {
+        // Show a loading dialog
+        LoadingDialog.setHeader("Restoring Permissions");
+        LoadingDialog.setBody("This window will close after the item permissions are restored...");
+        LoadingDialog.show();
+
+        // Get the context
+        ContextInfo.getWeb(row.WebUrl).execute(context => {
+            // Restore the permissions
+            Web(context.GetContextWebInformation.WebFullUrl, { requestDigest: context.GetContextWebInformation.FormDigestValue })
+                .Lists(row.ListName).Items(row.ItemId).resetRoleInheritance().execute(() => {
+                    // Close the loading dialog
+                    LoadingDialog.hide();
+                });
+        });
     }
 }
 
