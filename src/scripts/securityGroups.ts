@@ -293,6 +293,7 @@ class SecurityGroups {
 
         // Render the table
         let elTable = document.createElement("div");
+        Modal.setBody(elTable);
         new DataTable({
             el: elTable,
             rows: this._rows,
@@ -408,9 +409,6 @@ class SecurityGroups {
                 }
             ]
         });
-
-        // Set the body
-        Modal.setBody(elTable)
 
         // Set the footer
         Modal.setFooter(Components.TooltipGroup({
