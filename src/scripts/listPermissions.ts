@@ -389,7 +389,7 @@ class ListPermissions {
                                         type: Components.ButtonTypes.OutlinePrimary,
                                         onClick: () => {
                                             // Show the security group
-                                            window.open(row.ListViewUrl + "?Id=" + row.ItemId, "_blank");
+                                            window.open(row.ListViewUrl + "?ID=" + row.ItemId, "_blank");
                                         }
                                     }
                                 },
