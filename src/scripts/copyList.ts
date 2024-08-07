@@ -217,6 +217,9 @@ export class CopyList {
                     for (let i = 0; i < list.ListViews.length; i++) {
                         let viewInfo = list.ListViews[i];
 
+                        // Skip hidden views
+                        if (viewInfo.Hidden) { continue; }
+
                         // Parse the fields
                         for (let j = 0; j < viewInfo.ViewFields.Items.results.length; j++) {
                             let field = list.getField(viewInfo.ViewFields.Items.results[j]);
