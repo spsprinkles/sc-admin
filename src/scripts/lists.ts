@@ -800,9 +800,8 @@ class ListInfo {
                                 let dstWebUrl = formValues["WebUrl"];
 
                                 // Copy the list
-                                CopyList.createListConfiguration(elResults, elLog, listInfo, dstWebUrl, dstListName).then(
+                                CopyList.createListConfiguration(elResults, listInfo, dstWebUrl, dstListName).then(
                                     // The list configuration as a JSON string
-                                    // We should allow the user to download it
                                     cfg => {
                                         // Ensure the control is valid
                                         let ctrl = form.getControl("WebUrl");
@@ -832,13 +831,6 @@ class ListInfo {
                 }
             ]
         });
-
-        // Create the log element
-        let elLog = document.createElement("div");
-        elLog.id = "log";
-        elLog.classList.add("mt-3");
-        elLog.classList.add("d-none");
-        CanvasForm.BodyElement.appendChild(elLog);
 
         // Show the canvas form
         CanvasForm.show();

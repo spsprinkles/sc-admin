@@ -7,7 +7,7 @@ import { IListInfo } from "./lists";
  */
 export class CopyList {
     // Method to create the list configuration
-    static createListConfiguration(elResults: HTMLElement, elLog: HTMLElement, srcList: IListInfo, dstWebUrl: string, dstListName: string): PromiseLike<string> {
+    static createListConfiguration(elResults: HTMLElement, srcList: IListInfo, dstWebUrl: string, dstListName: string): PromiseLike<string> {
         // Show a loading dialog
         LoadingDialog.setHeader("Copying the List");
         LoadingDialog.setBody("Initializing the request...");
@@ -43,6 +43,12 @@ export class CopyList {
                             srcListId: srcList.ListId,
                             srcWebUrl: srcList.WebUrl,
                         }).then((listCfg) => {
+                            // See if the destination list name exists
+                            if (dstListName) {
+                                // Set the destination list name
+                                listCfg.ListCfg[listCfg.ListCfg.length - 1].ListInformation.Title = dstListName;
+                            }
+
                             // Save a copy of the configuration
                             let strConfig = JSON.stringify(listCfg);
 
