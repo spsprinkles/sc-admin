@@ -3,6 +3,7 @@ import { Components, ContextInfo, Helper, Types, Web } from "gd-sprest-bs";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
+import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
@@ -50,7 +51,7 @@ class SiteUsers {
     private _urls: string[] = null;
 
     // Constructor
-    constructor(urls: string[] = []) {
+    constructor(urls: string[] = Strings.SiteUrls) {
         // Set the urls
         this._urls = urls;
 
@@ -325,14 +326,14 @@ class SiteUsers {
                                 let formValues = form.getValues();
                                 let userName: string = formValues["UserName"].trim();
                                 let user: Types.SP.User = formValues["PeoplePicker"][0];
-                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                                Strings.SiteUrls = formValues["Urls"].match(/[^\n]+/g);
 
                                 // Clear the data
                                 this._errors = [];
                                 this._rows = [];
 
                                 // Parse the webs
-                                Helper.Executor(webUrls, webUrl => {
+                                Helper.Executor(Strings.SiteUrls, webUrl => {
                                     // Return a promise
                                     return new Promise((resolve) => {
                                         // Get the webs

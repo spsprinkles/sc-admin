@@ -4,6 +4,9 @@ import * as Scripts from "./scripts";
 import Strings from "./strings";
 import { GetIcon, IScript } from "./common";
 
+/**
+ * Dashboard
+ */
 export class Dashboard {
     private _el: HTMLElement = null;
 

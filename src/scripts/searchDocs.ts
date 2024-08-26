@@ -44,7 +44,7 @@ class DocumentSearch {
     private _urls: string[] = null;
 
     // Constructor
-    constructor(urls: string[] = []) {
+    constructor(urls: string[] = Strings.SiteUrls) {
         // Set the urls
         this._urls = urls;
 
@@ -200,7 +200,7 @@ class DocumentSearch {
                             if (form.isValid()) {
                                 let formValues = form.getValues();
                                 let fileExtensions = formValues["FileTypes"].split(' ').join('", "');
-                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                                Strings.SiteUrls = formValues["Urls"].match(/[^\n]+/g);
 
                                 // Determine the query text/phrases to search for
                                 let searchTerms = formValues["SearchTerms"] || "";
@@ -246,7 +246,7 @@ class DocumentSearch {
                                 LoadingDialog.show();
 
                                 // Parse the webs
-                                Helper.Executor(webUrls, webUrl => {
+                                Helper.Executor(Strings.SiteUrls, webUrl => {
                                     // Return a promise
                                     return new Promise((resolve) => {
                                         // Update the dialog

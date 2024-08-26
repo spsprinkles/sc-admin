@@ -40,7 +40,7 @@ class SiteUsage {
     private _urls: string[] = null;
 
     // Constructor
-    constructor(urls: string[] = []) {
+    constructor(urls: string[] = Strings.SiteUrls) {
         // Set the urls
         this._urls = urls;
 
@@ -127,14 +127,14 @@ class SiteUsage {
                             // Ensure the form is valid
                             if (form.isValid()) {
                                 let formValues = form.getValues();
-                                let siteUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                                Strings.SiteUrls = formValues["Urls"].match(/[^\n]+/g);
 
                                 // Clear the data
                                 this._errors = [];
                                 this._rows = [];
 
                                 // Parse the webs
-                                Helper.Executor(siteUrls, siteUrl => {
+                                Helper.Executor(Strings.SiteUrls, siteUrl => {
                                     // Return a promise
                                     return new Promise((resolve) => {
                                         new Sites({

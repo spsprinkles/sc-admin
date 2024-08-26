@@ -24,8 +24,9 @@ const Strings = {
     SearchFileTypes: "csv doc docx dot dotx pdf pot potx pps ppsx ppt pptx txt xls xlsx xlt xltx",
     SearchMonths: 18,
     SearchTerms: "phi pii ssn",
+    SiteUrls: [],
     SourceUrl: ContextInfo.webServerRelativeUrl,
     TimeFormat: "YYYY-MMM-DD HH:mm:ss",
-    Version: "0.1.7"
+    Version: "0.1.8"
 };
 export default Strings;
