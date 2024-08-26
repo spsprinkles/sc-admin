@@ -1,4 +1,4 @@
-import { CanvasForm, List, LoadingDialog } from "dattatable";
+import { CanvasForm, ILookupData, List, ListConfig, LoadingDialog } from "dattatable";
 import { Components, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
 import { IListInfo } from "./lists";
 
@@ -29,19 +29,36 @@ export class CopyList {
                     }
 
                     // Generate the list configuration
-                    this.generateListConfiguration(srcList.WebUrl, srcList, dstListName).then(listCfg => {
-                        // Save a copy of the configuration
-                        let strConfig = JSON.stringify(listCfg.cfg);
-
+                    ListConfig.generate({
+                        showDialog: true,
+                        srcWebUrl: srcList.WebUrl,
+                        srcList: srcList.ListName
+                    }).then(srcListCfg => {
                         // Validate the lookup fields
-                        this.validateLookups(srcList.WebUrl, web.ServerRelativeUrl, srcList, listCfg.lookupFields).then(() => {
-                            // Test the configuration
-                            this.installConfiguration(listCfg.cfg, web.ServerRelativeUrl, elLog).then(list => {
-                                // Show the results
-                                this.renderResults(elResults, listCfg.cfg, web.ServerRelativeUrl, list);
+                        ListConfig.validateLookups({
+                            cfg: srcListCfg.cfg,
+                            dstUrl: web.ServerRelativeUrl,
+                            lookupFields: srcListCfg.lookupFields,
+                            showDialog: true,
+                            srcListId: srcList.ListId,
+                            srcWebUrl: srcList.WebUrl,
+                        }).then((listCfg) => {
+                            // Save a copy of the configuration
+                            let strConfig = JSON.stringify(listCfg);
 
-                                // Resolve the request
-                                resolve(strConfig);
+                            // Get the lookup list data
+                            this.getLookupData(true, srcList.WebUrl, srcList.ListId, srcListCfg.lookupFields).then(lookupData => {
+                                // Test the configuration
+                                this.installConfiguration(listCfg, web.ServerRelativeUrl, JSON.stringify(lookupData)).then(lists => {
+                                    // Hide the loading dialog
+                                    LoadingDialog.hide();
+
+                                    // Show the results
+                                    this.renderResults(elResults, listCfg, web.ServerRelativeUrl, lists);
+
+                                    // Resolve the request
+                                    resolve(strConfig);
+                                });
                             }, reject);
                         }, reject);
                     }, reject);
@@ -61,26 +78,24 @@ export class CopyList {
     }
 
     // Method to create the list
-    private static createList(cfgProps: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List> {
+    private static createLists(cfgProps: Helper.ISPConfigProps, webUrl: string, lookupData: ILookupData[]): PromiseLike<List[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
+            // Initialize the logging form
+            this.initLoggingForm();
+
             // Set the log event
-            cfgProps.onLogMessage = msg => {
+            cfgProps.onLogMessage = (msg, isError) => {
                 // Append the message
                 let elMessage = document.createElement("p");
                 elMessage.innerHTML = msg;
-                elLog.appendChild(elMessage);
+                isError ? elMessage.style.color = "red" : null;
+                CanvasForm.BodyElement.appendChild(elMessage);
 
                 // Focus on the message
                 elMessage.focus();
                 elMessage.scrollIntoView();
             };
-
-            // Clear the log
-            while (elLog.firstChild) { elLog.removeChild(elLog.firstChild); }
-
-            // Show the log
-            elLog.classList.remove("d-none");
 
             // Create the configuration
             let cfg = Helper.SPConfig(cfgProps, webUrl);
@@ -90,269 +105,79 @@ export class CopyList {
 
             // Install the solution
             cfg.install().then(() => {
+                let lists: List[] = [];
+
                 // Update the loading dialog
                 LoadingDialog.setBody("Validating the list(s)...");
 
-                // Test the list
-                this.testList(cfgProps.ListCfg[0], webUrl).then(list => {
-                    // Hide the log
-                    elLog.classList.add("d-none");
+                // Parse the lists
+                Helper.Executor(cfgProps.ListCfg, listCfg => {
+                    // Return a promise
+                    return new Promise(resolve => {
+                        // Test the list
+                        this.testList(listCfg, webUrl).then(list => {
+                            // Append the list
+                            lists.push(list);
 
-                    // Resolve the request
-                    resolve(list);
+                            // Check the next list
+                            resolve(null);
+                        });
+                    });
+                }).then(() => {
+                    // Create the lookup list data
+                    ListConfig.createLookupListData({
+                        lookupData,
+                        webUrl,
+                        showDialog: true
+                    }).then(() => {
+                        // Resolve the request
+                        resolve(lists);
+                    }, reject);
                 });
             }, reject);
         });
     }
 
-    // Generates the list configuration
-    private static generateListConfiguration(srcWebUrl: string, srcList: IListInfo, dstListName?: string): PromiseLike<{ cfg: Helper.ISPConfigProps, lookupFields: Types.SP.FieldLookup[] }> {
-        // Getting the source list information
-        LoadingDialog.setBody("Loading source list...");
-
+    // Gets the lookup data
+    private static getLookupData(includeLookupData: boolean, srcWebUrl: string, srcListId: string, lookupFields: Types.SP.FieldLookup[]): PromiseLike<ILookupData[]> {
         // Return a promise
         return new Promise((resolve, reject) => {
-            // Get the list information
-            var list = new List({
-                listName: srcList.ListName,
-                webUrl: srcWebUrl,
-                itemQuery: { Filter: "Id eq 0" },
-                onInitError: () => {
-                    // Reject the request
-                    reject("Error loading the list information. Please check your permission to the source list.");
-                },
-                onInitialized: () => {
-                    let calcFields: Types.SP.Field[] = [];
-                    let fields: { [key: string]: boolean } = {};
-                    let lookupFields: Types.SP.FieldLookup[] = [];
+            // See if we are not getting the lookup data
+            if (!includeLookupData) { resolve([]); return; }
 
-                    // Update the loading dialog
-                    LoadingDialog.setBody("Analyzing the list information...");
-
-                    // Create the configuration
-                    let cfgProps: Helper.ISPConfigProps = {
-                        ContentTypes: [],
-                        ListCfg: [{
-                            ListInformation: {
-                                AllowContentTypes: list.ListInfo.AllowContentTypes,
-                                BaseTemplate: list.ListInfo.BaseTemplate,
-                                ContentTypesEnabled: list.ListInfo.ContentTypesEnabled,
-                                Title: dstListName || srcList.ListName,
-                                Hidden: list.ListInfo.Hidden,
-                                NoCrawl: list.ListInfo.NoCrawl
-                            },
-                            ContentTypes: [],
-                            CustomFields: [],
-                            ViewInformation: []
-                        }]
-                    };
-
-                    // Parse the content types
-                    for (let i = 0; i < list.ListContentTypes.length; i++) {
-                        let ct = list.ListContentTypes[i];
-
-                        // Skip sealed content types
-                        if (ct.Sealed) { continue; }
-
-                        // Skip the internal content types
-                        if (ct.Name != "Document" && ct.Name != "Event" && ct.Name != "Item" && ct.Name != "Task") {
-                            // Add the content type
-                            cfgProps.ContentTypes.push({
-                                Name: ct.Name,
-                                ParentName: "Item"
-                            });
-                        }
-
-                        // Parse the content type fields
-                        let fieldRefs = [];
-                        for (let j = 0; j < ct.FieldLinks.results.length; j++) {
-                            let fldInfo: Types.SP.Field = list.getField(ct.FieldLinks.results[j].Name);
-
-                            // See if this is a lookup field
-                            if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
-                                // Ensure this isn't an associated lookup field
-                                if ((fldInfo as Types.SP.FieldLookup).IsDependentLookup != true) {
-                                    // Append the field ref
-                                    fieldRefs.push(fldInfo.InternalName);
-                                }
-                            } else {
-                                // Append the field ref
-                                fieldRefs.push(fldInfo.InternalName);
-                            }
-
-                            // Skip internal fields
-                            if (fldInfo.InternalName == "ContentType" || fldInfo.InternalName == "Title") { continue; }
-
-                            // See if this is a calculated field
-                            if (fldInfo.FieldTypeKind == SPTypes.FieldType.Calculated) {
-                                // Add the field and continue the loop
-                                calcFields.push(fldInfo);
-                            }
-                            // Else, see if this is a lookup field
-                            else if (fldInfo.FieldTypeKind == SPTypes.FieldType.Lookup) {
-                                // Add the field
-                                lookupFields.push(fldInfo);
-                            }
-                            // Else, ensure the field hasn't been added
-                            else if (fields[fldInfo.InternalName] == null) {
-                                // Add the field information
-                                fields[fldInfo.InternalName] = true;
-                                cfgProps.ListCfg[0].CustomFields.push({
-                                    name: fldInfo.InternalName,
-                                    schemaXml: fldInfo.SchemaXml
-                                });
-                            }
-                        }
-
-                        // Add the list content type
-                        cfgProps.ListCfg[0].ContentTypes.push({
-                            Name: ct.Name,
-                            Description: ct.Description,
-                            ParentName: ct.Name,
-                            FieldRefs: fieldRefs
-                        });
-                    }
-
-                    // Parse the views
-                    for (let i = 0; i < list.ListViews.length; i++) {
-                        let viewInfo = list.ListViews[i];
-
-                        // Skip hidden views
-                        if (viewInfo.Hidden) { continue; }
-
-                        // Parse the fields
-                        for (let j = 0; j < viewInfo.ViewFields.Items.results.length; j++) {
-                            let field = list.getField(viewInfo.ViewFields.Items.results[j]);
-
-                            // Ensure the field exists
-                            if (fields[field.InternalName] == null) {
-                                // See if this is a calculated field
-                                if (field.FieldTypeKind == SPTypes.FieldType.Calculated) {
-                                    // Add the field and continue the loop
-                                    calcFields.push(field);
-                                }
-                                // Else, see if this is a lookup field
-                                else if (field.FieldTypeKind == SPTypes.FieldType.Lookup) {
-                                    // Add the field
-                                    lookupFields.push(field);
-                                } else {
-                                    // Append the field
-                                    fields[field.InternalName] = true;
-                                    cfgProps.ListCfg[0].CustomFields.push({
-                                        name: field.InternalName,
-                                        schemaXml: field.SchemaXml
-                                    });
-                                }
-                            }
-                        }
-
-                        // Add the view
-                        cfgProps.ListCfg[0].ViewInformation.push({
-                            Default: viewInfo.DefaultView,
-                            Hidden: viewInfo.Hidden,
-                            JSLink: viewInfo.JSLink,
-                            MobileDefaultView: viewInfo.MobileDefaultView,
-                            MobileView: viewInfo.MobileView,
-                            RowLimit: viewInfo.RowLimit,
-                            Tabular: viewInfo.TabularView,
-                            ViewName: viewInfo.Title,
-                            ViewFields: viewInfo.ViewFields.Items.results,
-                            ViewQuery: viewInfo.ViewQuery
-                        });
-                    }
-
-                    // Update the loading dialog
-                    LoadingDialog.setBody("Analyzing the lookup fields...");
-
-                    // Parse the lookup fields
-                    Helper.Executor(lookupFields, lookupField => {
-                        // Skip the field, if it was already added
-                        if (fields[lookupField.InternalName]) { return; }
-
-                        // Return a promise
-                        return new Promise((resolve) => {
-                            // Get the lookup list
-                            Web(srcWebUrl).Lists().getById(lookupField.LookupList).execute(
-                                list => {
-                                    // Add the lookup list field
-                                    fields[lookupField.InternalName] = true;
-                                    cfgProps.ListCfg[0].CustomFields.push({
-                                        description: lookupField.Description,
-                                        fieldRef: lookupField.PrimaryFieldId,
-                                        hidden: lookupField.Hidden,
-                                        id: lookupField.Id,
-                                        indexed: lookupField.Indexed,
-                                        listName: list.Title,
-                                        multi: lookupField.AllowMultipleValues,
-                                        name: lookupField.InternalName,
-                                        readOnly: lookupField.ReadOnlyField,
-                                        relationshipBehavior: lookupField.RelationshipDeleteBehavior,
-                                        required: lookupField.Required,
-                                        showField: lookupField.LookupField,
-                                        title: lookupField.Title,
-                                        type: Helper.SPCfgFieldType.Lookup
-                                    } as Helper.IFieldInfoLookup);
-
-                                    // Check the next field
-                                    resolve(null);
-                                },
-
-                                err => {
-                                    // Broken lookup field, don't add it
-                                    console.log("Error trying to find lookup list for field '" + lookupField.InternalName + "' with id: " + lookupField.LookupList);
-                                    resolve(null);
-                                }
-                            )
-                        });
-                    }).then(() => {
-                        // Parse the calculated fields
-                        for (let i = 0; i < calcFields.length; i++) {
-                            let calcField = calcFields[i];
-
-                            if (fields[calcField.InternalName] == null) {
-                                let parser = new DOMParser();
-                                let schemaXml = parser.parseFromString(calcField.SchemaXml, "application/xml");
-
-                                // Get the formula
-                                let formula = schemaXml.querySelector("Formula");
-
-                                // Parse the field refs
-                                let fieldRefs = schemaXml.querySelectorAll("FieldRef");
-                                for (let j = 0; j < fieldRefs.length; j++) {
-                                    let fieldRef = fieldRefs[j].getAttribute("Name");
-
-                                    // Ensure the field exists
-                                    let field = list.getField(fieldRef);
-                                    if (field) {
-                                        // Calculated formulas are supposed to contain the display name
-                                        // Replace any instance of the internal field w/ the correct format
-                                        let regexp = new RegExp(fieldRef, "g");
-                                        formula.innerHTML = formula.innerHTML.replace(regexp, "[" + field.Title + "]");
-                                    }
-                                }
-
-                                // Append the field
-                                fields[calcField.InternalName] = true;
-                                cfgProps.ListCfg[0].CustomFields.push({
-                                    name: calcField.InternalName,
-                                    schemaXml: schemaXml.querySelector("Field").outerHTML
-                                });
-                            }
-                        }
-
-                        // Resolve the request
-                        resolve({
-                            cfg: cfgProps,
-                            lookupFields
-                        });
-                    });
-                }
-            });
+            // Get the lookup list data
+            ListConfig.generateLookupListData({
+                lookupFields,
+                srcListId,
+                srcWebUrl,
+                showDialog: true
+            }).then(lookupData => {
+                // Resolve the request
+                resolve(lookupData);
+            }, reject);
         });
     }
 
+    // Initializes the logging form
+    private static initLoggingForm() {
+        // Clear the canvas form
+        CanvasForm.clear();
+
+        // Disable auto-close
+        CanvasForm.setAutoClose(false);
+
+        // Set the size
+        CanvasForm.setSize(Components.OffcanvasSize.Medium2);
+
+        // Set the header
+        CanvasForm.setHeader("Create List Logging");
+
+        // Show the logging
+        CanvasForm.show();
+    }
+
     // Installs the configuration
-    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string, elLog: HTMLElement): PromiseLike<List> {
+    private static installConfiguration(cfg: Helper.ISPConfigProps, webUrl: string, strLookupData: string): PromiseLike<List[]> {
         // Show a loading dialog
         LoadingDialog.setHeader("Creating the List");
         LoadingDialog.setBody("Initializing the request...");
@@ -360,82 +185,106 @@ export class CopyList {
 
         // Return a promise
         return new Promise((resolve, reject) => {
+            // Try to convert the data
+            let lookupData: ILookupData[] = null;
+            try { lookupData = JSON.parse(strLookupData); }
+            catch { lookupData = []; }
+
             // Create the list(s)
-            this.createList(cfg, webUrl, elLog).then(list => {
+            this.createLists(cfg, webUrl, lookupData).then(lists => {
                 // Hide the dialog
                 LoadingDialog.hide();
 
                 // Resolve the request
-                resolve(list);
+                resolve(lists);
             }, reject);
         });
     }
 
     // Renders the results
-    static renderResults(el: HTMLElement, cfgProps: Helper.ISPConfigProps, webUrl: string, list: List) {
+    static renderResults(el: HTMLElement, cfgProps: Helper.ISPConfigProps, webUrl: string, lists: List[]) {
         // Clear the element
         while (el.firstChild) { el.removeChild(el.firstChild); }
 
         // Set the body
         el.innerHTML = "<p>Click on the link(s) below to access the list settings for validation.</p>";
 
+        // Parse the lists
+        let items: Components.IListGroupItem[] = [];
+        for (let i = 0; i < lists.length; i++) {
+            let list = lists[i];
+
+            // Create the list element
+            let elList = document.createElement("div");
+            elList.innerHTML = `<h6>${list.ListName}:</h6>`;
+
+            // Create the buttons
+            Components.ButtonGroup({
+                el: elList,
+                isSmall: true,
+                buttons: [
+                    {
+                        data: list,
+                        text: "View List",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: (button) => {
+                            // Go to the list
+                            window.open((button.data as List).ListUrl, "_blank");
+                        }
+                    },
+                    {
+                        data: list,
+                        text: "Settings",
+                        type: Components.ButtonTypes.OutlinePrimary,
+                        onClick: (button) => {
+                            // Go to the list
+                            window.open((button.data as List).ListSettingsUrl, "_blank");
+                        }
+                    }
+                ]
+            });
+
+            // Add the view list link
+            items.push({ content: elList });
+        }
+
         // Render the list group
         Components.ListGroup({
             el: CanvasForm.BodyElement,
-            isHorizontal: true,
-            items: [
-                {
-                    data: list,
-                    content: Components.Button({
-                        el,
-                        isSmall: true,
-                        text: "View List",
-                        type: Components.ButtonTypes.OutlinePrimary,
-                        onClick: () => {
-                            // Go to the list
-                            window.open(list.ListUrl, "_blank");
-                        }
-                    }).el
-                },
-                {
-                    data: list,
-                    content: Components.Button({
-                        el,
-                        className: "ms-2",
-                        isSmall: true,
-                        text: "Settings",
-                        type: Components.ButtonTypes.OutlinePrimary,
-                        onClick: () => {
-                            // Go to the list
-                            window.open(list.ListSettingsUrl, "_blank");
-                        }
-                    }).el
-                },
-                {
-                    data: list,
-                    content: Components.Button({
-                        el,
-                        className: "ms-2",
-                        isSmall: true,
-                        text: "Delete List",
-                        type: Components.ButtonTypes.OutlineDanger,
-                        onClick: () => {
-                            // Show a loading dialog
-                            LoadingDialog.setHeader("Deleting List");
-                            LoadingDialog.setBody("This will close after the lists are removed...");
-                            LoadingDialog.show();
+            items
+        });
 
-                            // Uninstall the configuration
-                            Helper.SPConfig(cfgProps, webUrl).uninstall().then(() => {
-                                // Hide the dialogs
-                                LoadingDialog.hide();
-                                CanvasForm.hide();
-                            });
-                        }
-                    }).el
+        // Render a button to close the form
+        Components.ButtonGroup({
+            el: CanvasForm.BodyElement,
+            buttons: [
+                {
+                    text: "Delete Lists",
+                    type: Components.ButtonTypes.OutlineDanger,
+                    onClick: () => {
+                        // Show a loading dialog
+                        LoadingDialog.setHeader("Deleting List");
+                        LoadingDialog.setBody("This will close after the lists are removed...");
+                        LoadingDialog.show();
+
+                        // Uninstall the configuration
+                        Helper.SPConfig(cfgProps, webUrl).uninstall().then(() => {
+                            // Hide the dialog and form
+                            LoadingDialog.hide();
+                            CanvasForm.hide();
+                        });
+                    }
+                },
+                {
+                    text: "Close",
+                    type: Components.ButtonTypes.OutlinePrimary,
+                    onClick: () => {
+                        // Close the form
+                        CanvasForm.hide();
+                    }
                 }
             ]
-        });
+        })
 
         // Show the modal
         CanvasForm.show();
@@ -457,31 +306,6 @@ export class CopyList {
                     resolve(list);
                 },
                 onInitError: reject
-            });
-        });
-    }
-
-    // Validates the lookup fields
-    private static validateLookups(srcUrl: string, dstUrl: string, srcList: IListInfo, lookups: Types.SP.FieldLookup[]) {
-        // Parse the lookup fields
-        return Helper.Executor(lookups, lookup => {
-            // Ensure this lookup isn't to the source list
-            if (lookup.LookupList?.indexOf(srcList.ListId) >= 0) { return; }
-
-            // Return a promise
-            return new Promise((resolve, reject) => {
-                // Get the source list
-                Web(srcUrl).Lists().getById(lookup.LookupList).execute(list => {
-                    // Ensure the list exists in the destination
-                    Web(dstUrl).Lists(list.Title).execute(resolve, () => {
-                        // Reject the reqeust
-                        reject("Lookup list for field '" + lookup.InternalName + "' does not exist in the configuration. Please add the lists in the appropriate order.");
-                    });
-
-                }, () => {
-                    // Reject the reqeust
-                    reject("Lookup list for field '" + lookup.InternalName + "' does not exist in the source web. Please review the source list for any issues.");
-                });
             });
         });
     }
