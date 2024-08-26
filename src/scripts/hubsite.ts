@@ -4,6 +4,7 @@ import { arrowClockwise } from "gd-sprest-bs/build/icons/svgs/arrowClockwise";
 import { search } from "gd-sprest-bs/build/icons/svgs/search";
 import { xSquare } from "gd-sprest-bs/build/icons/svgs/xSquare";
 import { ExportCSV, GetIcon, IScript, Webs } from "../common";
+import Strings from "../strings";
 
 // Row Information
 interface IRowInfo {
@@ -44,7 +45,7 @@ class HubSiteInfo {
     private _urls: string[] = null;
 
     // Constructor
-    constructor(urls: string[] = []) {
+    constructor(urls: string[] = Strings.SiteUrls) {
         // Set the urls
         this._urls = urls;
 
@@ -307,14 +308,14 @@ class HubSiteInfo {
                             // Ensure the form is valid
                             if (form.isValid()) {
                                 let formValues = form.getValues();
-                                let webUrls: string[] = formValues["Urls"].match(/[^\n]+/g);
+                                Strings.SiteUrls = formValues["Urls"].match(/[^\n]+/g);
 
                                 // Clear the data
                                 this._errors = [];
                                 this._rows = [];
 
                                 // Parse the webs
-                                Helper.Executor(webUrls, webUrl => {
+                                Helper.Executor(Strings.SiteUrls, webUrl => {
                                     // Return a promise
                                     return new Promise((resolve) => {
                                         new Webs({

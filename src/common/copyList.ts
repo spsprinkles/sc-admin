@@ -1,6 +1,6 @@
 import { CanvasForm, ILookupData, List, ListConfig, LoadingDialog } from "dattatable";
 import { Components, Helper, SPTypes, Types, Web } from "gd-sprest-bs";
-import { IListInfo } from "./lists";
+import { IListInfo } from "../scripts/lists";
 
 /**
  * Copy List
